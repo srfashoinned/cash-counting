@@ -1,343 +1,1683 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Cash Counter Ledger - Professional denomination-wise cash counting and ledger management" />
-  <meta name="theme-color" content="#0f172a" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Cash Ledger" />
-  <title>Cash Counter Ledger</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="icon" type="image/png" href="icons/icon-192.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Cash Counter Ledger - Professional cash management for businesses"/>
+<meta name="theme-color" content="#0f1117"/>
+<title>Cash Counter Ledger</title>
+
+<!-- PWA Manifest inline -->
+<script>
+// Inline manifest for PWA
+const manifestData = {
+  name: "Cash Counter Ledger",
+  short_name: "CashLedger",
+  description: "Professional cash denomination counter and ledger",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#0f1117",
+  theme_color: "#10b981",
+  icons: [
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230f1117'/><text y='130' x='30' font-size='120' font-family='serif'>₹</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230f1117'/><text y='360' x='60' font-size='340' font-family='serif' fill='%2310b981'>₹</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+const manifestUrl = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestUrl + '"/>');
+</script>
+
+<style>
+/* ============================================================
+   CASH COUNTER LEDGER — COMPLETE STYLES
+   ============================================================ */
+
+/* ---------- CSS Variables (Theme) ---------- */
+:root {
+  --font-main: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+
+  /* Dark theme (default) */
+  --bg-base:       #0f1117;
+  --bg-card:       #1a1d27;
+  --bg-card2:      #22263a;
+  --bg-input:      #0f1117;
+  --border:        #2e3250;
+  --accent:        #10b981;
+  --accent2:       #3b82f6;
+  --accent3:       #f59e0b;
+  --danger:        #ef4444;
+  --text-primary:  #f1f5f9;
+  --text-secondary:#94a3b8;
+  --text-muted:    #475569;
+  --shadow:        0 4px 32px rgba(0,0,0,0.5);
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.3);
+  --radius:        14px;
+  --radius-sm:     8px;
+  --glow:          0 0 20px rgba(16,185,129,0.15);
+  --transition:    0.2s ease;
+}
+
+[data-theme="light"] {
+  --bg-base:       #f0f4f8;
+  --bg-card:       #ffffff;
+  --bg-card2:      #f8fafc;
+  --bg-input:      #f1f5f9;
+  --border:        #e2e8f0;
+  --text-primary:  #0f172a;
+  --text-secondary:#475569;
+  --text-muted:    #94a3b8;
+  --shadow:        0 4px 32px rgba(0,0,0,0.08);
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.06);
+  --glow:          0 0 20px rgba(16,185,129,0.08);
+}
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  overflow-x: hidden;
+}
+
+/* ---------- Splash Screen ---------- */
+#splash {
+  position: fixed; inset: 0;
+  background: var(--bg-base);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+#splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-icon {
+  font-size: 72px;
+  animation: splashBounce 1s ease infinite alternate;
+}
+.splash-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-top: 16px;
+  letter-spacing: -0.5px;
+}
+.splash-sub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+.splash-bar {
+  width: 180px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: 32px;
+  overflow: hidden;
+}
+.splash-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 2px;
+  animation: progressFill 1.5s ease forwards;
+}
+@keyframes splashBounce { from{transform:translateY(0)} to{transform:translateY(-10px)} }
+@keyframes progressFill { from{width:0} to{width:100%} }
+
+/* ---------- Layout ---------- */
+#app { display: none; }
+#app.visible { display: block; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 58px;
+  box-shadow: var(--shadow-sm);
+}
+.topbar-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 18px; font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.3px;
+}
+.topbar-brand span { font-size: 24px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card2);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all var(--transition);
+}
+.icon-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+/* ---------- Bottom Nav ---------- */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  height: 62px;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px; cursor: pointer;
+  font-size: 10px; font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all var(--transition);
+  border: none; background: none;
+  padding: 0;
+}
+.nav-item .nav-icon { font-size: 20px; }
+.nav-item.active { color: var(--accent); }
+.nav-item:hover { color: var(--accent); }
+
+/* ---------- Pages ---------- */
+.page { display: none; padding: 16px 16px 80px; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 14px;
+}
+
+/* ---------- Dashboard Cards ---------- */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.stat-card.green::before { background: linear-gradient(90deg,var(--accent),#6ee7b7); }
+.stat-card.blue::before  { background: linear-gradient(90deg,var(--accent2),#93c5fd); }
+.stat-card.amber::before { background: linear-gradient(90deg,var(--accent3),#fcd34d); }
+.stat-card.red::before   { background: linear-gradient(90deg,var(--danger),#fca5a5); }
+
+.stat-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-size: 22px; font-weight: 800;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.stat-sub {
+  font-size: 11px; color: var(--text-secondary);
+  margin-top: 4px;
+}
+.stat-icon {
+  position: absolute; top: 14px; right: 14px;
+  font-size: 26px; opacity: 0.15;
+}
+
+/* ---------- Section Header ---------- */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 15px; font-weight: 700;
+  color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title span { font-size: 18px; }
+
+/* ---------- Denomination Cards ---------- */
+.denom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+@media (min-width: 480px) { .denom-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 700px) { .denom-grid { grid-template-columns: repeat(6, 1fr); } }
+
+.denom-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  text-align: center;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+.denom-card:hover { border-color: var(--accent); box-shadow: var(--glow); }
+.denom-card.has-value { border-color: var(--accent); background: var(--bg-card2); }
+
+.denom-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-size: 12px; font-weight: 800;
+  border-radius: 6px;
+  padding: 3px 8px;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+.denom-card.d20  .denom-badge { background: var(--accent2); }
+.denom-card.d50  .denom-badge { background: #8b5cf6; }
+.denom-card.d100 .denom-badge { background: var(--accent3); color: #1a1a1a; }
+.denom-card.d200 .denom-badge { background: #ec4899; }
+.denom-card.d500 .denom-badge { background: var(--danger); }
+
+.denom-input-wrap { position: relative; }
+.denom-input {
+  width: 100%; height: 44px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 18px; font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transition);
+  font-family: var(--font-mono);
+  -moz-appearance: textfield;
+}
+.denom-input::-webkit-inner-spin-button,
+.denom-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.denom-input:focus { border-color: var(--accent); }
+.denom-input::placeholder { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+
+.denom-label { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+.denom-subtotal {
+  font-size: 13px; font-weight: 700;
+  color: var(--accent);
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  min-height: 18px;
+}
+
+/* ---------- Sticky Totals ---------- */
+.sticky-totals {
+  position: sticky; top: 58px; z-index: 90;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.totals-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px;
+}
+.total-chip {
+  flex: 1; text-align: center;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 6px;
+}
+.total-chip-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); font-weight: 700; }
+.total-chip-value { font-size: 16px; font-weight: 800; color: var(--accent); font-family: var(--font-mono); margin-top: 3px; }
+.total-chip.grand .total-chip-value { color: var(--accent3); font-size: 18px; }
+.total-chip.notes .total-chip-value { color: var(--accent2); }
+
+/* ---------- Action Buttons ---------- */
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.btn {
+  height: 50px;
+  border-radius: var(--radius-sm);
+  border: none; cursor: pointer;
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 0.3px;
+  transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #059669);
+  color: white; box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+}
+.btn-primary:hover { box-shadow: 0 6px 24px rgba(16,185,129,0.45); filter: brightness(1.05); }
+.btn-secondary {
+  background: var(--bg-card2);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+.btn-danger {
+  background: var(--bg-card2);
+  color: var(--danger);
+  border: 1.5px solid var(--border);
+}
+.btn-danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
+.btn-full { grid-column: 1 / -1; }
+.btn-amber {
+  background: linear-gradient(135deg, var(--accent3), #d97706);
+  color: #1a1a1a;
+  box-shadow: 0 4px 16px rgba(245,158,11,0.3);
+}
+
+/* ---------- History ---------- */
+.search-bar {
+  display: flex; gap: 8px; margin-bottom: 12px;
+}
+.search-input {
+  flex: 1; height: 44px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  color: var(--text-primary);
+  font-size: 14px; outline: none;
+}
+.search-input:focus { border-color: var(--accent); }
+.date-filter {
+  height: 44px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  color: var(--text-primary);
+  font-size: 13px; outline: none;
+  cursor: pointer;
+}
+.date-filter:focus { border-color: var(--accent); }
+
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  animation: fadeIn 0.2s ease;
+  position: relative;
+}
+.history-item:hover { border-color: var(--border); box-shadow: var(--shadow-sm); }
+
+.hi-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 10px;
+}
+.hi-date { font-size: 12px; color: var(--text-muted); }
+.hi-amount { font-size: 20px; font-weight: 800; color: var(--accent); font-family: var(--font-mono); }
+.hi-notes-count { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+.hi-denoms {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin-bottom: 10px;
+}
+.hi-denom-chip {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 11px; font-weight: 600;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+.hi-denom-chip.active { border-color: var(--accent); color: var(--accent); }
+
+.hi-footer {
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+.hi-del-btn {
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px; font-size: 12px;
+  color: var(--danger); cursor: pointer;
+  transition: all var(--transition);
+}
+.hi-del-btn:hover { background: var(--danger); color: white; border-color: var(--danger); }
+
+.empty-state {
+  text-align: center; padding: 48px 20px;
+  color: var(--text-muted);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state p { font-size: 14px; }
+
+.daily-total-bar {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.dtb-date { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.dtb-total { font-size: 16px; font-weight: 800; color: var(--accent); font-family: var(--font-mono); }
+
+/* ---------- Reports ---------- */
+.report-options {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 14px;
+}
+.report-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 14px;
+  text-align: center; cursor: pointer;
+  transition: all var(--transition);
+}
+.report-card:hover { border-color: var(--accent); box-shadow: var(--glow); transform: translateY(-2px); }
+.report-card .rc-icon { font-size: 32px; margin-bottom: 10px; }
+.report-card .rc-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.report-card .rc-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+/* ---------- Toasts ---------- */
+#toast-container {
+  position: fixed; top: 70px; right: 16px;
+  z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+  animation: toastIn 0.3s ease;
+  min-width: 220px; max-width: 300px;
+}
+.toast.error { border-left-color: var(--danger); }
+.toast.warn  { border-left-color: var(--accent3); }
+@keyframes toastIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:none} }
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; visibility: hidden;
+  transition: all 0.2s ease;
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 100%; max-width: 400px;
+  box-shadow: var(--shadow);
+  transform: scale(0.95);
+  transition: transform 0.2s ease;
+}
+.modal-overlay.open .modal { transform: scale(1); }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 12px; }
+.modal-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-btn {
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  border: none; cursor: pointer; font-size: 14px; font-weight: 700;
+  transition: all var(--transition);
+}
+.modal-btn.cancel { background: var(--bg-card2); color: var(--text-secondary); border: 1px solid var(--border); }
+.modal-btn.confirm { background: var(--danger); color: white; }
+.modal-btn:hover { opacity: 0.85; }
+
+/* ---------- Badge / Tag ---------- */
+.badge {
+  display: inline-flex; align-items: center;
+  background: rgba(16,185,129,0.15);
+  color: var(--accent);
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+/* ---------- Note amount total summary in entry ---------- */
+.entry-summary {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.es-row {
+  display: flex; justify-content: space-between;
+  font-size: 13px; padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+.es-row:last-child { border-bottom: none; font-weight: 800; color: var(--accent); font-size: 15px; }
+.es-denom { color: var(--text-secondary); }
+.es-val { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
+
+/* ---------- Misc ---------- */
+.divider { height: 1px; background: var(--border); margin: 14px 0; }
+.text-sm { font-size: 13px; color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.mt-2 { margin-top: 8px; }
+.mb-2 { margin-bottom: 8px; }
+.bold { font-weight: 700; }
+.font-mono { font-family: var(--font-mono); }
+
+/* ---------- PRINT STYLES (A4 & Thermal 3") ---------- */
+@media print {
+  body { background: white !important; color: black !important; }
+  .topbar, .bottom-nav, .action-row, .report-options,
+  #toast-container, #splash, .no-print { display: none !important; }
+  .page { display: block !important; padding: 0; }
+  #page-reports { display: block !important; }
+
+  /* A4 print */
+  .print-a4 .print-area {
+    width: 210mm; margin: 0 auto;
+    padding: 15mm;
+    font-size: 11pt;
+  }
+
+  /* Thermal 3-inch (80mm) */
+  .print-thermal .print-area {
+    width: 80mm; margin: 0 auto;
+    padding: 4mm;
+    font-size: 8pt;
+  }
+}
+
+/* ---------- Print Preview Styles ---------- */
+.print-area {
+  background: white;
+  color: #111;
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-top: 14px;
+  font-family: var(--font-mono);
+}
+.pa-header { text-align: center; border-bottom: 2px solid #111; padding-bottom: 10px; margin-bottom: 10px; }
+.pa-shop { font-size: 18px; font-weight: 800; }
+.pa-title { font-size: 13px; font-weight: 600; margin-top: 4px; }
+.pa-date { font-size: 11px; color: #555; margin-top: 2px; }
+.pa-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
+.pa-table th { text-align: left; padding: 5px 4px; border-bottom: 1px solid #ccc; font-size: 11px; }
+.pa-table td { padding: 4px 4px; border-bottom: 1px dotted #eee; font-size: 12px; }
+.pa-total-row { font-weight: 800; font-size: 14px; border-top: 2px solid #111 !important; }
+.pa-footer { text-align: center; font-size: 10px; color: #888; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 8px; }
+
+/* Thermal specific - denser layout */
+.print-thermal .pa-shop { font-size: 14px; }
+.print-thermal .pa-table th,
+.print-thermal .pa-table td { padding: 2px 2px; font-size: 10px; }
+.print-thermal .pa-total-row { font-size: 12px; }
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ---------- Range Input ---------- */
+.note-label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+
+/* ---------- Undo snackbar ---------- */
+#undo-bar {
+  position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: var(--shadow);
+  opacity: 0; pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 200;
+  white-space: nowrap;
+}
+#undo-bar.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+#undo-bar button {
+  background: var(--accent); color: white;
+  border: none; border-radius: 20px;
+  padding: 4px 14px; font-size: 13px; font-weight: 700;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
 
-  <!-- Splash Screen -->
-  <div id="splash-screen" class="splash">
-    <div class="splash-inner">
-      <div class="splash-logo">
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <rect width="64" height="64" rx="16" fill="url(#splashGrad)"/>
-          <path d="M16 32h32M16 24h20M16 40h24" stroke="white" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="44" cy="40" r="8" fill="white" fill-opacity="0.2" stroke="white" stroke-width="2"/>
-          <path d="M44 37v3l2 2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-          <defs>
-            <linearGradient id="splashGrad" x1="0" y1="0" x2="64" y2="64">
-              <stop offset="0%" stop-color="#6366f1"/>
-              <stop offset="100%" stop-color="#22d3ee"/>
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-      <h1 class="splash-title">Cash Counter<br/>Ledger</h1>
-      <div class="splash-bar"><div class="splash-fill"></div></div>
+<!-- ===== SPLASH SCREEN ===== -->
+<div id="splash">
+  <div class="splash-icon">₹</div>
+  <div class="splash-title">Cash Counter Ledger</div>
+  <div class="splash-sub">Professional Cash Management</div>
+  <div class="splash-bar"><div class="splash-progress"></div></div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span>₹</span> Cash Ledger
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="theme-toggle" title="Toggle Theme" aria-label="Toggle theme">🌙</button>
+      <button class="icon-btn" id="install-btn" title="Install App" style="display:none" aria-label="Install app">📲</button>
     </div>
   </div>
 
-  <!-- App Shell -->
-  <div id="app" class="app hidden">
+  <!-- === PAGE: COUNTER === -->
+  <div class="page active" id="page-counter">
 
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="sidebar">
-      <div class="sidebar-logo">
-        <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
-          <rect width="64" height="64" rx="14" fill="url(#navGrad)"/>
-          <path d="M16 32h32M16 24h20M16 40h24" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
-          <circle cx="44" cy="40" r="8" fill="white" fill-opacity="0.2" stroke="white" stroke-width="2"/>
-          <path d="M44 37v3l2 2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-          <defs>
-            <linearGradient id="navGrad" x1="0" y1="0" x2="64" y2="64">
-              <stop offset="0%" stop-color="#6366f1"/>
-              <stop offset="100%" stop-color="#22d3ee"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span>Cash Ledger</span>
+    <!-- Sticky Totals -->
+    <div class="sticky-totals">
+      <div class="totals-row">
+        <div class="total-chip">
+          <div class="total-chip-label">Entry Total</div>
+          <div class="total-chip-value" id="entry-total-disp">₹0</div>
+        </div>
+        <div class="total-chip grand">
+          <div class="total-chip-label">Running Total</div>
+          <div class="total-chip-value" id="running-total-disp">₹0</div>
+        </div>
+        <div class="total-chip notes">
+          <div class="total-chip-label">Note Count</div>
+          <div class="total-chip-value" id="note-count-disp">0</div>
+        </div>
       </div>
-      <nav class="sidebar-nav">
-        <button class="nav-btn active" data-page="dashboard">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          Dashboard
-        </button>
-        <button class="nav-btn" data-page="entry">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-          Cash Entry
-        </button>
-        <button class="nav-btn" data-page="history">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m-3-10a9 9 0 110 18A9 9 0 0112 2z"/></svg>
-          History
-        </button>
-        <button class="nav-btn" data-page="reports">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          Reports
-        </button>
-      </nav>
-      <div class="sidebar-footer">
-        <button id="theme-toggle" class="theme-btn" title="Toggle Dark/Light Mode">
-          <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hidden"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-          <span id="theme-label">Light Mode</span>
-        </button>
-      </div>
-    </aside>
+    </div>
 
-    <!-- Mobile Header -->
-    <header class="mobile-header">
-      <button id="menu-toggle" class="menu-btn" aria-label="Toggle Menu">
-        <span></span><span></span><span></span>
+    <!-- Denomination Grid -->
+    <div class="section-header">
+      <div class="section-title"><span>💵</span> Enter Note Quantities</div>
+    </div>
+
+    <div class="denom-grid" id="denom-grid">
+      <!-- Generated by JS -->
+    </div>
+
+    <!-- Entry Summary -->
+    <div class="entry-summary" id="entry-summary" style="display:none">
+      <div id="summary-rows"></div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-row">
+      <button class="btn btn-primary btn-full" onclick="addToTotal()">
+        ✅ Add To Running Total
       </button>
-      <span class="mobile-title">Cash Counter Ledger</span>
-      <button id="mobile-theme-toggle" class="icon-btn" title="Toggle Theme">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </div>
+    <div class="action-row">
+      <button class="btn btn-secondary" onclick="resetCurrentEntry()">
+        🔄 Reset Entry
       </button>
-    </header>
+      <button class="btn btn-danger" onclick="confirmResetAll()">
+        🗑️ Reset All Data
+      </button>
+    </div>
 
-    <!-- Overlay for mobile sidebar -->
-    <div id="sidebar-overlay" class="overlay hidden"></div>
-
-    <!-- Main Content -->
-    <main id="main-content" class="main">
-
-      <!-- ============================
-           PAGE: DASHBOARD
-           ============================ -->
-      <section id="page-dashboard" class="page active">
-        <div class="page-header">
-          <h2 class="page-title">Dashboard</h2>
-          <p class="page-subtitle" id="dashboard-date">Loading...</p>
-        </div>
-
-        <!-- KPI Cards -->
-        <div class="kpi-grid">
-          <div class="kpi-card kpi-primary">
-            <div class="kpi-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-            </div>
-            <div class="kpi-body">
-              <span class="kpi-label">Total Cash in Ledger</span>
-              <span class="kpi-value" id="kpi-total">₹0</span>
-            </div>
-          </div>
-          <div class="kpi-card kpi-success">
-            <div class="kpi-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            <div class="kpi-body">
-              <span class="kpi-label">Today's Total</span>
-              <span class="kpi-value" id="kpi-today">₹0</span>
-            </div>
-          </div>
-          <div class="kpi-card kpi-info">
-            <div class="kpi-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-            </div>
-            <div class="kpi-body">
-              <span class="kpi-label">Total Entries</span>
-              <span class="kpi-value" id="kpi-entries">0</span>
-            </div>
-          </div>
-          <div class="kpi-card kpi-warning">
-            <div class="kpi-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div class="kpi-body">
-              <span class="kpi-label">Last Entry Time</span>
-              <span class="kpi-value kpi-small" id="kpi-last">—</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="section-header">
-          <h3>Quick Actions</h3>
-        </div>
-        <div class="quick-actions">
-          <button class="qa-btn" data-page="entry">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            New Cash Entry
-          </button>
-          <button class="qa-btn secondary" data-page="history">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
-            View History
-          </button>
-          <button class="qa-btn secondary" data-page="reports">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Reports & Export
-          </button>
-        </div>
-
-        <!-- Recent Entries -->
-        <div class="section-header">
-          <h3>Recent Entries</h3>
-        </div>
-        <div id="recent-entries" class="recent-list">
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M9 14l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.06 0 2.08.18 3.03.52"/><path d="M21 3l-9 9-3-3"/></svg>
-            <p>No entries yet. Start by adding cash!</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================
-           PAGE: CASH ENTRY
-           ============================ -->
-      <section id="page-entry" class="page">
-        <div class="page-header">
-          <h2 class="page-title">Cash Entry</h2>
-          <p class="page-subtitle">Enter denomination-wise note quantities</p>
-        </div>
-
-        <!-- Note entry field for description -->
-        <div class="entry-meta">
-          <label class="field-label" for="entry-note">Entry Note / Description</label>
-          <input type="text" id="entry-note" class="field-input" placeholder="e.g. Morning cash collection, Shop 1..." maxlength="100" />
-        </div>
-
-        <!-- Denomination Cards -->
-        <div class="denom-grid" id="denom-grid">
-          <!-- Generated by JS -->
-        </div>
-
-        <!-- Sticky Totals -->
-        <div class="totals-sticky" id="totals-sticky">
-          <div class="totals-row">
-            <div class="total-item">
-              <span class="total-label">Current Entry</span>
-              <span class="total-val" id="current-total">₹0</span>
-            </div>
-            <div class="total-item">
-              <span class="total-label">Total Notes</span>
-              <span class="total-val" id="total-notes">0</span>
-            </div>
-            <div class="total-item">
-              <span class="total-label">Running Total</span>
-              <span class="total-val highlight" id="running-total">₹0</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-btns">
-          <button id="btn-add" class="btn btn-primary" title="Add entry to ledger (Ctrl+Enter)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            Add To Ledger
-          </button>
-          <button id="btn-reset-entry" class="btn btn-secondary" title="Clear current entry">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-            Reset Entry
-          </button>
-          <button id="btn-undo" class="btn btn-ghost" title="Undo last added entry">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg>
-            Undo Last
-          </button>
-          <button id="btn-reset-all" class="btn btn-danger" title="Reset all data">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-            Reset All
-          </button>
-        </div>
-      </section>
-
-      <!-- ============================
-           PAGE: HISTORY
-           ============================ -->
-      <section id="page-history" class="page">
-        <div class="page-header">
-          <h2 class="page-title">Entry History</h2>
-          <p class="page-subtitle">Browse, filter and manage all ledger entries</p>
-        </div>
-
-        <!-- History Controls -->
-        <div class="history-controls">
-          <input type="search" id="history-search" class="field-input search-input" placeholder="🔍  Search entries..." />
-          <input type="date" id="history-date-filter" class="field-input date-input" title="Filter by date" />
-          <button id="btn-clear-filter" class="btn btn-ghost btn-sm">Clear Filter</button>
-        </div>
-
-        <!-- History Summary -->
-        <div class="history-summary" id="history-summary" style="display:none">
-          <span id="history-count">0 entries</span>
-          <span id="history-filtered-total"></span>
-        </div>
-
-        <!-- History List -->
-        <div id="history-list" class="history-list">
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M3 12a9 9 0 109-9"/><path d="M3 3v6h6"/><path d="M12 7v5l3 3"/></svg>
-            <p>No history yet. Add your first cash entry!</p>
-          </div>
-        </div>
-
-        <!-- Delete All -->
-        <div class="history-footer" id="history-footer" style="display:none">
-          <button id="btn-delete-all" class="btn btn-danger">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-            Delete All History
-          </button>
-        </div>
-      </section>
-
-      <!-- ============================
-           PAGE: REPORTS
-           ============================ -->
-      <section id="page-reports" class="page">
-        <div class="page-header">
-          <h2 class="page-title">Reports & Export</h2>
-          <p class="page-subtitle">Generate printable reports and export data</p>
-        </div>
-
-        <div class="report-controls">
-          <div class="report-date-range">
-            <label class="field-label">From Date</label>
-            <input type="date" id="report-from" class="field-input" />
-          </div>
-          <div class="report-date-range">
-            <label class="field-label">To Date</label>
-            <input type="date" id="report-to" class="field-input" />
-          </div>
-        </div>
-
-        <div class="export-btns">
-          <button id="btn-print" class="btn btn-primary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Print / Save PDF
-          </button>
-          <button id="btn-csv" class="btn btn-success">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            Export CSV
-          </button>
-        </div>
-
-        <!-- Report Preview -->
-        <div class="report-preview" id="report-preview">
-          <!-- Generated by JS -->
-        </div>
-      </section>
-
-    </main>
+    <!-- Note -->
+    <p class="text-sm text-muted mt-2">💡 Tip: Use Tab/Enter to jump between fields quickly.</p>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast-container" class="toast-container"></div>
+  <!-- === PAGE: DASHBOARD === -->
+  <div class="page" id="page-dashboard">
+    <div class="section-header">
+      <div class="section-title"><span>📊</span> Dashboard</div>
+      <span class="badge" id="last-updated-badge">Live</span>
+    </div>
 
-  <!-- Confirm Modal -->
-  <div id="confirm-modal" class="modal-overlay hidden">
-    <div class="modal">
-      <h3 id="modal-title">Confirm Action</h3>
-      <p id="modal-message">Are you sure?</p>
-      <div class="modal-actions">
-        <button id="modal-cancel" class="btn btn-ghost">Cancel</button>
-        <button id="modal-confirm" class="btn btn-danger">Confirm</button>
+    <div class="dash-grid">
+      <div class="stat-card green">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Total Cash</div>
+        <div class="stat-value" id="dash-total">₹0</div>
+        <div class="stat-sub">Running ledger total</div>
       </div>
+      <div class="stat-card blue">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">Today's Total</div>
+        <div class="stat-value" id="dash-today">₹0</div>
+        <div class="stat-sub" id="dash-today-date">—</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon">📋</div>
+        <div class="stat-label">Total Entries</div>
+        <div class="stat-value" id="dash-entries">0</div>
+        <div class="stat-sub">All time entries</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon">🕐</div>
+        <div class="stat-label">Last Entry</div>
+        <div class="stat-value" id="dash-last-time" style="font-size:14px">—</div>
+        <div class="stat-sub" id="dash-last-date">No entries yet</div>
+      </div>
+    </div>
+
+    <!-- Denomination breakdown of total -->
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px"><span>📈</span> Denomination Breakdown (All Time)</div>
+      <div id="dash-breakdown"></div>
+    </div>
+
+    <!-- Quick recent entries -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title"><span>🕐</span> Recent Entries</div>
+      </div>
+      <div id="dash-recent"></div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- === PAGE: HISTORY === -->
+  <div class="page" id="page-history">
+    <div class="section-header">
+      <div class="section-title"><span>📜</span> Entry History</div>
+      <button class="icon-btn" onclick="confirmClearAll()" title="Clear all history" style="color:var(--danger)">🗑️</button>
+    </div>
+
+    <div class="search-bar">
+      <input type="search" class="search-input" id="search-input" placeholder="🔍 Search entries..." oninput="renderHistory()" aria-label="Search history"/>
+      <input type="date" class="date-filter" id="date-filter" onchange="renderHistory()" aria-label="Filter by date"/>
+    </div>
+
+    <div id="daily-totals-section"></div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+
+  <!-- === PAGE: REPORTS === -->
+  <div class="page" id="page-reports">
+    <div class="section-header">
+      <div class="section-title"><span>📄</span> Reports</div>
+    </div>
+
+    <!-- Report Options -->
+    <div class="report-options">
+      <div class="report-card" onclick="generateReport('a4')">
+        <div class="rc-icon">🖨️</div>
+        <div class="rc-title">Print A4</div>
+        <div class="rc-sub">Full page report</div>
+      </div>
+      <div class="report-card" onclick="generateReport('thermal')">
+        <div class="rc-icon">🧾</div>
+        <div class="rc-title">Thermal 3"</div>
+        <div class="rc-sub">80mm receipt format</div>
+      </div>
+      <div class="report-card" onclick="exportCSV()">
+        <div class="rc-icon">📊</div>
+        <div class="rc-title">Export CSV</div>
+        <div class="rc-sub">Open in Excel</div>
+      </div>
+      <div class="report-card" onclick="shareBluetooth()">
+        <div class="rc-icon">🔵</div>
+        <div class="rc-title">Bluetooth Print</div>
+        <div class="rc-sub">ATPOS thermal</div>
+      </div>
+    </div>
+
+    <!-- Date range for report -->
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px"><span>📅</span> Report Period</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label class="note-label">From Date</label>
+          <input type="date" class="date-filter" id="report-from" style="width:100%" aria-label="Report from date"/>
+        </div>
+        <div>
+          <label class="note-label">To Date</label>
+          <input type="date" class="date-filter" id="report-to" style="width:100%" aria-label="Report to date"/>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="generateReport('a4')" style="width:100%">Generate & Preview Report</button>
+    </div>
+
+    <!-- Print Preview -->
+    <div id="print-preview-container" style="display:none">
+      <div class="section-header mt-2">
+        <div class="section-title"><span>👁️</span> Preview</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="window.print()" style="height:36px;font-size:12px;padding:0 12px">🖨️ Print</button>
+        </div>
+      </div>
+      <div id="print-preview-inner" class="print-area"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+    <button class="nav-item active" onclick="showPage('counter', this)" aria-label="Counter">
+      <span class="nav-icon">💵</span>
+      Counter
+    </button>
+    <button class="nav-item" onclick="showPage('dashboard', this)" aria-label="Dashboard">
+      <span class="nav-icon">📊</span>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('history', this)" aria-label="History">
+      <span class="nav-icon">📜</span>
+      History
+    </button>
+    <button class="nav-item" onclick="showPage('reports', this)" aria-label="Reports">
+      <span class="nav-icon">📄</span>
+      Reports
+    </button>
+  </nav>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- Undo Bar -->
+<div id="undo-bar">
+  ↩️ Entry added <button onclick="undoLastEntry()">Undo</button>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirm-modal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Are you sure?</div>
+    <div class="modal-text" id="modal-text">This action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn confirm" id="modal-confirm-btn" onclick="modalConfirmAction()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT — COMPLETE APP LOGIC
+     ============================================================ -->
+<script>
+'use strict';
+
+/* ============================================================
+   CONSTANTS & STATE
+   ============================================================ */
+const DENOMINATIONS = [10, 20, 50, 100, 200, 500];
+const DENOM_COLORS  = { 10:'d10', 20:'d20', 50:'d50', 100:'d100', 200:'d200', 500:'d500' };
+const LS = {
+  RUNNING_TOTAL : 'ccl_running_total',
+  HISTORY       : 'ccl_history',
+  THEME         : 'ccl_theme',
+  DENOM_TOTALS  : 'ccl_denom_totals',
+};
+
+// App state
+let state = {
+  currentEntry: {},       // { 10: qty, 20: qty, ... }
+  runningTotal: 0,        // ₹ amount
+  denomTotals: {},        // cumulative notes per denom
+  history: [],            // [ {id, ts, date, entry, total, notes} ]
+  undoBuffer: null,       // last added entry for undo
+  undoTimer: null,
+};
+
+// Modal callback
+let _modalAction = null;
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init() {
+  loadFromStorage();
+  buildDenomGrid();
+  renderDashboard();
+  renderHistory();
+  setTheme(localStorage.getItem(LS.THEME) || 'dark');
+  setDefaultDates();
+  registerServiceWorker();
+  initPWAInstall();
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hidden');
+    document.getElementById('app').classList.add('visible');
+  }, 1700);
+}
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+function loadFromStorage() {
+  state.runningTotal = parseFloat(localStorage.getItem(LS.RUNNING_TOTAL)) || 0;
+  state.history      = JSON.parse(localStorage.getItem(LS.HISTORY) || '[]');
+  state.denomTotals  = JSON.parse(localStorage.getItem(LS.DENOM_TOTALS) || '{}');
+  DENOMINATIONS.forEach(d => {
+    if (!state.denomTotals[d]) state.denomTotals[d] = 0;
+    state.currentEntry[d] = 0;
+  });
+}
+
+function saveToStorage() {
+  localStorage.setItem(LS.RUNNING_TOTAL, state.runningTotal);
+  localStorage.setItem(LS.HISTORY, JSON.stringify(state.history));
+  localStorage.setItem(LS.DENOM_TOTALS, JSON.stringify(state.denomTotals));
+}
+
+/* ============================================================
+   DENOMINATION GRID
+   ============================================================ */
+function buildDenomGrid() {
+  const grid = document.getElementById('denom-grid');
+  grid.innerHTML = DENOMINATIONS.map(d => `
+    <div class="denom-card ${DENOM_COLORS[d]}" id="dcard-${d}">
+      <div class="denom-badge">₹${d}</div>
+      <div class="denom-label">Quantity</div>
+      <div class="denom-input-wrap">
+        <input
+          type="number"
+          class="denom-input"
+          id="qty-${d}"
+          min="0"
+          placeholder="0"
+          inputmode="numeric"
+          aria-label="Quantity for ₹${d} notes"
+          onchange="updateEntry(${d})"
+          oninput="updateEntry(${d})"
+          onkeydown="handleDenomKey(event, ${d})"
+        />
+      </div>
+      <div class="denom-subtotal" id="sub-${d}"></div>
+    </div>
+  `).join('');
+}
+
+function handleDenomKey(e, denom) {
+  // Enter or Tab → jump to next denom input
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const idx = DENOMINATIONS.indexOf(denom);
+    const next = DENOMINATIONS[idx + 1];
+    if (next) document.getElementById(`qty-${next}`).focus();
+    else document.getElementById('qty-' + DENOMINATIONS[0]).blur();
+  }
+}
+
+function updateEntry(denom) {
+  const input = document.getElementById(`qty-${denom}`);
+  const qty   = Math.max(0, parseInt(input.value) || 0);
+  state.currentEntry[denom] = qty;
+
+  // Update card subtotal
+  const sub  = document.getElementById(`sub-${denom}`);
+  const card = document.getElementById(`dcard-${denom}`);
+  if (qty > 0) {
+    sub.textContent = `₹${fmt(qty * denom)}`;
+    card.classList.add('has-value');
+  } else {
+    sub.textContent = '';
+    card.classList.remove('has-value');
+  }
+
+  refreshDisplayTotals();
+  refreshEntrySummary();
+}
+
+function refreshDisplayTotals() {
+  const entryTotal = calcEntryTotal();
+  const noteCount  = DENOMINATIONS.reduce((s,d) => s + (state.currentEntry[d]||0), 0);
+  document.getElementById('entry-total-disp').textContent  = `₹${fmt(entryTotal)}`;
+  document.getElementById('running-total-disp').textContent = `₹${fmt(state.runningTotal)}`;
+  document.getElementById('note-count-disp').textContent   = noteCount;
+}
+
+function refreshEntrySummary() {
+  const summary = document.getElementById('entry-summary');
+  const rows    = document.getElementById('summary-rows');
+  const entryTotal = calcEntryTotal();
+
+  if (entryTotal === 0) { summary.style.display = 'none'; return; }
+  summary.style.display = 'block';
+
+  let html = '';
+  DENOMINATIONS.forEach(d => {
+    const qty = state.currentEntry[d] || 0;
+    if (qty > 0) {
+      html += `<div class="es-row">
+        <span class="es-denom">₹${d} × ${qty}</span>
+        <span class="es-val">₹${fmt(d * qty)}</span>
+      </div>`;
+    }
+  });
+  html += `<div class="es-row">
+    <span class="es-denom">TOTAL</span>
+    <span class="es-val">₹${fmt(entryTotal)}</span>
+  </div>`;
+  rows.innerHTML = html;
+}
+
+function calcEntryTotal() {
+  return DENOMINATIONS.reduce((s, d) => s + (state.currentEntry[d] || 0) * d, 0);
+}
+
+/* ============================================================
+   ADD TO TOTAL
+   ============================================================ */
+function addToTotal() {
+  const entryTotal = calcEntryTotal();
+  if (entryTotal === 0) {
+    showToast('⚠️ Please enter note quantities first', 'warn');
+    return;
+  }
+
+  // Save for undo
+  state.undoBuffer = {
+    entry: { ...state.currentEntry },
+    total: entryTotal,
+    prevRunning: state.runningTotal,
+    prevDenomTotals: { ...state.denomTotals },
+  };
+
+  // Add to running total
+  state.runningTotal += entryTotal;
+
+  // Update denom totals
+  DENOMINATIONS.forEach(d => {
+    state.denomTotals[d] = (state.denomTotals[d] || 0) + (state.currentEntry[d] || 0);
+  });
+
+  // Save to history
+  const now = new Date();
+  const histEntry = {
+    id    : Date.now(),
+    ts    : now.toISOString(),
+    date  : toDateStr(now),
+    time  : now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',hour12:true}),
+    entry : { ...state.currentEntry },
+    total : entryTotal,
+    notes : DENOMINATIONS.reduce((s,d) => s + (state.currentEntry[d]||0), 0),
+  };
+  state.history.unshift(histEntry);
+
+  saveToStorage();
+  resetCurrentEntry(false);
+  refreshDisplayTotals();
+  renderDashboard();
+  renderHistory();
+
+  showToast(`✅ ₹${fmt(entryTotal)} added to ledger!`);
+  vibrate([50, 30, 50]);
+  showUndoBar();
+}
+
+/* ============================================================
+   UNDO
+   ============================================================ */
+function showUndoBar() {
+  if (state.undoTimer) clearTimeout(state.undoTimer);
+  document.getElementById('undo-bar').classList.add('show');
+  state.undoTimer = setTimeout(() => {
+    document.getElementById('undo-bar').classList.remove('show');
+  }, 5000);
+}
+
+function undoLastEntry() {
+  if (!state.undoBuffer) return;
+  const buf = state.undoBuffer;
+  state.runningTotal = buf.prevRunning;
+  state.denomTotals  = { ...buf.prevDenomTotals };
+
+  // Remove last history entry
+  state.history.shift();
+  saveToStorage();
+  refreshDisplayTotals();
+  renderDashboard();
+  renderHistory();
+
+  // Restore inputs
+  DENOMINATIONS.forEach(d => {
+    const qty = buf.entry[d] || 0;
+    state.currentEntry[d] = qty;
+    const inp = document.getElementById(`qty-${d}`);
+    if (inp) inp.value = qty || '';
+    const sub  = document.getElementById(`sub-${d}`);
+    const card = document.getElementById(`dcard-${d}`);
+    if (qty > 0) {
+      sub.textContent = `₹${fmt(qty * d)}`;
+      card.classList.add('has-value');
+    } else {
+      sub.textContent = '';
+      card.classList.remove('has-value');
+    }
+  });
+  refreshDisplayTotals();
+  refreshEntrySummary();
+  state.undoBuffer = null;
+  document.getElementById('undo-bar').classList.remove('show');
+  showToast('↩️ Last entry undone');
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+function resetCurrentEntry(showMsg = true) {
+  DENOMINATIONS.forEach(d => {
+    state.currentEntry[d] = 0;
+    const inp = document.getElementById(`qty-${d}`);
+    if (inp) inp.value = '';
+    const sub  = document.getElementById(`sub-${d}`);
+    const card = document.getElementById(`dcard-${d}`);
+    if (sub)  sub.textContent = '';
+    if (card) card.classList.remove('has-value');
+  });
+  document.getElementById('entry-summary').style.display = 'none';
+  refreshDisplayTotals();
+  if (showMsg) showToast('🔄 Entry cleared');
+}
+
+function confirmResetAll() {
+  openModal(
+    '⚠️ Reset All Data?',
+    'This will permanently delete all ledger history and reset the running total to ₹0. This cannot be undone.',
+    'Reset Everything',
+    resetAllData
+  );
+}
+
+function resetAllData() {
+  state.runningTotal = 0;
+  state.history      = [];
+  state.denomTotals  = {};
+  DENOMINATIONS.forEach(d => state.denomTotals[d] = 0);
+  saveToStorage();
+  resetCurrentEntry(false);
+  refreshDisplayTotals();
+  renderDashboard();
+  renderHistory();
+  showToast('🗑️ All data has been reset', 'error');
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function renderDashboard() {
+  // Stats
+  document.getElementById('dash-total').textContent = `₹${fmt(state.runningTotal)}`;
+
+  const todayStr   = toDateStr(new Date());
+  const todayEnts  = state.history.filter(h => h.date === todayStr);
+  const todayTotal = todayEnts.reduce((s,h) => s + h.total, 0);
+  document.getElementById('dash-today').textContent    = `₹${fmt(todayTotal)}`;
+  document.getElementById('dash-today-date').textContent = fmtDate(new Date());
+  document.getElementById('dash-entries').textContent  = state.history.length;
+
+  if (state.history.length > 0) {
+    const last = state.history[0];
+    document.getElementById('dash-last-time').textContent = last.time;
+    document.getElementById('dash-last-date').textContent = fmtDate(new Date(last.ts));
+  }
+
+  // Denom breakdown
+  const breakdown = document.getElementById('dash-breakdown');
+  const maxVal = Math.max(...DENOMINATIONS.map(d => (state.denomTotals[d]||0)*d), 1);
+  breakdown.innerHTML = DENOMINATIONS.map(d => {
+    const qty  = state.denomTotals[d] || 0;
+    const val  = qty * d;
+    const pct  = Math.round((val / maxVal) * 100);
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+        <span style="font-weight:700">₹${d} × ${qty} notes</span>
+        <span class="font-mono" style="color:var(--accent)">₹${fmt(val)}</span>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 0.5s ease"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Recent entries (last 5)
+  const recent = document.getElementById('dash-recent');
+  if (state.history.length === 0) {
+    recent.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No entries yet</p></div>';
+    return;
+  }
+  recent.innerHTML = state.history.slice(0, 5).map(h => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px;font-weight:600">${h.date} · ${h.time}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${h.notes} notes</div>
+      </div>
+      <div style="font-size:16px;font-weight:800;color:var(--accent);font-family:var(--font-mono)">₹${fmt(h.total)}</div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   HISTORY
+   ============================================================ */
+function renderHistory() {
+  const search   = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const dateFilter = document.getElementById('date-filter')?.value || '';
+
+  let filtered = state.history.filter(h => {
+    const matchDate   = !dateFilter || h.date === dateFilter;
+    const matchSearch = !search    || h.date.includes(search) || String(h.total).includes(search);
+    return matchDate && matchSearch;
+  });
+
+  // Daily totals
+  const dailyTotSection = document.getElementById('daily-totals-section');
+  if (dateFilter) {
+    const dayTotal = filtered.reduce((s,h) => s + h.total, 0);
+    dailyTotSection.innerHTML = `
+      <div class="daily-total-bar">
+        <div class="dtb-date">📅 ${dateFilter}</div>
+        <div class="dtb-total">₹${fmt(dayTotal)}</div>
+      </div>`;
+  } else {
+    dailyTotSection.innerHTML = '';
+  }
+
+  const list = document.getElementById('history-list');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📜</div>
+      <p>${state.history.length === 0 ? 'No entries yet. Start counting cash!' : 'No entries match your search.'}</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(h => {
+    const chips = DENOMINATIONS.map(d => {
+      const qty = h.entry[d] || 0;
+      const active = qty > 0 ? 'active' : '';
+      return `<span class="hi-denom-chip ${active}">₹${d}×${qty}</span>`;
+    }).join('');
+
+    return `<div class="history-item">
+      <div class="hi-header">
+        <div>
+          <div class="hi-date">📅 ${h.date} · ⏰ ${h.time}</div>
+          <div class="hi-notes-count">${h.notes} notes</div>
+        </div>
+        <div style="text-align:right">
+          <div class="hi-amount">₹${fmt(h.total)}</div>
+        </div>
+      </div>
+      <div class="hi-denoms">${chips}</div>
+      <div class="hi-footer">
+        <button class="hi-del-btn" onclick="deleteHistoryEntry(${h.id})">🗑️ Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteHistoryEntry(id) {
+  const entry = state.history.find(h => h.id === id);
+  if (!entry) return;
+  openModal(
+    '🗑️ Delete Entry?',
+    `Delete entry of ₹${fmt(entry.total)} from ${entry.date}? The running total will be reduced by this amount.`,
+    'Delete',
+    () => {
+      state.runningTotal -= entry.total;
+      if (state.runningTotal < 0) state.runningTotal = 0;
+      // Subtract denom totals
+      DENOMINATIONS.forEach(d => {
+        state.denomTotals[d] = Math.max(0, (state.denomTotals[d]||0) - (entry.entry[d]||0));
+      });
+      state.history = state.history.filter(h => h.id !== id);
+      saveToStorage();
+      refreshDisplayTotals();
+      renderHistory();
+      renderDashboard();
+      showToast('🗑️ Entry deleted');
+    }
+  );
+}
+
+function confirmClearAll() {
+  if (state.history.length === 0) { showToast('No history to clear', 'warn'); return; }
+  openModal(
+    '🗑️ Clear All History?',
+    'This will delete all history entries but keep the running total intact.',
+    'Clear History',
+    () => {
+      state.history = [];
+      localStorage.setItem(LS.HISTORY, '[]');
+      renderHistory();
+      renderDashboard();
+      showToast('🗑️ History cleared');
+    }
+  );
+}
+
+/* ============================================================
+   REPORTS
+   ============================================================ */
+function setDefaultDates() {
+  const today = toDateStr(new Date());
+  const fromEl = document.getElementById('report-from');
+  const toEl   = document.getElementById('report-to');
+  if (fromEl) fromEl.value = today;
+  if (toEl)   toEl.value   = today;
+}
+
+function generateReport(type) {
+  const fromDate = document.getElementById('report-from')?.value || '';
+  const toDate   = document.getElementById('report-to')?.value   || '';
+
+  let filtered = state.history;
+  if (fromDate) filtered = filtered.filter(h => h.date >= fromDate);
+  if (toDate)   filtered = filtered.filter(h => h.date <= toDate);
+  filtered = filtered.slice().reverse(); // chronological
+
+  if (filtered.length === 0) {
+    showToast('⚠️ No entries in selected period', 'warn');
+    return;
+  }
+
+  const total      = filtered.reduce((s,h) => s + h.total, 0);
+  const totalNotes = filtered.reduce((s,h) => s + h.notes, 0);
+
+  // Build denomination totals for report
+  const reportDenomTotals = {};
+  DENOMINATIONS.forEach(d => reportDenomTotals[d] = 0);
+  filtered.forEach(h => DENOMINATIONS.forEach(d => { reportDenomTotals[d] += (h.entry[d]||0); }));
+
+  const periodLabel = fromDate === toDate
+    ? `Date: ${fromDate}`
+    : `Period: ${fromDate} to ${toDate}`;
+
+  const isThermal = type === 'thermal';
+  const shopName  = 'Cash Counter Ledger';
+  const genTime   = new Date().toLocaleString('en-IN');
+
+  let entriesHTML = '';
+  if (!isThermal) {
+    // A4: full table
+    entriesHTML = `
+      <table class="pa-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Date</th><th>Time</th>
+            ${DENOMINATIONS.map(d=>`<th>₹${d}</th>`).join('')}
+            <th>Notes</th><th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map((h,i) => `
+            <tr>
+              <td>${i+1}</td><td>${h.date}</td><td>${h.time}</td>
+              ${DENOMINATIONS.map(d=>`<td>${h.entry[d]||0}</td>`).join('')}
+              <td>${h.notes}</td><td style="font-weight:700">₹${fmt(h.total)}</td>
+            </tr>
+          `).join('')}
+          <tr class="pa-total-row">
+            <td colspan="3"><strong>TOTAL</strong></td>
+            ${DENOMINATIONS.map(d=>`<td><strong>${reportDenomTotals[d]}</strong></td>`).join('')}
+            <td><strong>${totalNotes}</strong></td>
+            <td><strong>₹${fmt(total)}</strong></td>
+          </tr>
+        </tbody>
+      </table>`;
+  } else {
+    // Thermal: compact receipt
+    entriesHTML = `
+      <table class="pa-table">
+        <thead><tr><th>Denom</th><th>Qty</th><th>Amount</th></tr></thead>
+        <tbody>
+          ${DENOMINATIONS.map(d => reportDenomTotals[d] > 0 ? `
+            <tr>
+              <td>₹${d}</td>
+              <td>${reportDenomTotals[d]}</td>
+              <td>₹${fmt(reportDenomTotals[d]*d)}</td>
+            </tr>` : '').join('')}
+          <tr class="pa-total-row">
+            <td colspan="2"><strong>TOTAL</strong></td>
+            <td><strong>₹${fmt(total)}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:8px;font-size:10px">
+        <div>Entries: ${filtered.length} | Notes: ${totalNotes}</div>
+      </div>`;
+  }
+
+  const html = `
+    <div class="pa-header">
+      <div class="pa-shop">${shopName}</div>
+      <div class="pa-title">Cash Denomination Report</div>
+      <div class="pa-date">${periodLabel}</div>
+      <div class="pa-date">Generated: ${genTime}</div>
+    </div>
+    ${entriesHTML}
+    <div class="pa-footer">
+      Total Cash: ₹${fmt(total)} | Entries: ${filtered.length}
+      <br>Cash Counter Ledger · Printed ${new Date().toLocaleDateString('en-IN')}
+    </div>`;
+
+  const container = document.getElementById('print-preview-container');
+  const inner     = document.getElementById('print-preview-inner');
+  inner.innerHTML = html;
+  inner.className = `print-area print-${isThermal ? 'thermal' : 'a4'}`;
+  container.style.display = 'block';
+  container.scrollIntoView({ behavior: 'smooth' });
+  showToast(`📄 ${isThermal ? 'Thermal' : 'A4'} report ready — tap Print`);
+}
+
+function exportCSV() {
+  if (state.history.length === 0) { showToast('⚠️ No data to export', 'warn'); return; }
+
+  const headers = ['#','Date','Time','₹10','₹20','₹50','₹100','₹200','₹500','Total Notes','Total Amount'];
+  const rows = state.history.slice().reverse().map((h,i) => [
+    i+1, h.date, h.time,
+    ...DENOMINATIONS.map(d => h.entry[d]||0),
+    h.notes, h.total
+  ]);
+
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `cash-ledger-${toDateStr(new Date())}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📊 CSV exported successfully!');
+}
+
+async function shareBluetooth() {
+  // Bluetooth thermal printing via Web Bluetooth API (best effort)
+  if (!navigator.bluetooth) {
+    showToast('📱 Bluetooth printing: Use your ATPOS app or browser Bluetooth. Share the CSV/PDF to your thermal printer app.', 'warn');
+    // Fallback: share via Web Share API
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Cash Ledger Report',
+          text : `Cash Ledger Report\nTotal: ₹${fmt(state.runningTotal)}\nEntries: ${state.history.length}`,
+        });
+      } catch(e) {}
+    }
+    return;
+  }
+  // Web Bluetooth thermal printing attempt
+  try {
+    showToast('🔵 Searching for Bluetooth printer...');
+    const device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // common printer service
+    });
+    showToast(`🔵 Connected to ${device.name}. Use your printer app to print the report.`);
+  } catch(e) {
+    // Build a thermal receipt text
+    generateReport('thermal');
+    showToast('🔵 Bluetooth not available. Report preview shown for manual printing.', 'warn');
+  }
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function showPage(pageName, navBtn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${pageName}`).classList.add('active');
+  if (navBtn) navBtn.classList.add('active');
+
+  if (pageName === 'dashboard') renderDashboard();
+  if (pageName === 'history')   renderHistory();
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(LS.THEME, theme);
+  document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+});
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openModal(title, text, confirmLabel, action) {
+  document.getElementById('modal-title').textContent   = title;
+  document.getElementById('modal-text').textContent    = text;
+  document.getElementById('modal-confirm-btn').textContent = confirmLabel;
+  _modalAction = action;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  _modalAction = null;
+}
+function modalConfirmAction() {
+  if (_modalAction) _modalAction();
+  closeModal();
+}
+// Close modal on overlay click
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast     = document.createElement('div');
+  toast.className = `toast${type === 'error' ? ' error' : type === 'warn' ? ' warn' : ''}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.3s';
+    toast.style.opacity    = '0';
+    setTimeout(() => toast.remove(), 350);
+  }, 3000);
+}
+
+/* ============================================================
+   VIBRATION
+   ============================================================ */
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
+/* ============================================================
+   SERVICE WORKER (Inline)
+   ============================================================ */
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    // Inline SW via blob URL
+    const swCode = `
+const CACHE = 'ccl-v1';
+self.addEventListener('install', e => {
+  self.skipWaiting();
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.open(CACHE).then(cache =>
+      cache.match(e.request).then(res => res || fetch(e.request).then(r => { cache.put(e.request, r.clone()); return r; }))
+    ).catch(() => new Response('Offline'))
+  );
+});`;
+    const blob = new Blob([swCode], {type:'application/javascript'});
+    const url  = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(() => {});
+  }
+}
+
+/* ============================================================
+   PWA INSTALL
+   ============================================================ */
+let _deferredPrompt = null;
+function initPWAInstall() {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredPrompt = e;
+    document.getElementById('install-btn').style.display = 'flex';
+  });
+  document.getElementById('install-btn').addEventListener('click', async () => {
+    if (!_deferredPrompt) return;
+    _deferredPrompt.prompt();
+    const { outcome } = await _deferredPrompt.userChoice;
+    if (outcome === 'accepted') showToast('📲 App installed!');
+    _deferredPrompt = null;
+    document.getElementById('install-btn').style.display = 'none';
+  });
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function fmt(n) {
+  // Indian number format
+  return Number(n).toLocaleString('en-IN');
+}
+
+function toDateStr(d) {
+  // YYYY-MM-DD
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
