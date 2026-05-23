@@ -1,10 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Cash Counter Ledger</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cash Counter Thermal Printer</title>
 
 <style>
 
@@ -46,28 +45,28 @@ h1{
 
 input{
     width:100%;
-    height:45px;
+    height:50px;
     border:none;
-    border-radius:8px;
+    border-radius:10px;
     text-align:center;
-    font-size:20px;
-    font-weight:bold;
+    font-size:22px;
+    font-weight:900;
 }
 
 .subtotal{
     margin-top:10px;
-    font-size:18px;
+    font-size:20px;
+    font-weight:900;
     color:#10b981;
-    font-weight:bold;
 }
 
 .totalBox{
     background:#000;
     color:#fff;
-    padding:18px;
+    padding:20px;
     border-radius:12px;
-    text-align:center;
     margin-top:20px;
+    text-align:center;
 }
 
 .totalBox h2{
@@ -76,14 +75,14 @@ input{
 }
 
 .total{
-    font-size:40px;
+    font-size:42px;
     font-weight:900;
     margin-top:10px;
 }
 
 button{
     width:100%;
-    height:55px;
+    height:58px;
     margin-top:15px;
     border:none;
     border-radius:12px;
@@ -94,125 +93,163 @@ button{
 
 .addBtn{
     background:#10b981;
-    color:#fff;
+    color:white;
 }
 
 .printBtn{
     background:#2563eb;
-    color:#fff;
+    color:white;
 }
 
 .resetBtn{
     background:#ef4444;
-    color:#fff;
+    color:white;
 }
 
-.report{
-    margin-top:30px;
-    background:#fff;
-    color:#000;
-    padding:20px;
-    border-radius:10px;
-}
+/* ========================= */
+/* PRINT AREA */
+/* ========================= */
 
-.hidden{
+#printSection{
     display:none;
 }
 
-/* ============================= */
-/* THERMAL PRINT FIXED */
-/* ============================= */
+/* ========================= */
+/* THERMAL PRINT */
+/* ========================= */
 
 @media print{
 
-    body{
-        background:#fff !important;
-        color:#000 !important;
+    html,body{
+        width:80mm;
         margin:0 !important;
         padding:0 !important;
+        background:#fff !important;
     }
 
-    .container{
-        display:none;
+    body *{
+        visibility:hidden;
     }
 
-    .report{
+    #printSection,
+    #printSection *{
+        visibility:visible;
+    }
+
+    #printSection{
+
         display:block !important;
 
-        width:75mm !important;
-        max-width:75mm !important;
-        min-width:75mm !important;
+        position:absolute;
+        left:0;
+        top:0;
 
-        margin:0 auto !important;
-        padding:3mm !important;
+        width:76mm;
+        max-width:76mm;
 
-        font-family:Arial,sans-serif !important;
+        padding:3mm;
 
-        color:#000 !important;
-        background:#fff !important;
+        color:#000;
+        background:#fff;
 
-        font-size:16px !important;
-        line-height:1.5 !important;
+        font-family:Arial,sans-serif;
 
-        border:none !important;
-        border-radius:0 !important;
+        overflow:hidden;
     }
 
     .shop{
         text-align:center;
-        font-size:30px !important;
-        font-weight:900 !important;
-        margin-bottom:8px;
+        font-size:30px;
+        font-weight:900;
+        margin-bottom:10px;
     }
 
     .title{
         text-align:center;
-        font-size:22px !important;
-        font-weight:900 !important;
+        font-size:22px;
+        font-weight:900;
         margin-bottom:10px;
     }
 
     .date{
         text-align:center;
-        font-size:16px !important;
-        font-weight:700 !important;
+        font-size:16px;
+        font-weight:700;
         margin-bottom:15px;
+    }
+
+    .sectionTitle{
+
+        background:#000;
+        color:#fff;
+
+        text-align:center;
+
+        padding:10px;
+
+        font-size:22px;
+        font-weight:900;
+
+        margin-top:15px;
+        margin-bottom:10px;
     }
 
     table{
         width:100%;
         border-collapse:collapse;
+        margin-bottom:10px;
     }
 
     th{
         border-bottom:3px solid #000;
         padding:10px 4px;
-        font-size:18px !important;
-        font-weight:900 !important;
+        font-size:18px;
+        font-weight:900;
     }
 
     td{
-        border-bottom:2px solid #999;
+        border-bottom:2px solid #aaa;
         padding:10px 4px;
-        font-size:18px !important;
-        font-weight:800 !important;
+        font-size:18px;
+        font-weight:800;
     }
 
-    .grand{
-        margin-top:15px;
+    .sectionTotal{
+
+        text-align:right;
+
+        font-size:24px;
+        font-weight:900;
+
+        margin-top:10px;
+        margin-bottom:15px;
+    }
+
+    .grandTotal{
+
         background:#000;
         color:#fff;
+
         text-align:center;
+
         padding:15px;
-        font-size:30px !important;
-        font-weight:900 !important;
+
+        font-size:30px;
+        font-weight:900;
+
+        margin-top:15px;
     }
 
     .footer{
         text-align:center;
-        margin-top:15px;
-        font-size:15px !important;
-        font-weight:700 !important;
+        margin-top:20px;
+        font-size:15px;
+        font-weight:700;
+    }
+
+    @page{
+        size:80mm auto;
+        margin:0;
     }
 }
 
@@ -223,32 +260,58 @@ button{
 
 <div class="container">
 
-<h1>₹ Cash Counter Ledger</h1>
+<h1>₹ Cash Counter</h1>
 
 <div class="grid" id="grid"></div>
 
 <div class="totalBox">
-    <h2>Running Total</h2>
-    <div class="total" id="grandTotal">₹0</div>
+
+<h2>Running Total</h2>
+
+<div class="total" id="runningTotal">
+₹0
 </div>
-
-<button class="addBtn" onclick="addTotal()">ADD TO TOTAL</button>
-
-<button class="printBtn" onclick="printReport()">PRINT THERMAL REPORT</button>
-
-<button class="resetBtn" onclick="resetAll()">RESET</button>
 
 </div>
 
-<div class="report hidden" id="report">
+<button class="addBtn" onclick="addTotal()">
+ADD TO TOTAL
+</button>
 
-<div class="shop">₹ CASH LEDGER</div>
+<button class="printBtn" onclick="printReport()">
+PRINT THERMAL REPORT
+</button>
 
-<div class="title">THERMAL REPORT</div>
+<button class="resetBtn" onclick="resetAll()">
+RESET
+</button>
 
-<div class="date" id="reportDate"></div>
+</div>
+
+<!-- ========================= -->
+<!-- PRINT SECTION -->
+<!-- ========================= -->
+
+<div id="printSection">
+
+<div class="shop">
+₹ CASH LEDGER
+</div>
+
+<div class="title">
+THERMAL REPORT
+</div>
+
+<div class="date" id="printDate"></div>
+
+<!-- OLD NOTES -->
+
+<div class="sectionTitle">
+OLD NOTES
+</div>
 
 <table>
+
 <thead>
 <tr>
 <th>NOTE</th>
@@ -257,11 +320,35 @@ button{
 </tr>
 </thead>
 
-<tbody id="reportBody"></tbody>
+<tbody id="oldBody"></tbody>
 
 </table>
 
-<div class="grand" id="reportGrand"></div>
+<div class="sectionTotal" id="oldTotal"></div>
+
+<!-- NEW NOTES -->
+
+<div class="sectionTitle">
+NEW NOTES
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>NOTE</th>
+<th>QTY</th>
+<th>AMOUNT</th>
+</tr>
+</thead>
+
+<tbody id="newBody"></tbody>
+
+</table>
+
+<div class="sectionTotal" id="newTotal"></div>
+
+<div class="grandTotal" id="grandTotalPrint"></div>
 
 <div class="footer">
 Cash Counter Ledger<br>
@@ -272,21 +359,24 @@ Thank You
 
 <script>
 
-const notes = [10,20,50,100,200,500];
+const oldNotes = [10,20,50];
+const newNotes = [100,200,500];
+
+const allNotes = [...oldNotes,...newNotes];
 
 let runningTotal = 0;
 
 const grid = document.getElementById("grid");
 
-notes.forEach(note=>{
+allNotes.forEach(note=>{
 
     grid.innerHTML += `
-    
+
     <div class="card">
 
         <h2>₹${note}</h2>
 
-        <input 
+        <input
             type="number"
             id="note${note}"
             min="0"
@@ -299,14 +389,15 @@ notes.forEach(note=>{
         </div>
 
     </div>
-    
+
     `;
 
 });
 
 function updateSubtotal(note){
 
-    let qty = Number(document.getElementById("note"+note).value || 0);
+    let qty =
+        Number(document.getElementById("note"+note).value || 0);
 
     let subtotal = qty * note;
 
@@ -319,9 +410,10 @@ function addTotal(){
 
     let total = 0;
 
-    notes.forEach(note=>{
+    allNotes.forEach(note=>{
 
-        let qty = Number(document.getElementById("note"+note).value || 0);
+        let qty =
+            Number(document.getElementById("note"+note).value || 0);
 
         total += qty * note;
 
@@ -329,7 +421,7 @@ function addTotal(){
 
     runningTotal += total;
 
-    document.getElementById("grandTotal").innerText =
+    document.getElementById("runningTotal").innerText =
         "₹" + runningTotal.toLocaleString();
 
     alert("₹" + total.toLocaleString() + " Added");
@@ -338,31 +430,32 @@ function addTotal(){
 
 function resetAll(){
 
-    notes.forEach(note=>{
+    allNotes.forEach(note=>{
 
         document.getElementById("note"+note).value = "";
 
-        document.getElementById("subtotal"+note).innerText = "₹0";
+        document.getElementById("subtotal"+note).innerText =
+            "₹0";
 
     });
 
 }
 
-function printReport(){
+function buildRows(noteArray){
 
-    let tbody = "";
-
+    let html = "";
     let total = 0;
 
-    notes.forEach(note=>{
+    noteArray.forEach(note=>{
 
-        let qty = Number(document.getElementById("note"+note).value || 0);
+        let qty =
+            Number(document.getElementById("note"+note).value || 0);
 
         let amount = qty * note;
 
         if(qty > 0){
 
-            tbody += `
+            html += `
             <tr>
                 <td>₹${note}</td>
                 <td>${qty}</td>
@@ -376,18 +469,45 @@ function printReport(){
 
     });
 
-    document.getElementById("reportBody").innerHTML = tbody;
+    return {
+        html,
+        total
+    };
+
+}
+
+function printReport(){
+
+    let oldData = buildRows(oldNotes);
+
+    let newData = buildRows(newNotes);
+
+    document.getElementById("oldBody").innerHTML =
+        oldData.html;
+
+    document.getElementById("newBody").innerHTML =
+        newData.html;
+
+    document.getElementById("oldTotal").innerHTML =
+        "OLD TOTAL ₹" + oldData.total.toLocaleString();
+
+    document.getElementById("newTotal").innerHTML =
+        "NEW TOTAL ₹" + newData.total.toLocaleString();
+
+    let grand =
+        oldData.total + newData.total;
+
+    document.getElementById("grandTotalPrint").innerHTML =
+        "GRAND TOTAL ₹" + grand.toLocaleString();
 
     let today = new Date();
 
-    document.getElementById("reportDate").innerHTML =
-        "DATE RANGE: " +
+    document.getElementById("printDate").innerHTML =
+        "DATE RANGE : " +
         today.toLocaleDateString();
 
-    document.getElementById("reportGrand").innerHTML =
-        "TOTAL ₹" + total.toLocaleString();
-
-    document.getElementById("report").classList.remove("hidden");
+    document.getElementById("printSection").style.display =
+        "block";
 
     window.print();
 
