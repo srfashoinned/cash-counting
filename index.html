@@ -1,1899 +1,400 @@
+```html
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="description" content="Cash Counter Ledger - Professional cash management for businesses"/>
-<meta name="theme-color" content="#0f1117"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Cash Counter Ledger</title>
 
-<!-- PWA Manifest inline -->
-<script>
-// Inline manifest for PWA
-const manifestData = {
-  name: "Cash Counter Ledger",
-  short_name: "CashLedger",
-  description: "Professional cash denomination counter and ledger",
-  start_url: "./",
-  display: "standalone",
-  background_color: "#0f1117",
-  theme_color: "#10b981",
-  icons: [
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230f1117'/><text y='130' x='30' font-size='120' font-family='serif'>₹</text></svg>", sizes: "192x192", type: "image/svg+xml" },
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230f1117'/><text y='360' x='60' font-size='340' font-family='serif' fill='%2310b981'>₹</text></svg>", sizes: "512x512", type: "image/svg+xml" }
-  ]
-};
-const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-const manifestUrl = URL.createObjectURL(blob);
-document.write('<link rel="manifest" href="' + manifestUrl + '"/>');
-</script>
-
 <style>
-/* ============================================================
-   CASH COUNTER LEDGER — COMPLETE STYLES
-   ============================================================ */
 
-/* ---------- CSS Variables (Theme) ---------- */
-:root {
-  --font-main: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Courier New', Courier, monospace;
-
-  /* Dark theme (default) */
-  --bg-base:       #0f1117;
-  --bg-card:       #1a1d27;
-  --bg-card2:      #22263a;
-  --bg-input:      #0f1117;
-  --border:        #2e3250;
-  --accent:        #10b981;
-  --accent2:       #3b82f6;
-  --accent3:       #f59e0b;
-  --danger:        #ef4444;
-  --text-primary:  #f1f5f9;
-  --text-secondary:#94a3b8;
-  --text-muted:    #475569;
-  --shadow:        0 4px 32px rgba(0,0,0,0.5);
-  --shadow-sm:     0 2px 8px rgba(0,0,0,0.3);
-  --radius:        14px;
-  --radius-sm:     8px;
-  --glow:          0 0 20px rgba(16,185,129,0.15);
-  --transition:    0.2s ease;
+body{
+    margin:0;
+    padding:0;
+    background:#111827;
+    color:white;
+    font-family:Arial,sans-serif;
 }
 
-[data-theme="light"] {
-  --bg-base:       #f0f4f8;
-  --bg-card:       #ffffff;
-  --bg-card2:      #f8fafc;
-  --bg-input:      #f1f5f9;
-  --border:        #e2e8f0;
-  --text-primary:  #0f172a;
-  --text-secondary:#475569;
-  --text-muted:    #94a3b8;
-  --shadow:        0 4px 32px rgba(0,0,0,0.08);
-  --shadow-sm:     0 2px 8px rgba(0,0,0,0.06);
-  --glow:          0 0 20px rgba(16,185,129,0.08);
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:15px;
 }
 
-/* ---------- Reset & Base ---------- */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: var(--font-main);
-  background: var(--bg-base);
-  color: var(--text-primary);
-  min-height: 100vh;
-  transition: background var(--transition), color var(--transition);
-  overflow-x: hidden;
+h1{
+    text-align:center;
+    margin-bottom:20px;
 }
 
-/* ---------- Splash Screen ---------- */
-#splash {
-  position: fixed; inset: 0;
-  background: var(--bg-base);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  z-index: 9999;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
-}
-#splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-.splash-icon {
-  font-size: 72px;
-  animation: splashBounce 1s ease infinite alternate;
-}
-.splash-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--accent);
-  margin-top: 16px;
-  letter-spacing: -0.5px;
-}
-.splash-sub {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-top: 6px;
-}
-.splash-bar {
-  width: 180px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin-top: 32px;
-  overflow: hidden;
-}
-.splash-progress {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  border-radius: 2px;
-  animation: progressFill 1.5s ease forwards;
-}
-@keyframes splashBounce { from{transform:translateY(0)} to{transform:translateY(-10px)} }
-@keyframes progressFill { from{width:0} to{width:100%} }
-
-/* ---------- Layout ---------- */
-#app { display: none; }
-#app.visible { display: block; }
-
-.topbar {
-  position: sticky; top: 0; z-index: 100;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  padding: 0 16px;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 58px;
-  box-shadow: var(--shadow-sm);
-}
-.topbar-brand {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 18px; font-weight: 800;
-  color: var(--accent);
-  letter-spacing: -0.3px;
-}
-.topbar-brand span { font-size: 24px; }
-.topbar-right { display: flex; align-items: center; gap: 8px; }
-
-.icon-btn {
-  width: 38px; height: 38px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-card2);
-  color: var(--text-primary);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  transition: all var(--transition);
-}
-.icon-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
-
-/* ---------- Bottom Nav ---------- */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border);
-  display: flex;
-  height: 62px;
-}
-.nav-item {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 3px; cursor: pointer;
-  font-size: 10px; font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all var(--transition);
-  border: none; background: none;
-  padding: 0;
-}
-.nav-item .nav-icon { font-size: 20px; }
-.nav-item.active { color: var(--accent); }
-.nav-item:hover { color: var(--accent); }
-
-/* ---------- Pages ---------- */
-.page { display: none; padding: 16px 16px 80px; }
-.page.active { display: block; animation: fadeIn 0.3s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
-
-/* ---------- Cards ---------- */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 14px;
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:12px;
 }
 
-/* ---------- Dashboard Cards ---------- */
-.dash-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 14px;
-}
-.stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 16px;
-  position: relative; overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-.stat-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 3px;
-}
-.stat-card.green::before { background: linear-gradient(90deg,var(--accent),#6ee7b7); }
-.stat-card.blue::before  { background: linear-gradient(90deg,var(--accent2),#93c5fd); }
-.stat-card.amber::before { background: linear-gradient(90deg,var(--accent3),#fcd34d); }
-.stat-card.red::before   { background: linear-gradient(90deg,var(--danger),#fca5a5); }
-
-.stat-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
-  text-transform: uppercase; color: var(--text-muted);
-  margin-bottom: 8px;
-}
-.stat-value {
-  font-size: 22px; font-weight: 800;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-.stat-sub {
-  font-size: 11px; color: var(--text-secondary);
-  margin-top: 4px;
-}
-.stat-icon {
-  position: absolute; top: 14px; right: 14px;
-  font-size: 26px; opacity: 0.15;
+.card{
+    background:#1f2937;
+    border-radius:12px;
+    padding:12px;
+    text-align:center;
 }
 
-/* ---------- Section Header ---------- */
-.section-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
-}
-.section-title {
-  font-size: 15px; font-weight: 700;
-  color: var(--text-primary);
-  display: flex; align-items: center; gap: 8px;
-}
-.section-title span { font-size: 18px; }
-
-/* ---------- Denomination Cards ---------- */
-.denom-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-@media (min-width: 480px) { .denom-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 700px) { .denom-grid { grid-template-columns: repeat(6, 1fr); } }
-
-.denom-card {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 12px;
-  text-align: center;
-  transition: all var(--transition);
-  box-shadow: var(--shadow-sm);
-}
-.denom-card:hover { border-color: var(--accent); box-shadow: var(--glow); }
-.denom-card.has-value { border-color: var(--accent); background: var(--bg-card2); }
-
-.denom-badge {
-  display: inline-block;
-  background: var(--accent);
-  color: white;
-  font-size: 12px; font-weight: 800;
-  border-radius: 6px;
-  padding: 3px 8px;
-  margin-bottom: 10px;
-  letter-spacing: 0.3px;
-}
-.denom-card.d20  .denom-badge { background: var(--accent2); }
-.denom-card.d50  .denom-badge { background: #8b5cf6; }
-.denom-card.d100 .denom-badge { background: var(--accent3); color: #1a1a1a; }
-.denom-card.d200 .denom-badge { background: #ec4899; }
-.denom-card.d500 .denom-badge { background: var(--danger); }
-
-.denom-input-wrap { position: relative; }
-.denom-input {
-  width: 100%; height: 44px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-size: 18px; font-weight: 700;
-  text-align: center;
-  outline: none;
-  transition: border-color var(--transition);
-  font-family: var(--font-mono);
-  -moz-appearance: textfield;
-}
-.denom-input::-webkit-inner-spin-button,
-.denom-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-.denom-input:focus { border-color: var(--accent); }
-.denom-input::placeholder { font-size: 13px; font-weight: 400; color: var(--text-muted); }
-
-.denom-label { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
-.denom-subtotal {
-  font-size: 13px; font-weight: 700;
-  color: var(--accent);
-  margin-top: 8px;
-  font-family: var(--font-mono);
-  min-height: 18px;
+.card h2{
+    margin:0 0 10px;
 }
 
-/* ---------- Sticky Totals ---------- */
-.sticky-totals {
-  position: sticky; top: 58px; z-index: 90;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 14px;
-  box-shadow: var(--shadow);
-}
-.totals-row {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 10px;
-}
-.total-chip {
-  flex: 1; text-align: center;
-  background: var(--bg-card2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 6px;
-}
-.total-chip-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); font-weight: 700; }
-.total-chip-value { font-size: 16px; font-weight: 800; color: var(--accent); font-family: var(--font-mono); margin-top: 3px; }
-.total-chip.grand .total-chip-value { color: var(--accent3); font-size: 18px; }
-.total-chip.notes .total-chip-value { color: var(--accent2); }
-
-/* ---------- Action Buttons ---------- */
-.action-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.btn {
-  height: 50px;
-  border-radius: var(--radius-sm);
-  border: none; cursor: pointer;
-  font-size: 14px; font-weight: 700;
-  letter-spacing: 0.3px;
-  transition: all var(--transition);
-  display: flex; align-items: center; justify-content: center;
-  gap: 7px;
-}
-.btn:active { transform: scale(0.97); }
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), #059669);
-  color: white; box-shadow: 0 4px 16px rgba(16,185,129,0.3);
-}
-.btn-primary:hover { box-shadow: 0 6px 24px rgba(16,185,129,0.45); filter: brightness(1.05); }
-.btn-secondary {
-  background: var(--bg-card2);
-  color: var(--text-secondary);
-  border: 1.5px solid var(--border);
-}
-.btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
-.btn-danger {
-  background: var(--bg-card2);
-  color: var(--danger);
-  border: 1.5px solid var(--border);
-}
-.btn-danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
-.btn-full { grid-column: 1 / -1; }
-.btn-amber {
-  background: linear-gradient(135deg, var(--accent3), #d97706);
-  color: #1a1a1a;
-  box-shadow: 0 4px 16px rgba(245,158,11,0.3);
+input{
+    width:100%;
+    height:45px;
+    border:none;
+    border-radius:8px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
 }
 
-/* ---------- History ---------- */
-.search-bar {
-  display: flex; gap: 8px; margin-bottom: 12px;
-}
-.search-input {
-  flex: 1; height: 44px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0 14px;
-  color: var(--text-primary);
-  font-size: 14px; outline: none;
-}
-.search-input:focus { border-color: var(--accent); }
-.date-filter {
-  height: 44px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0 10px;
-  color: var(--text-primary);
-  font-size: 13px; outline: none;
-  cursor: pointer;
-}
-.date-filter:focus { border-color: var(--accent); }
-
-.history-list { display: flex; flex-direction: column; gap: 10px; }
-.history-item {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
-  animation: fadeIn 0.2s ease;
-  position: relative;
-}
-.history-item:hover { border-color: var(--border); box-shadow: var(--shadow-sm); }
-
-.hi-header {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: 10px;
-}
-.hi-date { font-size: 12px; color: var(--text-muted); }
-.hi-amount { font-size: 20px; font-weight: 800; color: var(--accent); font-family: var(--font-mono); }
-.hi-notes-count { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-
-.hi-denoms {
-  display: flex; flex-wrap: wrap; gap: 5px;
-  margin-bottom: 10px;
-}
-.hi-denom-chip {
-  background: var(--bg-card2);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 3px 8px;
-  font-size: 11px; font-weight: 600;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-}
-.hi-denom-chip.active { border-color: var(--accent); color: var(--accent); }
-
-.hi-footer {
-  display: flex; justify-content: flex-end; gap: 8px;
-}
-.hi-del-btn {
-  background: none; border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 5px 12px; font-size: 12px;
-  color: var(--danger); cursor: pointer;
-  transition: all var(--transition);
-}
-.hi-del-btn:hover { background: var(--danger); color: white; border-color: var(--danger); }
-
-.empty-state {
-  text-align: center; padding: 48px 20px;
-  color: var(--text-muted);
-}
-.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
-.empty-state p { font-size: 14px; }
-
-.daily-total-bar {
-  background: var(--bg-card2);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  margin-bottom: 10px;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.dtb-date { font-size: 13px; font-weight: 700; color: var(--text-primary); }
-.dtb-total { font-size: 16px; font-weight: 800; color: var(--accent); font-family: var(--font-mono); }
-
-/* ---------- Reports ---------- */
-.report-options {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 10px; margin-bottom: 14px;
-}
-.report-card {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 14px;
-  text-align: center; cursor: pointer;
-  transition: all var(--transition);
-}
-.report-card:hover { border-color: var(--accent); box-shadow: var(--glow); transform: translateY(-2px); }
-.report-card .rc-icon { font-size: 32px; margin-bottom: 10px; }
-.report-card .rc-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
-.report-card .rc-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-
-/* ---------- Toasts ---------- */
-#toast-container {
-  position: fixed; top: 70px; right: 16px;
-  z-index: 9999; display: flex; flex-direction: column; gap: 8px;
-}
-.toast {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  font-size: 13px; font-weight: 600;
-  color: var(--text-primary);
-  box-shadow: var(--shadow);
-  animation: toastIn 0.3s ease;
-  min-width: 220px; max-width: 300px;
-}
-.toast.error { border-left-color: var(--danger); }
-.toast.warn  { border-left-color: var(--accent3); }
-@keyframes toastIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:none} }
-
-/* ---------- Modal ---------- */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 1000;
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px;
-  opacity: 0; visibility: hidden;
-  transition: all 0.2s ease;
-}
-.modal-overlay.open { opacity: 1; visibility: visible; }
-.modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  width: 100%; max-width: 400px;
-  box-shadow: var(--shadow);
-  transform: scale(0.95);
-  transition: transform 0.2s ease;
-}
-.modal-overlay.open .modal { transform: scale(1); }
-.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 12px; }
-.modal-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
-.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-.modal-btn {
-  padding: 10px 20px; border-radius: var(--radius-sm);
-  border: none; cursor: pointer; font-size: 14px; font-weight: 700;
-  transition: all var(--transition);
-}
-.modal-btn.cancel { background: var(--bg-card2); color: var(--text-secondary); border: 1px solid var(--border); }
-.modal-btn.confirm { background: var(--danger); color: white; }
-.modal-btn:hover { opacity: 0.85; }
-
-/* ---------- Badge / Tag ---------- */
-.badge {
-  display: inline-flex; align-items: center;
-  background: rgba(16,185,129,0.15);
-  color: var(--accent);
-  font-size: 11px; font-weight: 700;
-  padding: 2px 8px; border-radius: 20px;
-  letter-spacing: 0.3px;
+.subtotal{
+    margin-top:10px;
+    font-size:18px;
+    color:#10b981;
+    font-weight:bold;
 }
 
-/* ---------- Note amount total summary in entry ---------- */
-.entry-summary {
-  background: var(--bg-card2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  margin-bottom: 12px;
-}
-.es-row {
-  display: flex; justify-content: space-between;
-  font-size: 13px; padding: 4px 0;
-  border-bottom: 1px solid var(--border);
-}
-.es-row:last-child { border-bottom: none; font-weight: 800; color: var(--accent); font-size: 15px; }
-.es-denom { color: var(--text-secondary); }
-.es-val { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
-
-/* ---------- Misc ---------- */
-.divider { height: 1px; background: var(--border); margin: 14px 0; }
-.text-sm { font-size: 13px; color: var(--text-secondary); }
-.text-muted { color: var(--text-muted); }
-.mt-2 { margin-top: 8px; }
-.mb-2 { margin-bottom: 8px; }
-.bold { font-weight: 700; }
-.font-mono { font-family: var(--font-mono); }
-
-/* ---------- PRINT STYLES (A4 & Thermal 3") ---------- */
-@media print {
-  /* Force all colors to print dark/solid — no fading */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
-  }
-  body { background: white !important; color: #000 !important; margin: 0; padding: 0; }
-  .topbar, .bottom-nav, .action-row, .report-options,
-  #toast-container, #splash, .no-print,
-  #print-preview-container > .section-header { display: none !important; }
-  .page { display: none !important; padding: 0; }
-  #page-reports { display: block !important; }
-  #print-preview-container { display: block !important; }
-
-  /* Hide the on-screen wrapper chrome, show only the receipt */
-  #print-preview-container > .section-header { display: none !important; }
-  .print-area {
-    border: none !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-  }
-
-  /* A4 print */
-  .print-a4 { width: 210mm; margin: 0 auto; padding: 15mm; font-size: 11pt; }
-  .print-a4 .pa-shop    { font-size: 18pt; }
-  .print-a4 .pa-table   { font-size: 10pt; }
-  .print-a4 .pa-table th,
-  .print-a4 .pa-table td { padding: 5px 4px; }
-
-  /* Thermal 3-inch (80mm) */
-  .print-thermal { width: 76mm; margin: 0; padding: 2mm 3mm; font-size: 8.5pt; }
+.totalBox{
+    background:#000;
+    color:#fff;
+    padding:18px;
+    border-radius:12px;
+    text-align:center;
+    margin-top:20px;
 }
 
-/* ---------- Print Preview Styles (on-screen + print) ---------- */
-.print-area {
-  background: #fff;
-  color: #000;
-  padding: 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  margin-top: 14px;
-  font-family: var(--font-mono);
-  max-width: 420px; /* thermal preview width on screen */
-}
-.print-area.print-a4 { max-width: 100%; }
-
-/* ── Header ── */
-.pa-header {
-  text-align: center;
-  border-bottom: 3px double #000;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-}
-.pa-shop  { font-size: 16px; font-weight: 900; color: #000; letter-spacing: 0.5px; }
-.pa-title { font-size: 11px; font-weight: 700; color: #000; margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; }
-.pa-date  { font-size: 10px; color: #333; margin-top: 2px; font-weight: 600; }
-
-/* ── Section block (Today / Previous) ── */
-.pa-section {
-  margin-bottom: 6px;
-}
-.pa-section-title {
-  font-size: 10px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #000;
-  background: #000;
-  color: #fff;
-  padding: 3px 6px;
-  margin-bottom: 4px;
-}
-.pa-section-meta {
-  font-size: 9px;
-  color: #333;
-  font-weight: 600;
-  margin-bottom: 3px;
-  padding: 0 2px;
+.totalBox h2{
+    margin:0;
+    font-size:22px;
 }
 
-/* ── Tables ── */
-.pa-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 10px;
-  margin: 2px 0 4px;
-}
-.pa-table th {
-  text-align: left;
-  padding: 3px 3px;
-  border-bottom: 2px solid #000;
-  font-size: 9px;
-  font-weight: 900;
-  color: #000;
-  text-transform: uppercase;
-}
-.pa-table td {
-  padding: 3px 3px;
-  border-bottom: 1px solid #999;
-  font-size: 10px;
-  color: #000;
-  font-weight: 600;
-}
-.pa-table tr:last-child td { border-bottom: none; }
-.pa-total-row td {
-  font-weight: 900 !important;
-  font-size: 11px !important;
-  border-top: 2px solid #000 !important;
-  border-bottom: none !important;
-  padding-top: 4px !important;
-  color: #000 !important;
-}
-.pa-section-total {
-  text-align: right;
-  font-size: 12px;
-  font-weight: 900;
-  color: #000;
-  border-top: 2px solid #000;
-  padding-top: 3px;
-  margin-top: 2px;
+.total{
+    font-size:40px;
+    font-weight:900;
+    margin-top:10px;
 }
 
-/* ── Divider ── */
-.pa-divider {
-  border: none;
-  border-top: 1px dashed #555;
-  margin: 6px 0;
+button{
+    width:100%;
+    height:55px;
+    margin-top:15px;
+    border:none;
+    border-radius:12px;
+    font-size:20px;
+    font-weight:900;
+    cursor:pointer;
 }
 
-/* ── Grand total bar ── */
-.pa-grand-total {
-  background: #000;
-  color: #fff;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 900;
-  padding: 5px 6px;
-  margin: 6px 0;
-  letter-spacing: 0.5px;
+.addBtn{
+    background:#10b981;
+    color:#fff;
 }
 
-/* ── Footer ── */
-.pa-footer {
-  text-align: center;
-  font-size: 9px;
-  color: #444;
-  font-weight: 600;
-  margin-top: 6px;
-  border-top: 1px dashed #888;
-  padding-top: 5px;
+.printBtn{
+    background:#2563eb;
+    color:#fff;
 }
 
-/* A4 overrides (wider, bigger) */
-.print-a4 .pa-shop    { font-size: 22px; }
-.print-a4 .pa-title   { font-size: 13px; }
-.print-a4 .pa-table   { font-size: 11px; }
-.print-a4 .pa-table th { font-size: 11px; padding: 6px 5px; }
-.print-a4 .pa-table td { font-size: 11px; padding: 5px 5px; }
-.print-a4 .pa-total-row td { font-size: 13px !important; }
-.print-a4 .pa-grand-total  { font-size: 16px; padding: 8px; }
-.print-a4 .pa-section-title { font-size: 12px; }
-
-/* ---------- Scrollbar ---------- */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-/* ---------- Range Input ---------- */
-.note-label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; }
-
-/* ---------- Undo snackbar ---------- */
-#undo-bar {
-  position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%) translateY(20px);
-  background: var(--bg-card2);
-  border: 1px solid var(--border);
-  border-radius: 30px;
-  padding: 10px 20px;
-  display: flex; align-items: center; gap: 12px;
-  font-size: 13px; font-weight: 600;
-  box-shadow: var(--shadow);
-  opacity: 0; pointer-events: none;
-  transition: all 0.3s ease;
-  z-index: 200;
-  white-space: nowrap;
+.resetBtn{
+    background:#ef4444;
+    color:#fff;
 }
-#undo-bar.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
-#undo-bar button {
-  background: var(--accent); color: white;
-  border: none; border-radius: 20px;
-  padding: 4px 14px; font-size: 13px; font-weight: 700;
-  cursor: pointer;
+
+.report{
+    margin-top:30px;
+    background:#fff;
+    color:#000;
+    padding:20px;
+    border-radius:10px;
 }
+
+.hidden{
+    display:none;
+}
+
+/* ============================= */
+/* THERMAL PRINT FIXED */
+/* ============================= */
+
+@media print{
+
+    body{
+        background:#fff !important;
+        color:#000 !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    .container{
+        display:none;
+    }
+
+    .report{
+        display:block !important;
+
+        width:75mm !important;
+        max-width:75mm !important;
+        min-width:75mm !important;
+
+        margin:0 auto !important;
+        padding:3mm !important;
+
+        font-family:Arial,sans-serif !important;
+
+        color:#000 !important;
+        background:#fff !important;
+
+        font-size:16px !important;
+        line-height:1.5 !important;
+
+        border:none !important;
+        border-radius:0 !important;
+    }
+
+    .shop{
+        text-align:center;
+        font-size:30px !important;
+        font-weight:900 !important;
+        margin-bottom:8px;
+    }
+
+    .title{
+        text-align:center;
+        font-size:22px !important;
+        font-weight:900 !important;
+        margin-bottom:10px;
+    }
+
+    .date{
+        text-align:center;
+        font-size:16px !important;
+        font-weight:700 !important;
+        margin-bottom:15px;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    th{
+        border-bottom:3px solid #000;
+        padding:10px 4px;
+        font-size:18px !important;
+        font-weight:900 !important;
+    }
+
+    td{
+        border-bottom:2px solid #999;
+        padding:10px 4px;
+        font-size:18px !important;
+        font-weight:800 !important;
+    }
+
+    .grand{
+        margin-top:15px;
+        background:#000;
+        color:#fff;
+        text-align:center;
+        padding:15px;
+        font-size:30px !important;
+        font-weight:900 !important;
+    }
+
+    .footer{
+        text-align:center;
+        margin-top:15px;
+        font-size:15px !important;
+        font-weight:700 !important;
+    }
+}
+
 </style>
 </head>
+
 <body>
 
-<!-- ===== SPLASH SCREEN ===== -->
-<div id="splash">
-  <div class="splash-icon">₹</div>
-  <div class="splash-title">Cash Counter Ledger</div>
-  <div class="splash-sub">Professional Cash Management</div>
-  <div class="splash-bar"><div class="splash-progress"></div></div>
+<div class="container">
+
+<h1>₹ Cash Counter Ledger</h1>
+
+<div class="grid" id="grid"></div>
+
+<div class="totalBox">
+    <h2>Running Total</h2>
+    <div class="total" id="grandTotal">₹0</div>
 </div>
 
-<!-- ===== APP ===== -->
-<div id="app">
+<button class="addBtn" onclick="addTotal()">ADD TO TOTAL</button>
 
-  <!-- Top Bar -->
-  <div class="topbar">
-    <div class="topbar-brand">
-      <span>₹</span> Cash Ledger
-    </div>
-    <div class="topbar-right">
-      <button class="icon-btn" id="theme-toggle" title="Toggle Theme" aria-label="Toggle theme">🌙</button>
-      <button class="icon-btn" id="install-btn" title="Install App" style="display:none" aria-label="Install app">📲</button>
-    </div>
-  </div>
+<button class="printBtn" onclick="printReport()">PRINT THERMAL REPORT</button>
 
-  <!-- === PAGE: COUNTER === -->
-  <div class="page active" id="page-counter">
+<button class="resetBtn" onclick="resetAll()">RESET</button>
 
-    <!-- Sticky Totals -->
-    <div class="sticky-totals">
-      <div class="totals-row">
-        <div class="total-chip">
-          <div class="total-chip-label">Entry Total</div>
-          <div class="total-chip-value" id="entry-total-disp">₹0</div>
-        </div>
-        <div class="total-chip grand">
-          <div class="total-chip-label">Running Total</div>
-          <div class="total-chip-value" id="running-total-disp">₹0</div>
-        </div>
-        <div class="total-chip notes">
-          <div class="total-chip-label">Note Count</div>
-          <div class="total-chip-value" id="note-count-disp">0</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Denomination Grid -->
-    <div class="section-header">
-      <div class="section-title"><span>💵</span> Enter Note Quantities</div>
-    </div>
-
-    <div class="denom-grid" id="denom-grid">
-      <!-- Generated by JS -->
-    </div>
-
-    <!-- Entry Summary -->
-    <div class="entry-summary" id="entry-summary" style="display:none">
-      <div id="summary-rows"></div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="action-row">
-      <button class="btn btn-primary btn-full" onclick="addToTotal()">
-        ✅ Add To Running Total
-      </button>
-    </div>
-    <div class="action-row">
-      <button class="btn btn-secondary" onclick="resetCurrentEntry()">
-        🔄 Reset Entry
-      </button>
-      <button class="btn btn-danger" onclick="confirmResetAll()">
-        🗑️ Reset All Data
-      </button>
-    </div>
-
-    <!-- Note -->
-    <p class="text-sm text-muted mt-2">💡 Tip: Use Tab/Enter to jump between fields quickly.</p>
-  </div>
-
-  <!-- === PAGE: DASHBOARD === -->
-  <div class="page" id="page-dashboard">
-    <div class="section-header">
-      <div class="section-title"><span>📊</span> Dashboard</div>
-      <span class="badge" id="last-updated-badge">Live</span>
-    </div>
-
-    <div class="dash-grid">
-      <div class="stat-card green">
-        <div class="stat-icon">💰</div>
-        <div class="stat-label">Total Cash</div>
-        <div class="stat-value" id="dash-total">₹0</div>
-        <div class="stat-sub">Running ledger total</div>
-      </div>
-      <div class="stat-card blue">
-        <div class="stat-icon">📅</div>
-        <div class="stat-label">Today's Total</div>
-        <div class="stat-value" id="dash-today">₹0</div>
-        <div class="stat-sub" id="dash-today-date">—</div>
-      </div>
-      <div class="stat-card amber">
-        <div class="stat-icon">📋</div>
-        <div class="stat-label">Total Entries</div>
-        <div class="stat-value" id="dash-entries">0</div>
-        <div class="stat-sub">All time entries</div>
-      </div>
-      <div class="stat-card red">
-        <div class="stat-icon">🕐</div>
-        <div class="stat-label">Last Entry</div>
-        <div class="stat-value" id="dash-last-time" style="font-size:14px">—</div>
-        <div class="stat-sub" id="dash-last-date">No entries yet</div>
-      </div>
-    </div>
-
-    <!-- Denomination breakdown of total -->
-    <div class="card">
-      <div class="section-title" style="margin-bottom:12px"><span>📈</span> Denomination Breakdown (All Time)</div>
-      <div id="dash-breakdown"></div>
-    </div>
-
-    <!-- Quick recent entries -->
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title"><span>🕐</span> Recent Entries</div>
-      </div>
-      <div id="dash-recent"></div>
-    </div>
-  </div>
-
-  <!-- === PAGE: HISTORY === -->
-  <div class="page" id="page-history">
-    <div class="section-header">
-      <div class="section-title"><span>📜</span> Entry History</div>
-      <button class="icon-btn" onclick="confirmClearAll()" title="Clear all history" style="color:var(--danger)">🗑️</button>
-    </div>
-
-    <div class="search-bar">
-      <input type="search" class="search-input" id="search-input" placeholder="🔍 Search entries..." oninput="renderHistory()" aria-label="Search history"/>
-      <input type="date" class="date-filter" id="date-filter" onchange="renderHistory()" aria-label="Filter by date"/>
-    </div>
-
-    <div id="daily-totals-section"></div>
-    <div class="history-list" id="history-list"></div>
-  </div>
-
-  <!-- === PAGE: REPORTS === -->
-  <div class="page" id="page-reports">
-    <div class="section-header">
-      <div class="section-title"><span>📄</span> Reports</div>
-    </div>
-
-    <!-- Report Options -->
-    <div class="report-options">
-      <div class="report-card" onclick="generateReport('a4')">
-        <div class="rc-icon">🖨️</div>
-        <div class="rc-title">Print A4</div>
-        <div class="rc-sub">Full page report</div>
-      </div>
-      <div class="report-card" onclick="generateReport('thermal')">
-        <div class="rc-icon">🧾</div>
-        <div class="rc-title">Thermal 3"</div>
-        <div class="rc-sub">80mm receipt format</div>
-      </div>
-      <div class="report-card" onclick="exportCSV()">
-        <div class="rc-icon">📊</div>
-        <div class="rc-title">Export CSV</div>
-        <div class="rc-sub">Open in Excel</div>
-      </div>
-      <div class="report-card" onclick="shareBluetooth()">
-        <div class="rc-icon">🔵</div>
-        <div class="rc-title">Bluetooth Print</div>
-        <div class="rc-sub">ATPOS thermal</div>
-      </div>
-    </div>
-
-    <!-- Date range for report -->
-    <div class="card">
-      <div class="section-title" style="margin-bottom:12px"><span>📅</span> Report Period</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div>
-          <label class="note-label">From Date</label>
-          <input type="date" class="date-filter" id="report-from" style="width:100%" aria-label="Report from date"/>
-        </div>
-        <div>
-          <label class="note-label">To Date</label>
-          <input type="date" class="date-filter" id="report-to" style="width:100%" aria-label="Report to date"/>
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="generateReport('a4')" style="width:100%">Generate & Preview Report</button>
-    </div>
-
-    <!-- Print Preview -->
-    <div id="print-preview-container" style="display:none">
-      <div class="section-header mt-2">
-        <div class="section-title"><span>👁️</span> Preview</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-primary" onclick="window.print()" style="height:36px;font-size:12px;padding:0 12px">🖨️ Print</button>
-        </div>
-      </div>
-      <div id="print-preview-inner" class="print-area"></div>
-    </div>
-  </div>
-
-  <!-- Bottom Navigation -->
-  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
-    <button class="nav-item active" onclick="showPage('counter', this)" aria-label="Counter">
-      <span class="nav-icon">💵</span>
-      Counter
-    </button>
-    <button class="nav-item" onclick="showPage('dashboard', this)" aria-label="Dashboard">
-      <span class="nav-icon">📊</span>
-      Dashboard
-    </button>
-    <button class="nav-item" onclick="showPage('history', this)" aria-label="History">
-      <span class="nav-icon">📜</span>
-      History
-    </button>
-    <button class="nav-item" onclick="showPage('reports', this)" aria-label="Reports">
-      <span class="nav-icon">📄</span>
-      Reports
-    </button>
-  </nav>
 </div>
 
-<!-- Toast Container -->
-<div id="toast-container" aria-live="polite"></div>
+<div class="report hidden" id="report">
 
-<!-- Undo Bar -->
-<div id="undo-bar">
-  ↩️ Entry added <button onclick="undoLastEntry()">Undo</button>
+<div class="shop">₹ CASH LEDGER</div>
+
+<div class="title">THERMAL REPORT</div>
+
+<div class="date" id="reportDate"></div>
+
+<table>
+<thead>
+<tr>
+<th>NOTE</th>
+<th>QTY</th>
+<th>AMOUNT</th>
+</tr>
+</thead>
+
+<tbody id="reportBody"></tbody>
+
+</table>
+
+<div class="grand" id="reportGrand"></div>
+
+<div class="footer">
+Cash Counter Ledger<br>
+Thank You
 </div>
 
-<!-- Confirm Modal -->
-<div class="modal-overlay" id="confirm-modal" role="dialog" aria-modal="true">
-  <div class="modal">
-    <div class="modal-title" id="modal-title">Are you sure?</div>
-    <div class="modal-text" id="modal-text">This action cannot be undone.</div>
-    <div class="modal-actions">
-      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-btn confirm" id="modal-confirm-btn" onclick="modalConfirmAction()">Delete</button>
-    </div>
-  </div>
 </div>
 
-<!-- ============================================================
-     JAVASCRIPT — COMPLETE APP LOGIC
-     ============================================================ -->
 <script>
-'use strict';
 
-/* ============================================================
-   CONSTANTS & STATE
-   ============================================================ */
-const DENOMINATIONS = [10, 20, 50, 100, 200, 500];
-const DENOM_COLORS  = { 10:'d10', 20:'d20', 50:'d50', 100:'d100', 200:'d200', 500:'d500' };
-const LS = {
-  RUNNING_TOTAL : 'ccl_running_total',
-  HISTORY       : 'ccl_history',
-  THEME         : 'ccl_theme',
-  DENOM_TOTALS  : 'ccl_denom_totals',
-};
+const notes = [10,20,50,100,200,500];
 
-// App state
-let state = {
-  currentEntry: {},       // { 10: qty, 20: qty, ... }
-  runningTotal: 0,        // ₹ amount
-  denomTotals: {},        // cumulative notes per denom
-  history: [],            // [ {id, ts, date, entry, total, notes} ]
-  undoBuffer: null,       // last added entry for undo
-  undoTimer: null,
-};
+let runningTotal = 0;
 
-// Modal callback
-let _modalAction = null;
+const grid = document.getElementById("grid");
 
-/* ============================================================
-   INIT
-   ============================================================ */
-function init() {
-  loadFromStorage();
-  buildDenomGrid();
-  renderDashboard();
-  renderHistory();
-  setTheme(localStorage.getItem(LS.THEME) || 'dark');
-  setDefaultDates();
-  registerServiceWorker();
-  initPWAInstall();
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('hidden');
-    document.getElementById('app').classList.add('visible');
-  }, 1700);
-}
+notes.forEach(note=>{
 
-/* ============================================================
-   STORAGE
-   ============================================================ */
-function loadFromStorage() {
-  state.runningTotal = parseFloat(localStorage.getItem(LS.RUNNING_TOTAL)) || 0;
-  state.history      = JSON.parse(localStorage.getItem(LS.HISTORY) || '[]');
-  state.denomTotals  = JSON.parse(localStorage.getItem(LS.DENOM_TOTALS) || '{}');
-  DENOMINATIONS.forEach(d => {
-    if (!state.denomTotals[d]) state.denomTotals[d] = 0;
-    state.currentEntry[d] = 0;
-  });
-}
+    grid.innerHTML += `
+    
+    <div class="card">
 
-function saveToStorage() {
-  localStorage.setItem(LS.RUNNING_TOTAL, state.runningTotal);
-  localStorage.setItem(LS.HISTORY, JSON.stringify(state.history));
-  localStorage.setItem(LS.DENOM_TOTALS, JSON.stringify(state.denomTotals));
-}
+        <h2>₹${note}</h2>
 
-/* ============================================================
-   DENOMINATION GRID
-   ============================================================ */
-function buildDenomGrid() {
-  const grid = document.getElementById('denom-grid');
-  grid.innerHTML = DENOMINATIONS.map(d => `
-    <div class="denom-card ${DENOM_COLORS[d]}" id="dcard-${d}">
-      <div class="denom-badge">₹${d}</div>
-      <div class="denom-label">Quantity</div>
-      <div class="denom-input-wrap">
-        <input
-          type="number"
-          class="denom-input"
-          id="qty-${d}"
-          min="0"
-          placeholder="0"
-          inputmode="numeric"
-          aria-label="Quantity for ₹${d} notes"
-          onchange="updateEntry(${d})"
-          oninput="updateEntry(${d})"
-          onkeydown="handleDenomKey(event, ${d})"
-        />
-      </div>
-      <div class="denom-subtotal" id="sub-${d}"></div>
-    </div>
-  `).join('');
-}
+        <input 
+            type="number"
+            id="note${note}"
+            min="0"
+            value=""
+            oninput="updateSubtotal(${note})"
+        >
 
-function handleDenomKey(e, denom) {
-  // Enter or Tab → jump to next denom input
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    const idx = DENOMINATIONS.indexOf(denom);
-    const next = DENOMINATIONS[idx + 1];
-    if (next) document.getElementById(`qty-${next}`).focus();
-    else document.getElementById('qty-' + DENOMINATIONS[0]).blur();
-  }
-}
-
-function updateEntry(denom) {
-  const input = document.getElementById(`qty-${denom}`);
-  const qty   = Math.max(0, parseInt(input.value) || 0);
-  state.currentEntry[denom] = qty;
-
-  // Update card subtotal
-  const sub  = document.getElementById(`sub-${denom}`);
-  const card = document.getElementById(`dcard-${denom}`);
-  if (qty > 0) {
-    sub.textContent = `₹${fmt(qty * denom)}`;
-    card.classList.add('has-value');
-  } else {
-    sub.textContent = '';
-    card.classList.remove('has-value');
-  }
-
-  refreshDisplayTotals();
-  refreshEntrySummary();
-}
-
-function refreshDisplayTotals() {
-  const entryTotal = calcEntryTotal();
-  const noteCount  = DENOMINATIONS.reduce((s,d) => s + (state.currentEntry[d]||0), 0);
-  document.getElementById('entry-total-disp').textContent  = `₹${fmt(entryTotal)}`;
-  document.getElementById('running-total-disp').textContent = `₹${fmt(state.runningTotal)}`;
-  document.getElementById('note-count-disp').textContent   = noteCount;
-}
-
-function refreshEntrySummary() {
-  const summary = document.getElementById('entry-summary');
-  const rows    = document.getElementById('summary-rows');
-  const entryTotal = calcEntryTotal();
-
-  if (entryTotal === 0) { summary.style.display = 'none'; return; }
-  summary.style.display = 'block';
-
-  let html = '';
-  DENOMINATIONS.forEach(d => {
-    const qty = state.currentEntry[d] || 0;
-    if (qty > 0) {
-      html += `<div class="es-row">
-        <span class="es-denom">₹${d} × ${qty}</span>
-        <span class="es-val">₹${fmt(d * qty)}</span>
-      </div>`;
-    }
-  });
-  html += `<div class="es-row">
-    <span class="es-denom">TOTAL</span>
-    <span class="es-val">₹${fmt(entryTotal)}</span>
-  </div>`;
-  rows.innerHTML = html;
-}
-
-function calcEntryTotal() {
-  return DENOMINATIONS.reduce((s, d) => s + (state.currentEntry[d] || 0) * d, 0);
-}
-
-/* ============================================================
-   ADD TO TOTAL
-   ============================================================ */
-function addToTotal() {
-  const entryTotal = calcEntryTotal();
-  if (entryTotal === 0) {
-    showToast('⚠️ Please enter note quantities first', 'warn');
-    return;
-  }
-
-  // Save for undo
-  state.undoBuffer = {
-    entry: { ...state.currentEntry },
-    total: entryTotal,
-    prevRunning: state.runningTotal,
-    prevDenomTotals: { ...state.denomTotals },
-  };
-
-  // Add to running total
-  state.runningTotal += entryTotal;
-
-  // Update denom totals
-  DENOMINATIONS.forEach(d => {
-    state.denomTotals[d] = (state.denomTotals[d] || 0) + (state.currentEntry[d] || 0);
-  });
-
-  // Save to history
-  const now = new Date();
-  const histEntry = {
-    id    : Date.now(),
-    ts    : now.toISOString(),
-    date  : toDateStr(now),
-    time  : now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',hour12:true}),
-    entry : { ...state.currentEntry },
-    total : entryTotal,
-    notes : DENOMINATIONS.reduce((s,d) => s + (state.currentEntry[d]||0), 0),
-  };
-  state.history.unshift(histEntry);
-
-  saveToStorage();
-  resetCurrentEntry(false);
-  refreshDisplayTotals();
-  renderDashboard();
-  renderHistory();
-
-  showToast(`✅ ₹${fmt(entryTotal)} added to ledger!`);
-  vibrate([50, 30, 50]);
-  showUndoBar();
-}
-
-/* ============================================================
-   UNDO
-   ============================================================ */
-function showUndoBar() {
-  if (state.undoTimer) clearTimeout(state.undoTimer);
-  document.getElementById('undo-bar').classList.add('show');
-  state.undoTimer = setTimeout(() => {
-    document.getElementById('undo-bar').classList.remove('show');
-  }, 5000);
-}
-
-function undoLastEntry() {
-  if (!state.undoBuffer) return;
-  const buf = state.undoBuffer;
-  state.runningTotal = buf.prevRunning;
-  state.denomTotals  = { ...buf.prevDenomTotals };
-
-  // Remove last history entry
-  state.history.shift();
-  saveToStorage();
-  refreshDisplayTotals();
-  renderDashboard();
-  renderHistory();
-
-  // Restore inputs
-  DENOMINATIONS.forEach(d => {
-    const qty = buf.entry[d] || 0;
-    state.currentEntry[d] = qty;
-    const inp = document.getElementById(`qty-${d}`);
-    if (inp) inp.value = qty || '';
-    const sub  = document.getElementById(`sub-${d}`);
-    const card = document.getElementById(`dcard-${d}`);
-    if (qty > 0) {
-      sub.textContent = `₹${fmt(qty * d)}`;
-      card.classList.add('has-value');
-    } else {
-      sub.textContent = '';
-      card.classList.remove('has-value');
-    }
-  });
-  refreshDisplayTotals();
-  refreshEntrySummary();
-  state.undoBuffer = null;
-  document.getElementById('undo-bar').classList.remove('show');
-  showToast('↩️ Last entry undone');
-}
-
-/* ============================================================
-   RESET
-   ============================================================ */
-function resetCurrentEntry(showMsg = true) {
-  DENOMINATIONS.forEach(d => {
-    state.currentEntry[d] = 0;
-    const inp = document.getElementById(`qty-${d}`);
-    if (inp) inp.value = '';
-    const sub  = document.getElementById(`sub-${d}`);
-    const card = document.getElementById(`dcard-${d}`);
-    if (sub)  sub.textContent = '';
-    if (card) card.classList.remove('has-value');
-  });
-  document.getElementById('entry-summary').style.display = 'none';
-  refreshDisplayTotals();
-  if (showMsg) showToast('🔄 Entry cleared');
-}
-
-function confirmResetAll() {
-  openModal(
-    '⚠️ Reset All Data?',
-    'This will permanently delete all ledger history and reset the running total to ₹0. This cannot be undone.',
-    'Reset Everything',
-    resetAllData
-  );
-}
-
-function resetAllData() {
-  state.runningTotal = 0;
-  state.history      = [];
-  state.denomTotals  = {};
-  DENOMINATIONS.forEach(d => state.denomTotals[d] = 0);
-  saveToStorage();
-  resetCurrentEntry(false);
-  refreshDisplayTotals();
-  renderDashboard();
-  renderHistory();
-  showToast('🗑️ All data has been reset', 'error');
-}
-
-/* ============================================================
-   DASHBOARD
-   ============================================================ */
-function renderDashboard() {
-  // Stats
-  document.getElementById('dash-total').textContent = `₹${fmt(state.runningTotal)}`;
-
-  const todayStr   = toDateStr(new Date());
-  const todayEnts  = state.history.filter(h => h.date === todayStr);
-  const todayTotal = todayEnts.reduce((s,h) => s + h.total, 0);
-  document.getElementById('dash-today').textContent    = `₹${fmt(todayTotal)}`;
-  document.getElementById('dash-today-date').textContent = fmtDate(new Date());
-  document.getElementById('dash-entries').textContent  = state.history.length;
-
-  if (state.history.length > 0) {
-    const last = state.history[0];
-    document.getElementById('dash-last-time').textContent = last.time;
-    document.getElementById('dash-last-date').textContent = fmtDate(new Date(last.ts));
-  }
-
-  // Denom breakdown
-  const breakdown = document.getElementById('dash-breakdown');
-  const maxVal = Math.max(...DENOMINATIONS.map(d => (state.denomTotals[d]||0)*d), 1);
-  breakdown.innerHTML = DENOMINATIONS.map(d => {
-    const qty  = state.denomTotals[d] || 0;
-    const val  = qty * d;
-    const pct  = Math.round((val / maxVal) * 100);
-    return `<div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
-        <span style="font-weight:700">₹${d} × ${qty} notes</span>
-        <span class="font-mono" style="color:var(--accent)">₹${fmt(val)}</span>
-      </div>
-      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 0.5s ease"></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  // Recent entries (last 5)
-  const recent = document.getElementById('dash-recent');
-  if (state.history.length === 0) {
-    recent.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No entries yet</p></div>';
-    return;
-  }
-  recent.innerHTML = state.history.slice(0, 5).map(h => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
-      <div>
-        <div style="font-size:13px;font-weight:600">${h.date} · ${h.time}</div>
-        <div style="font-size:11px;color:var(--text-muted)">${h.notes} notes</div>
-      </div>
-      <div style="font-size:16px;font-weight:800;color:var(--accent);font-family:var(--font-mono)">₹${fmt(h.total)}</div>
-    </div>
-  `).join('');
-}
-
-/* ============================================================
-   HISTORY
-   ============================================================ */
-function renderHistory() {
-  const search   = (document.getElementById('search-input')?.value || '').toLowerCase();
-  const dateFilter = document.getElementById('date-filter')?.value || '';
-
-  let filtered = state.history.filter(h => {
-    const matchDate   = !dateFilter || h.date === dateFilter;
-    const matchSearch = !search    || h.date.includes(search) || String(h.total).includes(search);
-    return matchDate && matchSearch;
-  });
-
-  // Daily totals
-  const dailyTotSection = document.getElementById('daily-totals-section');
-  if (dateFilter) {
-    const dayTotal = filtered.reduce((s,h) => s + h.total, 0);
-    dailyTotSection.innerHTML = `
-      <div class="daily-total-bar">
-        <div class="dtb-date">📅 ${dateFilter}</div>
-        <div class="dtb-total">₹${fmt(dayTotal)}</div>
-      </div>`;
-  } else {
-    dailyTotSection.innerHTML = '';
-  }
-
-  const list = document.getElementById('history-list');
-  if (filtered.length === 0) {
-    list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">📜</div>
-      <p>${state.history.length === 0 ? 'No entries yet. Start counting cash!' : 'No entries match your search.'}</p>
-    </div>`;
-    return;
-  }
-
-  list.innerHTML = filtered.map(h => {
-    const chips = DENOMINATIONS.map(d => {
-      const qty = h.entry[d] || 0;
-      const active = qty > 0 ? 'active' : '';
-      return `<span class="hi-denom-chip ${active}">₹${d}×${qty}</span>`;
-    }).join('');
-
-    return `<div class="history-item">
-      <div class="hi-header">
-        <div>
-          <div class="hi-date">📅 ${h.date} · ⏰ ${h.time}</div>
-          <div class="hi-notes-count">${h.notes} notes</div>
+        <div class="subtotal" id="subtotal${note}">
+            ₹0
         </div>
-        <div style="text-align:right">
-          <div class="hi-amount">₹${fmt(h.total)}</div>
-        </div>
-      </div>
-      <div class="hi-denoms">${chips}</div>
-      <div class="hi-footer">
-        <button class="hi-del-btn" onclick="deleteHistoryEntry(${h.id})">🗑️ Delete</button>
-      </div>
-    </div>`;
-  }).join('');
-}
 
-function deleteHistoryEntry(id) {
-  const entry = state.history.find(h => h.id === id);
-  if (!entry) return;
-  openModal(
-    '🗑️ Delete Entry?',
-    `Delete entry of ₹${fmt(entry.total)} from ${entry.date}? The running total will be reduced by this amount.`,
-    'Delete',
-    () => {
-      state.runningTotal -= entry.total;
-      if (state.runningTotal < 0) state.runningTotal = 0;
-      // Subtract denom totals
-      DENOMINATIONS.forEach(d => {
-        state.denomTotals[d] = Math.max(0, (state.denomTotals[d]||0) - (entry.entry[d]||0));
-      });
-      state.history = state.history.filter(h => h.id !== id);
-      saveToStorage();
-      refreshDisplayTotals();
-      renderHistory();
-      renderDashboard();
-      showToast('🗑️ Entry deleted');
-    }
-  );
-}
-
-function confirmClearAll() {
-  if (state.history.length === 0) { showToast('No history to clear', 'warn'); return; }
-  openModal(
-    '🗑️ Clear All History?',
-    'This will delete all history entries but keep the running total intact.',
-    'Clear History',
-    () => {
-      state.history = [];
-      localStorage.setItem(LS.HISTORY, '[]');
-      renderHistory();
-      renderDashboard();
-      showToast('🗑️ History cleared');
-    }
-  );
-}
-
-/* ============================================================
-   REPORTS
-   ============================================================ */
-function setDefaultDates() {
-  const today = toDateStr(new Date());
-  const fromEl = document.getElementById('report-from');
-  const toEl   = document.getElementById('report-to');
-  if (fromEl) fromEl.value = today;
-  if (toEl)   toEl.value   = today;
-}
-
-function generateReport(type) {
-  const isThermal = type === 'thermal';
-
-  if (isThermal) {
-    generateThermalReport();
-  } else {
-    generateA4Report();
-  }
-}
-
-/* ── Thermal 3-inch: exactly TWO sections — Today's entries + Previous entries ── */
-function generateThermalReport() {
-  if (state.history.length === 0) {
-    showToast('⚠️ No entries to print', 'warn');
-    return;
-  }
-
-  const todayStr    = toDateStr(new Date());
-  const now         = new Date();
-  const genTime     = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
-  const genDate     = now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
-
-  // Split into today vs previous
-  const todayEntries = state.history.filter(h => h.date === todayStr).slice().reverse(); // chronological
-  const prevEntries  = state.history.filter(h => h.date !== todayStr).slice().reverse(); // chronological
-
-  /* Helper: build denom totals from a list of entries */
-  function denomTotalsFrom(entries) {
-    const dt = {};
-    DENOMINATIONS.forEach(d => dt[d] = 0);
-    entries.forEach(h => DENOMINATIONS.forEach(d => { dt[d] += (h.entry[d] || 0); }));
-    return dt;
-  }
-
-  /* Helper: build a compact denom rows table for a single entry */
-  function entryDenomRows(h) {
-    const rows = DENOMINATIONS
-      .filter(d => (h.entry[d] || 0) > 0)
-      .map(d => `<tr>
-        <td>&#8377;${d}</td>
-        <td style="text-align:center">${h.entry[d]}</td>
-        <td style="text-align:right">&#8377;${fmt(d * h.entry[d])}</td>
-      </tr>`).join('');
-    return rows;
-  }
-
-  /* Helper: render one section (Today or Previous) */
-  function renderSection(label, entries) {
-    if (entries.length === 0) return '';
-
-    const dt    = denomTotalsFrom(entries);
-    const total = entries.reduce((s,h) => s + h.total, 0);
-    const notes = entries.reduce((s,h) => s + h.notes, 0);
-
-    // Each individual entry with its date/time + denom breakdown
-    const entryBlocks = entries.map(h => `
-      <div class="pa-section-meta">${h.date} ${h.time} &mdash; ${h.notes} notes &mdash; &#8377;${fmt(h.total)}</div>
-      <table class="pa-table">
-        <thead><tr><th>Note</th><th>Qty</th><th>Amt</th></tr></thead>
-        <tbody>
-          ${entryDenomRows(h)}
-        </tbody>
-      </table>
-      <hr class="pa-divider"/>
-    `).join('');
-
-    // Section total (combined denom totals across all entries in this section)
-    const combinedRows = DENOMINATIONS
-      .filter(d => dt[d] > 0)
-      .map(d => `<tr>
-        <td><strong>&#8377;${d}</strong></td>
-        <td style="text-align:center"><strong>${dt[d]}</strong></td>
-        <td style="text-align:right"><strong>&#8377;${fmt(d * dt[d])}</strong></td>
-      </tr>`).join('');
-
-    return `
-      <div class="pa-section">
-        <div class="pa-section-title">${label} (${entries.length} entr${entries.length===1?'y':'ies'})</div>
-        ${entryBlocks}
-        ${entries.length > 1 ? `
-          <div class="pa-section-meta" style="font-weight:900;color:#000">SECTION TOTAL &mdash; ${notes} notes</div>
-          <table class="pa-table">
-            <thead><tr><th>Note</th><th>Qty</th><th>Amt</th></tr></thead>
-            <tbody>
-              ${combinedRows}
-            </tbody>
-          </table>
-        ` : ''}
-        <div class="pa-section-total">TOTAL: &#8377;${fmt(total)}</div>
-      </div>`;
-  }
-
-  const todaySection = renderSection('TODAY — ' + todayStr, todayEntries);
-  const prevSection  = renderSection('PREVIOUS ENTRIES', prevEntries);
-
-  // Grand total across everything that was printed
-  const printedEntries = [...todayEntries, ...prevEntries];
-  const grandTotal     = printedEntries.reduce((s,h) => s + h.total, 0);
-
-  const hasBoth = todayEntries.length > 0 && prevEntries.length > 0;
-
-  const html = `
-    <div class="pa-header">
-      <div class="pa-shop">&#8377; CASH COUNTER LEDGER</div>
-      <div class="pa-title">Denomination Receipt</div>
-      <div class="pa-date">Printed: ${genDate} ${genTime}</div>
     </div>
+    
+    `;
 
-    ${todaySection}
+});
 
-    ${hasBoth ? '<hr class="pa-divider"/>' : ''}
+function updateSubtotal(note){
 
-    ${prevSection}
+    let qty = Number(document.getElementById("note"+note).value || 0);
 
-    ${hasBoth ? `<div class="pa-grand-total">GRAND TOTAL: &#8377;${fmt(grandTotal)}</div>` : ''}
+    let subtotal = qty * note;
 
-    <div class="pa-footer">
-      Cash Counter Ledger<br>
-      ${genDate} · ${genTime}<br>
-      *** Thank You ***
-    </div>`;
+    document.getElementById("subtotal"+note).innerText =
+        "₹" + subtotal.toLocaleString();
 
-  const container = document.getElementById('print-preview-container');
-  const inner     = document.getElementById('print-preview-inner');
-  inner.innerHTML  = html;
-  inner.className  = 'print-area print-thermal';
-  container.style.display = 'block';
-  container.scrollIntoView({ behavior: 'smooth' });
-  showToast('🧾 Thermal receipt ready — tap Print');
 }
 
-/* ── A4 full report (date range based) ── */
-function generateA4Report() {
-  const fromDate = document.getElementById('report-from')?.value || '';
-  const toDate   = document.getElementById('report-to')?.value   || '';
+function addTotal(){
 
-  let filtered = state.history;
-  if (fromDate) filtered = filtered.filter(h => h.date >= fromDate);
-  if (toDate)   filtered = filtered.filter(h => h.date <= toDate);
-  filtered = filtered.slice().reverse(); // chronological
+    let total = 0;
 
-  if (filtered.length === 0) {
-    showToast('⚠️ No entries in selected period', 'warn');
-    return;
-  }
+    notes.forEach(note=>{
 
-  const total      = filtered.reduce((s,h) => s + h.total, 0);
-  const totalNotes = filtered.reduce((s,h) => s + h.notes, 0);
-  const reportDenomTotals = {};
-  DENOMINATIONS.forEach(d => reportDenomTotals[d] = 0);
-  filtered.forEach(h => DENOMINATIONS.forEach(d => { reportDenomTotals[d] += (h.entry[d]||0); }));
+        let qty = Number(document.getElementById("note"+note).value || 0);
 
-  const periodLabel = fromDate === toDate
-    ? `Date: ${fromDate}`
-    : `Period: ${fromDate} to ${toDate}`;
-  const genTime = new Date().toLocaleString('en-IN');
+        total += qty * note;
 
-  const html = `
-    <div class="pa-header">
-      <div class="pa-shop">&#8377; Cash Counter Ledger</div>
-      <div class="pa-title">Cash Denomination Report</div>
-      <div class="pa-date">${periodLabel}</div>
-      <div class="pa-date">Generated: ${genTime}</div>
-    </div>
-    <table class="pa-table">
-      <thead>
-        <tr>
-          <th>#</th><th>Date</th><th>Time</th>
-          ${DENOMINATIONS.map(d=>`<th>&#8377;${d}</th>`).join('')}
-          <th>Notes</th><th>Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${filtered.map((h,i) => `
-          <tr>
-            <td>${i+1}</td><td>${h.date}</td><td>${h.time}</td>
-            ${DENOMINATIONS.map(d=>`<td>${h.entry[d]||0}</td>`).join('')}
-            <td>${h.notes}</td><td style="font-weight:900">&#8377;${fmt(h.total)}</td>
-          </tr>
-        `).join('')}
-        <tr class="pa-total-row">
-          <td colspan="3"><strong>TOTAL</strong></td>
-          ${DENOMINATIONS.map(d=>`<td><strong>${reportDenomTotals[d]}</strong></td>`).join('')}
-          <td><strong>${totalNotes}</strong></td>
-          <td><strong>&#8377;${fmt(total)}</strong></td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="pa-footer">
-      Total Cash: &#8377;${fmt(total)} &nbsp;|&nbsp; Entries: ${filtered.length} &nbsp;|&nbsp; Notes: ${totalNotes}
-      <br>Cash Counter Ledger &middot; Printed ${new Date().toLocaleDateString('en-IN')}
-    </div>`;
-
-  const container = document.getElementById('print-preview-container');
-  const inner     = document.getElementById('print-preview-inner');
-  inner.innerHTML  = html;
-  inner.className  = 'print-area print-a4';
-  container.style.display = 'block';
-  container.scrollIntoView({ behavior: 'smooth' });
-  showToast('📄 A4 report ready — tap Print');
-}
-
-function exportCSV() {
-  if (state.history.length === 0) { showToast('⚠️ No data to export', 'warn'); return; }
-
-  const headers = ['#','Date','Time','₹10','₹20','₹50','₹100','₹200','₹500','Total Notes','Total Amount'];
-  const rows = state.history.slice().reverse().map((h,i) => [
-    i+1, h.date, h.time,
-    ...DENOMINATIONS.map(d => h.entry[d]||0),
-    h.notes, h.total
-  ]);
-
-  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `cash-ledger-${toDateStr(new Date())}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('📊 CSV exported successfully!');
-}
-
-async function shareBluetooth() {
-  // Bluetooth thermal printing via Web Bluetooth API (best effort)
-  if (!navigator.bluetooth) {
-    showToast('📱 Bluetooth printing: Use your ATPOS app or browser Bluetooth. Share the CSV/PDF to your thermal printer app.', 'warn');
-    // Fallback: share via Web Share API
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Cash Ledger Report',
-          text : `Cash Ledger Report\nTotal: ₹${fmt(state.runningTotal)}\nEntries: ${state.history.length}`,
-        });
-      } catch(e) {}
-    }
-    return;
-  }
-  // Web Bluetooth thermal printing attempt
-  try {
-    showToast('🔵 Searching for Bluetooth printer...');
-    const device = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
-      optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // common printer service
     });
-    showToast(`🔵 Connected to ${device.name}. Use your printer app to print the report.`);
-  } catch(e) {
-    // Build a thermal receipt text
-    generateReport('thermal');
-    showToast('🔵 Bluetooth not available. Report preview shown for manual printing.', 'warn');
-  }
+
+    runningTotal += total;
+
+    document.getElementById("grandTotal").innerText =
+        "₹" + runningTotal.toLocaleString();
+
+    alert("₹" + total.toLocaleString() + " Added");
+
 }
 
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
-function showPage(pageName, navBtn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`page-${pageName}`).classList.add('active');
-  if (navBtn) navBtn.classList.add('active');
+function resetAll(){
 
-  if (pageName === 'dashboard') renderDashboard();
-  if (pageName === 'history')   renderHistory();
+    notes.forEach(note=>{
+
+        document.getElementById("note"+note).value = "";
+
+        document.getElementById("subtotal"+note).innerText = "₹0";
+
+    });
+
 }
 
-/* ============================================================
-   THEME
-   ============================================================ */
-function setTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem(LS.THEME, theme);
-  document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+function printReport(){
+
+    let tbody = "";
+
+    let total = 0;
+
+    notes.forEach(note=>{
+
+        let qty = Number(document.getElementById("note"+note).value || 0);
+
+        let amount = qty * note;
+
+        if(qty > 0){
+
+            tbody += `
+            <tr>
+                <td>₹${note}</td>
+                <td>${qty}</td>
+                <td>₹${amount.toLocaleString()}</td>
+            </tr>
+            `;
+
+            total += amount;
+
+        }
+
+    });
+
+    document.getElementById("reportBody").innerHTML = tbody;
+
+    let today = new Date();
+
+    document.getElementById("reportDate").innerHTML =
+        "DATE RANGE: " +
+        today.toLocaleDateString();
+
+    document.getElementById("reportGrand").innerHTML =
+        "TOTAL ₹" + total.toLocaleString();
+
+    document.getElementById("report").classList.remove("hidden");
+
+    window.print();
+
 }
 
-document.getElementById('theme-toggle').addEventListener('click', () => {
-  const cur = document.documentElement.getAttribute('data-theme');
-  setTheme(cur === 'dark' ? 'light' : 'dark');
-});
-
-/* ============================================================
-   MODAL
-   ============================================================ */
-function openModal(title, text, confirmLabel, action) {
-  document.getElementById('modal-title').textContent   = title;
-  document.getElementById('modal-text').textContent    = text;
-  document.getElementById('modal-confirm-btn').textContent = confirmLabel;
-  _modalAction = action;
-  document.getElementById('confirm-modal').classList.add('open');
-}
-function closeModal() {
-  document.getElementById('confirm-modal').classList.remove('open');
-  _modalAction = null;
-}
-function modalConfirmAction() {
-  if (_modalAction) _modalAction();
-  closeModal();
-}
-// Close modal on overlay click
-document.getElementById('confirm-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-/* ============================================================
-   TOAST
-   ============================================================ */
-function showToast(msg, type = 'success') {
-  const container = document.getElementById('toast-container');
-  const toast     = document.createElement('div');
-  toast.className = `toast${type === 'error' ? ' error' : type === 'warn' ? ' warn' : ''}`;
-  toast.textContent = msg;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.transition = 'opacity 0.3s';
-    toast.style.opacity    = '0';
-    setTimeout(() => toast.remove(), 350);
-  }, 3000);
-}
-
-/* ============================================================
-   VIBRATION
-   ============================================================ */
-function vibrate(pattern) {
-  if (navigator.vibrate) navigator.vibrate(pattern);
-}
-
-/* ============================================================
-   SERVICE WORKER (Inline)
-   ============================================================ */
-function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    // Inline SW via blob URL
-    const swCode = `
-const CACHE = 'ccl-v1';
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.open(CACHE).then(cache =>
-      cache.match(e.request).then(res => res || fetch(e.request).then(r => { cache.put(e.request, r.clone()); return r; }))
-    ).catch(() => new Response('Offline'))
-  );
-});`;
-    const blob = new Blob([swCode], {type:'application/javascript'});
-    const url  = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(url).catch(() => {});
-  }
-}
-
-/* ============================================================
-   PWA INSTALL
-   ============================================================ */
-let _deferredPrompt = null;
-function initPWAInstall() {
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    _deferredPrompt = e;
-    document.getElementById('install-btn').style.display = 'flex';
-  });
-  document.getElementById('install-btn').addEventListener('click', async () => {
-    if (!_deferredPrompt) return;
-    _deferredPrompt.prompt();
-    const { outcome } = await _deferredPrompt.userChoice;
-    if (outcome === 'accepted') showToast('📲 App installed!');
-    _deferredPrompt = null;
-    document.getElementById('install-btn').style.display = 'none';
-  });
-}
-
-/* ============================================================
-   HELPERS
-   ============================================================ */
-function fmt(n) {
-  // Indian number format
-  return Number(n).toLocaleString('en-IN');
-}
-
-function toDateStr(d) {
-  // YYYY-MM-DD
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const day = String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
-}
-
-function fmtDate(d) {
-  return d.toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
-}
-
-/* ============================================================
-   START
-   ============================================================ */
-window.addEventListener('DOMContentLoaded', init);
 </script>
+
 </body>
 </html>
+```
