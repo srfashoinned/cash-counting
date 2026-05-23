@@ -3,518 +3,392 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cash Counter Thermal Printer</title>
-
+<title>Cash Counter</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
+  *{box-sizing:border-box;margin:0;padding:0}
 
-body{
-    margin:0;
-    padding:0;
-    background:#111827;
-    color:white;
+  body{
     font-family:Arial,sans-serif;
-}
+    background:#111827;
+    color:#f9fafb;
+    min-height:100vh;
+    padding:20px;
+  }
 
-.container{
-    max-width:900px;
-    margin:auto;
-    padding:15px;
-}
+  .wrap{max-width:700px;margin:auto}
 
-h1{
-    text-align:center;
-    margin-bottom:20px;
-}
+  .header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:24px;
+  }
+  .header i{font-size:24px;color:#9ca3af}
+  .header h1{font-size:22px;font-weight:500}
 
-.grid{
+  .section-label{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#6b7280;
+    margin-bottom:10px;
+  }
+
+  .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-    gap:12px;
-}
+    grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
+    gap:10px;
+    margin-bottom:16px;
+  }
 
-.card{
+  .card{
     background:#1f2937;
+    border:1px solid #374151;
     border-radius:12px;
-    padding:12px;
+    padding:14px 10px;
     text-align:center;
-}
+  }
 
-.card h2{
-    margin:0 0 10px;
-}
+  .denom{
+    font-size:13px;
+    font-weight:500;
+    color:#9ca3af;
+    margin-bottom:8px;
+  }
 
-input{
+  .card input{
     width:100%;
-    height:50px;
+    background:#111827;
+    border:1px solid #374151;
+    border-radius:8px;
+    color:#f9fafb;
+    font-size:20px;
+    font-weight:500;
+    text-align:center;
+    padding:8px 4px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  .card input:focus{border-color:#3b82f6}
+  .card input::-webkit-inner-spin-button,
+  .card input::-webkit-outer-spin-button{-webkit-appearance:none}
+
+  .sub{
+    font-size:12px;
+    color:#6b7280;
+    margin-top:6px;
+    min-height:16px;
+  }
+
+  .divider{
+    height:1px;
+    background:#1f2937;
+    margin:20px 0;
+  }
+
+  .summary-box{
+    background:#1f2937;
+    border:1px solid #374151;
+    border-radius:12px;
+    padding:14px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+  }
+
+  .summary-box .lbl{font-size:13px;color:#9ca3af}
+  .summary-box .val{font-size:22px;font-weight:500;color:#f9fafb}
+
+  .running-box{
+    background:#1f2937;
+    border:2px solid #3b82f6;
+    border-radius:12px;
+    padding:14px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+  }
+  .running-box .lbl{font-size:13px;color:#9ca3af}
+  .running-box .val{font-size:28px;font-weight:500;color:#60a5fa}
+
+  .actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:6px;
+  }
+
+  button{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    height:46px;
     border:none;
     border-radius:10px;
-    text-align:center;
-    font-size:22px;
-    font-weight:900;
-}
-
-.subtotal{
-    margin-top:10px;
-    font-size:20px;
-    font-weight:900;
-    color:#10b981;
-}
-
-.totalBox{
-    background:#000;
-    color:#fff;
-    padding:20px;
-    border-radius:12px;
-    margin-top:20px;
-    text-align:center;
-}
-
-.totalBox h2{
-    margin:0;
-    font-size:22px;
-}
-
-.total{
-    font-size:42px;
-    font-weight:900;
-    margin-top:10px;
-}
-
-button{
-    width:100%;
-    height:58px;
-    margin-top:15px;
-    border:none;
-    border-radius:12px;
-    font-size:20px;
-    font-weight:900;
+    font-size:14px;
+    font-weight:600;
     cursor:pointer;
-}
+    transition:filter .15s;
+  }
+  button:hover{filter:brightness(.9)}
 
-.addBtn{
-    background:#10b981;
-    color:white;
-}
+  .btn-add{background:#065f46;color:#6ee7b7}
+  .btn-reset{background:#7f1d1d;color:#fca5a5}
+  .btn-print{
+    grid-column:1/-1;
+    background:#1e3a5f;
+    color:#93c5fd;
+  }
 
-.printBtn{
-    background:#2563eb;
-    color:white;
-}
+  .history{margin-top:16px}
+  .hist-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:9px 0;
+    border-bottom:1px solid #1f2937;
+    font-size:13px;
+    color:#6b7280;
+  }
+  .hist-item .hval{font-weight:500;color:#f9fafb}
 
-.resetBtn{
-    background:#ef4444;
-    color:white;
-}
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(60px);
+    background:#1f2937;
+    border:1px solid #374151;
+    border-radius:10px;
+    padding:10px 22px;
+    font-size:14px;
+    font-weight:500;
+    color:#f9fafb;
+    transition:transform .25s ease,opacity .25s ease;
+    opacity:0;
+    pointer-events:none;
+    z-index:99;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-/* ========================= */
-/* PRINT AREA */
-/* ========================= */
+  /* ===== PRINT ===== */
+  #printSection{display:none}
 
-#printSection{
-    display:none;
-}
-
-/* ========================= */
-/* THERMAL PRINT */
-/* ========================= */
-
-@media print{
-
+  @media print{
     html,body{
-        width:80mm;
-        margin:0 !important;
-        padding:0 !important;
-        background:#fff !important;
+      width:80mm;
+      margin:0!important;
+      padding:0!important;
+      background:#fff!important;
+      color:#000;
     }
-
-    body *{
-        visibility:hidden;
-    }
-
-    #printSection,
-    #printSection *{
-        visibility:visible;
-    }
-
+    body *{visibility:hidden}
+    #printSection,#printSection *{visibility:visible}
     #printSection{
-
-        display:block !important;
-
-        position:absolute;
-        left:0;
-        top:0;
-
-        width:76mm;
-        max-width:76mm;
-
-        padding:3mm;
-
-        color:#000;
-        background:#fff;
-
-        font-family:Arial,sans-serif;
-
-        overflow:hidden;
+      display:block!important;
+      position:absolute;
+      left:0;top:0;
+      width:76mm;
+      padding:3mm;
+      background:#fff;
+      font-family:Arial,sans-serif;
     }
-
-    .shop{
-        text-align:center;
-        font-size:30px;
-        font-weight:900;
-        margin-bottom:10px;
-    }
-
-    .title{
-        text-align:center;
-        font-size:22px;
-        font-weight:900;
-        margin-bottom:10px;
-    }
-
-    .date{
-        text-align:center;
-        font-size:16px;
-        font-weight:700;
-        margin-bottom:15px;
-    }
-
-    .sectionTitle{
-
-        background:#000;
-        color:#fff;
-
-        text-align:center;
-
-        padding:10px;
-
-        font-size:22px;
-        font-weight:900;
-
-        margin-top:15px;
-        margin-bottom:10px;
-    }
-
-    table{
-        width:100%;
-        border-collapse:collapse;
-        margin-bottom:10px;
-    }
-
-    th{
-        border-bottom:3px solid #000;
-        padding:10px 4px;
-        font-size:18px;
-        font-weight:900;
-    }
-
-    td{
-        border-bottom:2px solid #aaa;
-        padding:10px 4px;
-        font-size:18px;
-        font-weight:800;
-    }
-
-    .sectionTotal{
-
-        text-align:right;
-
-        font-size:24px;
-        font-weight:900;
-
-        margin-top:10px;
-        margin-bottom:15px;
-    }
-
-    .grandTotal{
-
-        background:#000;
-        color:#fff;
-
-        text-align:center;
-
-        padding:15px;
-
-        font-size:30px;
-        font-weight:900;
-
-        margin-top:15px;
-    }
-
-    .footer{
-        text-align:center;
-        margin-top:20px;
-        font-size:15px;
-        font-weight:700;
-    }
-
-    @page{
-        size:80mm auto;
-        margin:0;
-    }
-}
-
+    .pt{text-align:center;font-size:22px;font-weight:900;margin:6px 0}
+    .ps{text-align:center;font-size:14px;margin:2px 0}
+    .ph{background:#000;color:#fff;text-align:center;padding:7px;font-size:16px;font-weight:900;margin:10px 0 6px}
+    table{width:100%;border-collapse:collapse;margin-bottom:4px}
+    th{border-bottom:2px solid #000;padding:7px 3px;font-size:14px;text-align:left;font-weight:900}
+    th:last-child,td:last-child{text-align:right}
+    th:nth-child(2),td:nth-child(2){text-align:center}
+    td{border-bottom:1px solid #bbb;padding:7px 3px;font-size:14px;font-weight:700}
+    .pst{text-align:right;font-size:15px;font-weight:900;margin:6px 0 10px}
+    .pgrand{background:#000;color:#fff;text-align:center;padding:12px;font-size:22px;font-weight:900;margin:10px 0}
+    .pruntotal{text-align:right;font-size:14px;font-weight:800;margin:6px 0}
+    .pft{text-align:center;font-size:12px;margin-top:14px}
+    @page{size:80mm auto;margin:0}
+  }
 </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="wrap">
 
-<h1>₹ Cash Counter</h1>
+  <div class="header">
+    <i class="ti ti-wallet"></i>
+    <h1>Cash Counter</h1>
+  </div>
 
-<div class="grid" id="grid"></div>
+  <p class="section-label">Older notes</p>
+  <div class="grid" id="oldGrid"></div>
 
-<div class="totalBox">
+  <p class="section-label">New notes</p>
+  <div class="grid" id="newGrid"></div>
 
-<h2>Running Total</h2>
+  <div class="divider"></div>
 
-<div class="total" id="runningTotal">
-₹0
-</div>
+  <div class="summary-box">
+    <span class="lbl"><i class="ti ti-calculator" style="font-size:15px;vertical-align:-2px;margin-right:5px"></i>This batch</span>
+    <span class="val" id="batchTotal">₹0</span>
+  </div>
 
-</div>
+  <div class="running-box">
+    <div>
+      <div class="lbl">Running total</div>
+      <div class="val" id="runningTotal">₹0</div>
+    </div>
+    <i class="ti ti-history" style="font-size:22px;color:#4b5563"></i>
+  </div>
 
-<button class="addBtn" onclick="addTotal()">
-ADD TO TOTAL
-</button>
+  <div class="actions">
+    <button class="btn-add" onclick="addBatch()">
+      <i class="ti ti-plus"></i> Add batch
+    </button>
+    <button class="btn-reset" onclick="resetAll()">
+      <i class="ti ti-trash"></i> Reset
+    </button>
+    <button class="btn-print" onclick="doPrint()">
+      <i class="ti ti-printer"></i> Print thermal report
+    </button>
+  </div>
 
-<button class="printBtn" onclick="printReport()">
-PRINT THERMAL REPORT
-</button>
-
-<button class="resetBtn" onclick="resetAll()">
-RESET
-</button>
-
-</div>
-
-<!-- ========================= -->
-<!-- PRINT SECTION -->
-<!-- ========================= -->
-
-<div id="printSection">
-
-<div class="shop">
-₹ CASH LEDGER
-</div>
-
-<div class="title">
-THERMAL REPORT
-</div>
-
-<div class="date" id="printDate"></div>
-
-<!-- OLD NOTES -->
-
-<div class="sectionTitle">
-OLD NOTES
-</div>
-
-<table>
-
-<thead>
-<tr>
-<th>NOTE</th>
-<th>QTY</th>
-<th>AMOUNT</th>
-</tr>
-</thead>
-
-<tbody id="oldBody"></tbody>
-
-</table>
-
-<div class="sectionTotal" id="oldTotal"></div>
-
-<!-- NEW NOTES -->
-
-<div class="sectionTitle">
-NEW NOTES
-</div>
-
-<table>
-
-<thead>
-<tr>
-<th>NOTE</th>
-<th>QTY</th>
-<th>AMOUNT</th>
-</tr>
-</thead>
-
-<tbody id="newBody"></tbody>
-
-</table>
-
-<div class="sectionTotal" id="newTotal"></div>
-
-<div class="grandTotal" id="grandTotalPrint"></div>
-
-<div class="footer">
-Cash Counter Ledger<br>
-Thank You
-</div>
+  <div class="history" id="historyList"></div>
 
 </div>
+
+<div class="toast" id="toast"></div>
+<div id="printSection"></div>
 
 <script>
+const oldNotes=[10,20,50];
+const newNotes=[100,200,500];
+const allNotes=[...oldNotes,...newNotes];
+let runningTotal=0;
+let history=[];
 
-const oldNotes = [10,20,50];
-const newNotes = [100,200,500];
-
-const allNotes = [...oldNotes,...newNotes];
-
-let runningTotal = 0;
-
-const grid = document.getElementById("grid");
-
-allNotes.forEach(note=>{
-
-    grid.innerHTML += `
-
-    <div class="card">
-
-        <h2>₹${note}</h2>
-
-        <input
-            type="number"
-            id="note${note}"
-            min="0"
-            value=""
-            oninput="updateSubtotal(${note})"
-        >
-
-        <div class="subtotal" id="subtotal${note}">
-            ₹0
-        </div>
-
-    </div>
-
-    `;
-
-});
-
-function updateSubtotal(note){
-
-    let qty =
-        Number(document.getElementById("note"+note).value || 0);
-
-    let subtotal = qty * note;
-
-    document.getElementById("subtotal"+note).innerText =
-        "₹" + subtotal.toLocaleString();
-
+function renderGrid(notes,containerId){
+  const g=document.getElementById(containerId);
+  g.innerHTML='';
+  notes.forEach(n=>{
+    const d=document.createElement('div');
+    d.className='card';
+    d.innerHTML=`<div class="denom">&#8377;${n}</div>
+      <input type="number" id="note${n}" min="0" placeholder="0" oninput="updateBatch()">
+      <div class="sub" id="sub${n}"></div>`;
+    g.appendChild(d);
+  });
 }
 
-function addTotal(){
+renderGrid(oldNotes,'oldGrid');
+renderGrid(newNotes,'newGrid');
 
-    let total = 0;
+function fmt(n){return'&#8377;'+n.toLocaleString('en-IN')}
 
-    allNotes.forEach(note=>{
+function updateBatch(){
+  let total=0;
+  allNotes.forEach(n=>{
+    const qty=Number(document.getElementById('note'+n).value||0);
+    const amt=qty*n;
+    const sub=document.getElementById('sub'+n);
+    sub.innerHTML=qty>0?fmt(amt):'';
+    total+=amt;
+  });
+  document.getElementById('batchTotal').innerHTML=fmt(total);
+}
 
-        let qty =
-            Number(document.getElementById("note"+note).value || 0);
+function addBatch(){
+  let total=0;
+  const rows=[];
+  allNotes.forEach(n=>{
+    const qty=Number(document.getElementById('note'+n).value||0);
+    const amt=qty*n;
+    if(qty>0) rows.push({note:n,qty,amt});
+    total+=amt;
+  });
+  if(total===0){showToast('Enter at least one quantity');return;}
+  runningTotal+=total;
+  history.unshift({total,rows,time:new Date()});
+  document.getElementById('runningTotal').innerHTML=fmt(runningTotal);
+  showToast(fmt(total)+' added');
+  renderHistory();
+  clearInputs();
+}
 
-        total += qty * note;
-
-    });
-
-    runningTotal += total;
-
-    document.getElementById("runningTotal").innerText =
-        "₹" + runningTotal.toLocaleString();
-
-    alert("₹" + total.toLocaleString() + " Added");
-
+function clearInputs(){
+  allNotes.forEach(n=>{
+    document.getElementById('note'+n).value='';
+    document.getElementById('sub'+n).innerHTML='';
+  });
+  document.getElementById('batchTotal').innerHTML=fmt(0);
 }
 
 function resetAll(){
-
-    allNotes.forEach(note=>{
-
-        document.getElementById("note"+note).value = "";
-
-        document.getElementById("subtotal"+note).innerText =
-            "₹0";
-
-    });
-
+  runningTotal=0;
+  history=[];
+  document.getElementById('runningTotal').innerHTML=fmt(0);
+  document.getElementById('historyList').innerHTML='';
+  clearInputs();
+  showToast('Reset complete');
 }
 
-function buildRows(noteArray){
-
-    let html = "";
-    let total = 0;
-
-    noteArray.forEach(note=>{
-
-        let qty =
-            Number(document.getElementById("note"+note).value || 0);
-
-        let amount = qty * note;
-
-        if(qty > 0){
-
-            html += `
-            <tr>
-                <td>₹${note}</td>
-                <td>${qty}</td>
-                <td>₹${amount.toLocaleString()}</td>
-            </tr>
-            `;
-
-            total += amount;
-
-        }
-
-    });
-
-    return {
-        html,
-        total
-    };
-
+function renderHistory(){
+  const el=document.getElementById('historyList');
+  if(!history.length){el.innerHTML='';return;}
+  el.innerHTML=history.slice(0,5).map((h,i)=>`
+    <div class="hist-item">
+      <span>Batch ${history.length-i} &nbsp;&middot;&nbsp; ${h.time.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>
+      <span class="hval">${fmt(h.total)}</span>
+    </div>`).join('');
 }
 
-function printReport(){
-
-    let oldData = buildRows(oldNotes);
-
-    let newData = buildRows(newNotes);
-
-    document.getElementById("oldBody").innerHTML =
-        oldData.html;
-
-    document.getElementById("newBody").innerHTML =
-        newData.html;
-
-    document.getElementById("oldTotal").innerHTML =
-        "OLD TOTAL ₹" + oldData.total.toLocaleString();
-
-    document.getElementById("newTotal").innerHTML =
-        "NEW TOTAL ₹" + newData.total.toLocaleString();
-
-    let grand =
-        oldData.total + newData.total;
-
-    document.getElementById("grandTotalPrint").innerHTML =
-        "GRAND TOTAL ₹" + grand.toLocaleString();
-
-    let today = new Date();
-
-    document.getElementById("printDate").innerHTML =
-        "DATE RANGE : " +
-        today.toLocaleDateString();
-
-    document.getElementById("printSection").style.display =
-        "block";
-
-    window.print();
-
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
 }
 
+function buildTableRows(noteList){
+  let html='',total=0;
+  noteList.forEach(n=>{
+    const qty=Number(document.getElementById('note'+n).value||0);
+    const amt=qty*n;
+    if(qty>0){
+      html+=`<tr><td>&#8377;${n}</td><td>${qty}</td><td>&#8377;${amt.toLocaleString('en-IN')}</td></tr>`;
+      total+=amt;
+    }
+  });
+  return{html,total};
+}
+
+function doPrint(){
+  const old=buildTableRows(oldNotes);
+  const nw=buildTableRows(newNotes);
+  const batchGrand=old.total+nw.total;
+  const now=new Date();
+  const ps=document.getElementById('printSection');
+  ps.innerHTML=`
+    <div class="pt">&#8377; Cash Ledger</div>
+    <div class="ps">Thermal Report</div>
+    <div class="ps">${now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} &nbsp; ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>
+    ${old.html?`<div class="ph">Older Notes</div>
+    <table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead>
+    <tbody>${old.html}</tbody></table>
+    <div class="pst">Old Total &nbsp; &#8377;${old.total.toLocaleString('en-IN')}</div>`:''}
+    ${nw.html?`<div class="ph">New Notes</div>
+    <table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead>
+    <tbody>${nw.html}</tbody></table>
+    <div class="pst">New Total &nbsp; &#8377;${nw.total.toLocaleString('en-IN')}</div>`:''}
+    <div class="pgrand">Grand Total &nbsp; &#8377;${batchGrand.toLocaleString('en-IN')}</div>
+    ${runningTotal>0?`<div class="pruntotal">Running Total &nbsp; &#8377;${runningTotal.toLocaleString('en-IN')}</div>`:''}
+    <div class="pft">Cash Counter Ledger &mdash; Thank You</div>`;
+  ps.style.display='block';
+  window.print();
+}
 </script>
-
 </body>
 </html>
-```
