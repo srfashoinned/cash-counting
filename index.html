@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Cash Counter Ledger - Professional denomination-wise cash counting and ledger management" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Cash Ledger" />
+  <title>Cash Counter Ledger</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Splash Screen -->
+  <div id="splash-screen" class="splash">
+    <div class="splash-inner">
+      <div class="splash-logo">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <rect width="64" height="64" rx="16" fill="url(#splashGrad)"/>
+          <path d="M16 32h32M16 24h20M16 40h24" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="44" cy="40" r="8" fill="white" fill-opacity="0.2" stroke="white" stroke-width="2"/>
+          <path d="M44 37v3l2 2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="splashGrad" x1="0" y1="0" x2="64" y2="64">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#22d3ee"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1 class="splash-title">Cash Counter<br/>Ledger</h1>
+      <div class="splash-bar"><div class="splash-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- App Shell -->
+  <div id="app" class="app hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-logo">
+        <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+          <rect width="64" height="64" rx="14" fill="url(#navGrad)"/>
+          <path d="M16 32h32M16 24h20M16 40h24" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="44" cy="40" r="8" fill="white" fill-opacity="0.2" stroke="white" stroke-width="2"/>
+          <path d="M44 37v3l2 2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="navGrad" x1="0" y1="0" x2="64" y2="64">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#22d3ee"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span>Cash Ledger</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-page="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-btn" data-page="entry">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          Cash Entry
+        </button>
+        <button class="nav-btn" data-page="history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m-3-10a9 9 0 110 18A9 9 0 0112 2z"/></svg>
+          History
+        </button>
+        <button class="nav-btn" data-page="reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Reports
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="theme-toggle" class="theme-btn" title="Toggle Dark/Light Mode">
+          <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hidden"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          <span id="theme-label">Light Mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+      <button id="menu-toggle" class="menu-btn" aria-label="Toggle Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="mobile-title">Cash Counter Ledger</span>
+      <button id="mobile-theme-toggle" class="icon-btn" title="Toggle Theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+    </header>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="overlay hidden"></div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main">
+
+      <!-- ============================
+           PAGE: DASHBOARD
+           ============================ -->
+      <section id="page-dashboard" class="page active">
+        <div class="page-header">
+          <h2 class="page-title">Dashboard</h2>
+          <p class="page-subtitle" id="dashboard-date">Loading...</p>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-primary">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Total Cash in Ledger</span>
+              <span class="kpi-value" id="kpi-total">₹0</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-success">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Today's Total</span>
+              <span class="kpi-value" id="kpi-today">₹0</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-info">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Total Entries</span>
+              <span class="kpi-value" id="kpi-entries">0</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-warning">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Last Entry Time</span>
+              <span class="kpi-value kpi-small" id="kpi-last">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-header">
+          <h3>Quick Actions</h3>
+        </div>
+        <div class="quick-actions">
+          <button class="qa-btn" data-page="entry">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            New Cash Entry
+          </button>
+          <button class="qa-btn secondary" data-page="history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+            View History
+          </button>
+          <button class="qa-btn secondary" data-page="reports">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Reports & Export
+          </button>
+        </div>
+
+        <!-- Recent Entries -->
+        <div class="section-header">
+          <h3>Recent Entries</h3>
+        </div>
+        <div id="recent-entries" class="recent-list">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M9 14l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.06 0 2.08.18 3.03.52"/><path d="M21 3l-9 9-3-3"/></svg>
+            <p>No entries yet. Start by adding cash!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================
+           PAGE: CASH ENTRY
+           ============================ -->
+      <section id="page-entry" class="page">
+        <div class="page-header">
+          <h2 class="page-title">Cash Entry</h2>
+          <p class="page-subtitle">Enter denomination-wise note quantities</p>
+        </div>
+
+        <!-- Note entry field for description -->
+        <div class="entry-meta">
+          <label class="field-label" for="entry-note">Entry Note / Description</label>
+          <input type="text" id="entry-note" class="field-input" placeholder="e.g. Morning cash collection, Shop 1..." maxlength="100" />
+        </div>
+
+        <!-- Denomination Cards -->
+        <div class="denom-grid" id="denom-grid">
+          <!-- Generated by JS -->
+        </div>
+
+        <!-- Sticky Totals -->
+        <div class="totals-sticky" id="totals-sticky">
+          <div class="totals-row">
+            <div class="total-item">
+              <span class="total-label">Current Entry</span>
+              <span class="total-val" id="current-total">₹0</span>
+            </div>
+            <div class="total-item">
+              <span class="total-label">Total Notes</span>
+              <span class="total-val" id="total-notes">0</span>
+            </div>
+            <div class="total-item">
+              <span class="total-label">Running Total</span>
+              <span class="total-val highlight" id="running-total">₹0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-btns">
+          <button id="btn-add" class="btn btn-primary" title="Add entry to ledger (Ctrl+Enter)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Add To Ledger
+          </button>
+          <button id="btn-reset-entry" class="btn btn-secondary" title="Clear current entry">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+            Reset Entry
+          </button>
+          <button id="btn-undo" class="btn btn-ghost" title="Undo last added entry">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg>
+            Undo Last
+          </button>
+          <button id="btn-reset-all" class="btn btn-danger" title="Reset all data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            Reset All
+          </button>
+        </div>
+      </section>
+
+      <!-- ============================
+           PAGE: HISTORY
+           ============================ -->
+      <section id="page-history" class="page">
+        <div class="page-header">
+          <h2 class="page-title">Entry History</h2>
+          <p class="page-subtitle">Browse, filter and manage all ledger entries</p>
+        </div>
+
+        <!-- History Controls -->
+        <div class="history-controls">
+          <input type="search" id="history-search" class="field-input search-input" placeholder="🔍  Search entries..." />
+          <input type="date" id="history-date-filter" class="field-input date-input" title="Filter by date" />
+          <button id="btn-clear-filter" class="btn btn-ghost btn-sm">Clear Filter</button>
+        </div>
+
+        <!-- History Summary -->
+        <div class="history-summary" id="history-summary" style="display:none">
+          <span id="history-count">0 entries</span>
+          <span id="history-filtered-total"></span>
+        </div>
+
+        <!-- History List -->
+        <div id="history-list" class="history-list">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M3 12a9 9 0 109-9"/><path d="M3 3v6h6"/><path d="M12 7v5l3 3"/></svg>
+            <p>No history yet. Add your first cash entry!</p>
+          </div>
+        </div>
+
+        <!-- Delete All -->
+        <div class="history-footer" id="history-footer" style="display:none">
+          <button id="btn-delete-all" class="btn btn-danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            Delete All History
+          </button>
+        </div>
+      </section>
+
+      <!-- ============================
+           PAGE: REPORTS
+           ============================ -->
+      <section id="page-reports" class="page">
+        <div class="page-header">
+          <h2 class="page-title">Reports & Export</h2>
+          <p class="page-subtitle">Generate printable reports and export data</p>
+        </div>
+
+        <div class="report-controls">
+          <div class="report-date-range">
+            <label class="field-label">From Date</label>
+            <input type="date" id="report-from" class="field-input" />
+          </div>
+          <div class="report-date-range">
+            <label class="field-label">To Date</label>
+            <input type="date" id="report-to" class="field-input" />
+          </div>
+        </div>
+
+        <div class="export-btns">
+          <button id="btn-print" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print / Save PDF
+          </button>
+          <button id="btn-csv" class="btn btn-success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Export CSV
+          </button>
+        </div>
+
+        <!-- Report Preview -->
+        <div class="report-preview" id="report-preview">
+          <!-- Generated by JS -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Confirm Modal -->
+  <div id="confirm-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 id="modal-title">Confirm Action</h3>
+      <p id="modal-message">Are you sure?</p>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="modal-confirm" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
