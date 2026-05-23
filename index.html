@@ -594,52 +594,169 @@ body {
 
 /* ---------- PRINT STYLES (A4 & Thermal 3") ---------- */
 @media print {
-  body { background: white !important; color: black !important; }
+  /* Force all colors to print dark/solid — no fading */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  body { background: white !important; color: #000 !important; margin: 0; padding: 0; }
   .topbar, .bottom-nav, .action-row, .report-options,
-  #toast-container, #splash, .no-print { display: none !important; }
-  .page { display: block !important; padding: 0; }
+  #toast-container, #splash, .no-print,
+  #print-preview-container > .section-header { display: none !important; }
+  .page { display: none !important; padding: 0; }
   #page-reports { display: block !important; }
+  #print-preview-container { display: block !important; }
+
+  /* Hide the on-screen wrapper chrome, show only the receipt */
+  #print-preview-container > .section-header { display: none !important; }
+  .print-area {
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
 
   /* A4 print */
-  .print-a4 .print-area {
-    width: 210mm; margin: 0 auto;
-    padding: 15mm;
-    font-size: 11pt;
-  }
+  .print-a4 { width: 210mm; margin: 0 auto; padding: 15mm; font-size: 11pt; }
+  .print-a4 .pa-shop    { font-size: 18pt; }
+  .print-a4 .pa-table   { font-size: 10pt; }
+  .print-a4 .pa-table th,
+  .print-a4 .pa-table td { padding: 5px 4px; }
 
   /* Thermal 3-inch (80mm) */
-  .print-thermal .print-area {
-    width: 80mm; margin: 0 auto;
-    padding: 4mm;
-    font-size: 8pt;
-  }
+  .print-thermal { width: 76mm; margin: 0; padding: 2mm 3mm; font-size: 8.5pt; }
 }
 
-/* ---------- Print Preview Styles ---------- */
+/* ---------- Print Preview Styles (on-screen + print) ---------- */
 .print-area {
-  background: white;
-  color: #111;
-  padding: 20px;
+  background: #fff;
+  color: #000;
+  padding: 16px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   margin-top: 14px;
   font-family: var(--font-mono);
+  max-width: 420px; /* thermal preview width on screen */
 }
-.pa-header { text-align: center; border-bottom: 2px solid #111; padding-bottom: 10px; margin-bottom: 10px; }
-.pa-shop { font-size: 18px; font-weight: 800; }
-.pa-title { font-size: 13px; font-weight: 600; margin-top: 4px; }
-.pa-date { font-size: 11px; color: #555; margin-top: 2px; }
-.pa-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
-.pa-table th { text-align: left; padding: 5px 4px; border-bottom: 1px solid #ccc; font-size: 11px; }
-.pa-table td { padding: 4px 4px; border-bottom: 1px dotted #eee; font-size: 12px; }
-.pa-total-row { font-weight: 800; font-size: 14px; border-top: 2px solid #111 !important; }
-.pa-footer { text-align: center; font-size: 10px; color: #888; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 8px; }
+.print-area.print-a4 { max-width: 100%; }
 
-/* Thermal specific - denser layout */
-.print-thermal .pa-shop { font-size: 14px; }
-.print-thermal .pa-table th,
-.print-thermal .pa-table td { padding: 2px 2px; font-size: 10px; }
-.print-thermal .pa-total-row { font-size: 12px; }
+/* ── Header ── */
+.pa-header {
+  text-align: center;
+  border-bottom: 3px double #000;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+.pa-shop  { font-size: 16px; font-weight: 900; color: #000; letter-spacing: 0.5px; }
+.pa-title { font-size: 11px; font-weight: 700; color: #000; margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; }
+.pa-date  { font-size: 10px; color: #333; margin-top: 2px; font-weight: 600; }
+
+/* ── Section block (Today / Previous) ── */
+.pa-section {
+  margin-bottom: 6px;
+}
+.pa-section-title {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  background: #000;
+  color: #fff;
+  padding: 3px 6px;
+  margin-bottom: 4px;
+}
+.pa-section-meta {
+  font-size: 9px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 3px;
+  padding: 0 2px;
+}
+
+/* ── Tables ── */
+.pa-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+  margin: 2px 0 4px;
+}
+.pa-table th {
+  text-align: left;
+  padding: 3px 3px;
+  border-bottom: 2px solid #000;
+  font-size: 9px;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+}
+.pa-table td {
+  padding: 3px 3px;
+  border-bottom: 1px solid #999;
+  font-size: 10px;
+  color: #000;
+  font-weight: 600;
+}
+.pa-table tr:last-child td { border-bottom: none; }
+.pa-total-row td {
+  font-weight: 900 !important;
+  font-size: 11px !important;
+  border-top: 2px solid #000 !important;
+  border-bottom: none !important;
+  padding-top: 4px !important;
+  color: #000 !important;
+}
+.pa-section-total {
+  text-align: right;
+  font-size: 12px;
+  font-weight: 900;
+  color: #000;
+  border-top: 2px solid #000;
+  padding-top: 3px;
+  margin-top: 2px;
+}
+
+/* ── Divider ── */
+.pa-divider {
+  border: none;
+  border-top: 1px dashed #555;
+  margin: 6px 0;
+}
+
+/* ── Grand total bar ── */
+.pa-grand-total {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 5px 6px;
+  margin: 6px 0;
+  letter-spacing: 0.5px;
+}
+
+/* ── Footer ── */
+.pa-footer {
+  text-align: center;
+  font-size: 9px;
+  color: #444;
+  font-weight: 600;
+  margin-top: 6px;
+  border-top: 1px dashed #888;
+  padding-top: 5px;
+}
+
+/* A4 overrides (wider, bigger) */
+.print-a4 .pa-shop    { font-size: 22px; }
+.print-a4 .pa-title   { font-size: 13px; }
+.print-a4 .pa-table   { font-size: 11px; }
+.print-a4 .pa-table th { font-size: 11px; padding: 6px 5px; }
+.print-a4 .pa-table td { font-size: 11px; padding: 5px 5px; }
+.print-a4 .pa-total-row td { font-size: 13px !important; }
+.print-a4 .pa-grand-total  { font-size: 16px; padding: 8px; }
+.print-a4 .pa-section-title { font-size: 12px; }
 
 /* ---------- Scrollbar ---------- */
 ::-webkit-scrollbar { width: 5px; }
@@ -1384,6 +1501,138 @@ function setDefaultDates() {
 }
 
 function generateReport(type) {
+  const isThermal = type === 'thermal';
+
+  if (isThermal) {
+    generateThermalReport();
+  } else {
+    generateA4Report();
+  }
+}
+
+/* ── Thermal 3-inch: exactly TWO sections — Today's entries + Previous entries ── */
+function generateThermalReport() {
+  if (state.history.length === 0) {
+    showToast('⚠️ No entries to print', 'warn');
+    return;
+  }
+
+  const todayStr    = toDateStr(new Date());
+  const now         = new Date();
+  const genTime     = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
+  const genDate     = now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+
+  // Split into today vs previous
+  const todayEntries = state.history.filter(h => h.date === todayStr).slice().reverse(); // chronological
+  const prevEntries  = state.history.filter(h => h.date !== todayStr).slice().reverse(); // chronological
+
+  /* Helper: build denom totals from a list of entries */
+  function denomTotalsFrom(entries) {
+    const dt = {};
+    DENOMINATIONS.forEach(d => dt[d] = 0);
+    entries.forEach(h => DENOMINATIONS.forEach(d => { dt[d] += (h.entry[d] || 0); }));
+    return dt;
+  }
+
+  /* Helper: build a compact denom rows table for a single entry */
+  function entryDenomRows(h) {
+    const rows = DENOMINATIONS
+      .filter(d => (h.entry[d] || 0) > 0)
+      .map(d => `<tr>
+        <td>&#8377;${d}</td>
+        <td style="text-align:center">${h.entry[d]}</td>
+        <td style="text-align:right">&#8377;${fmt(d * h.entry[d])}</td>
+      </tr>`).join('');
+    return rows;
+  }
+
+  /* Helper: render one section (Today or Previous) */
+  function renderSection(label, entries) {
+    if (entries.length === 0) return '';
+
+    const dt    = denomTotalsFrom(entries);
+    const total = entries.reduce((s,h) => s + h.total, 0);
+    const notes = entries.reduce((s,h) => s + h.notes, 0);
+
+    // Each individual entry with its date/time + denom breakdown
+    const entryBlocks = entries.map(h => `
+      <div class="pa-section-meta">${h.date} ${h.time} &mdash; ${h.notes} notes &mdash; &#8377;${fmt(h.total)}</div>
+      <table class="pa-table">
+        <thead><tr><th>Note</th><th>Qty</th><th>Amt</th></tr></thead>
+        <tbody>
+          ${entryDenomRows(h)}
+        </tbody>
+      </table>
+      <hr class="pa-divider"/>
+    `).join('');
+
+    // Section total (combined denom totals across all entries in this section)
+    const combinedRows = DENOMINATIONS
+      .filter(d => dt[d] > 0)
+      .map(d => `<tr>
+        <td><strong>&#8377;${d}</strong></td>
+        <td style="text-align:center"><strong>${dt[d]}</strong></td>
+        <td style="text-align:right"><strong>&#8377;${fmt(d * dt[d])}</strong></td>
+      </tr>`).join('');
+
+    return `
+      <div class="pa-section">
+        <div class="pa-section-title">${label} (${entries.length} entr${entries.length===1?'y':'ies'})</div>
+        ${entryBlocks}
+        ${entries.length > 1 ? `
+          <div class="pa-section-meta" style="font-weight:900;color:#000">SECTION TOTAL &mdash; ${notes} notes</div>
+          <table class="pa-table">
+            <thead><tr><th>Note</th><th>Qty</th><th>Amt</th></tr></thead>
+            <tbody>
+              ${combinedRows}
+            </tbody>
+          </table>
+        ` : ''}
+        <div class="pa-section-total">TOTAL: &#8377;${fmt(total)}</div>
+      </div>`;
+  }
+
+  const todaySection = renderSection('TODAY — ' + todayStr, todayEntries);
+  const prevSection  = renderSection('PREVIOUS ENTRIES', prevEntries);
+
+  // Grand total across everything that was printed
+  const printedEntries = [...todayEntries, ...prevEntries];
+  const grandTotal     = printedEntries.reduce((s,h) => s + h.total, 0);
+
+  const hasBoth = todayEntries.length > 0 && prevEntries.length > 0;
+
+  const html = `
+    <div class="pa-header">
+      <div class="pa-shop">&#8377; CASH COUNTER LEDGER</div>
+      <div class="pa-title">Denomination Receipt</div>
+      <div class="pa-date">Printed: ${genDate} ${genTime}</div>
+    </div>
+
+    ${todaySection}
+
+    ${hasBoth ? '<hr class="pa-divider"/>' : ''}
+
+    ${prevSection}
+
+    ${hasBoth ? `<div class="pa-grand-total">GRAND TOTAL: &#8377;${fmt(grandTotal)}</div>` : ''}
+
+    <div class="pa-footer">
+      Cash Counter Ledger<br>
+      ${genDate} · ${genTime}<br>
+      *** Thank You ***
+    </div>`;
+
+  const container = document.getElementById('print-preview-container');
+  const inner     = document.getElementById('print-preview-inner');
+  inner.innerHTML  = html;
+  inner.className  = 'print-area print-thermal';
+  container.style.display = 'block';
+  container.scrollIntoView({ behavior: 'smooth' });
+  showToast('🧾 Thermal receipt ready — tap Print');
+}
+
+/* ── A4 full report (date range based) ── */
+function generateA4Report() {
   const fromDate = document.getElementById('report-from')?.value || '';
   const toDate   = document.getElementById('report-to')?.value   || '';
 
@@ -1399,8 +1648,6 @@ function generateReport(type) {
 
   const total      = filtered.reduce((s,h) => s + h.total, 0);
   const totalNotes = filtered.reduce((s,h) => s + h.notes, 0);
-
-  // Build denomination totals for report
   const reportDenomTotals = {};
   DENOMINATIONS.forEach(d => reportDenomTotals[d] = 0);
   filtered.forEach(h => DENOMINATIONS.forEach(d => { reportDenomTotals[d] += (h.entry[d]||0); }));
@@ -1408,82 +1655,51 @@ function generateReport(type) {
   const periodLabel = fromDate === toDate
     ? `Date: ${fromDate}`
     : `Period: ${fromDate} to ${toDate}`;
-
-  const isThermal = type === 'thermal';
-  const shopName  = 'Cash Counter Ledger';
-  const genTime   = new Date().toLocaleString('en-IN');
-
-  let entriesHTML = '';
-  if (!isThermal) {
-    // A4: full table
-    entriesHTML = `
-      <table class="pa-table">
-        <thead>
-          <tr>
-            <th>#</th><th>Date</th><th>Time</th>
-            ${DENOMINATIONS.map(d=>`<th>₹${d}</th>`).join('')}
-            <th>Notes</th><th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filtered.map((h,i) => `
-            <tr>
-              <td>${i+1}</td><td>${h.date}</td><td>${h.time}</td>
-              ${DENOMINATIONS.map(d=>`<td>${h.entry[d]||0}</td>`).join('')}
-              <td>${h.notes}</td><td style="font-weight:700">₹${fmt(h.total)}</td>
-            </tr>
-          `).join('')}
-          <tr class="pa-total-row">
-            <td colspan="3"><strong>TOTAL</strong></td>
-            ${DENOMINATIONS.map(d=>`<td><strong>${reportDenomTotals[d]}</strong></td>`).join('')}
-            <td><strong>${totalNotes}</strong></td>
-            <td><strong>₹${fmt(total)}</strong></td>
-          </tr>
-        </tbody>
-      </table>`;
-  } else {
-    // Thermal: compact receipt
-    entriesHTML = `
-      <table class="pa-table">
-        <thead><tr><th>Denom</th><th>Qty</th><th>Amount</th></tr></thead>
-        <tbody>
-          ${DENOMINATIONS.map(d => reportDenomTotals[d] > 0 ? `
-            <tr>
-              <td>₹${d}</td>
-              <td>${reportDenomTotals[d]}</td>
-              <td>₹${fmt(reportDenomTotals[d]*d)}</td>
-            </tr>` : '').join('')}
-          <tr class="pa-total-row">
-            <td colspan="2"><strong>TOTAL</strong></td>
-            <td><strong>₹${fmt(total)}</strong></td>
-          </tr>
-        </tbody>
-      </table>
-      <div style="margin-top:8px;font-size:10px">
-        <div>Entries: ${filtered.length} | Notes: ${totalNotes}</div>
-      </div>`;
-  }
+  const genTime = new Date().toLocaleString('en-IN');
 
   const html = `
     <div class="pa-header">
-      <div class="pa-shop">${shopName}</div>
+      <div class="pa-shop">&#8377; Cash Counter Ledger</div>
       <div class="pa-title">Cash Denomination Report</div>
       <div class="pa-date">${periodLabel}</div>
       <div class="pa-date">Generated: ${genTime}</div>
     </div>
-    ${entriesHTML}
+    <table class="pa-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Date</th><th>Time</th>
+          ${DENOMINATIONS.map(d=>`<th>&#8377;${d}</th>`).join('')}
+          <th>Notes</th><th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.map((h,i) => `
+          <tr>
+            <td>${i+1}</td><td>${h.date}</td><td>${h.time}</td>
+            ${DENOMINATIONS.map(d=>`<td>${h.entry[d]||0}</td>`).join('')}
+            <td>${h.notes}</td><td style="font-weight:900">&#8377;${fmt(h.total)}</td>
+          </tr>
+        `).join('')}
+        <tr class="pa-total-row">
+          <td colspan="3"><strong>TOTAL</strong></td>
+          ${DENOMINATIONS.map(d=>`<td><strong>${reportDenomTotals[d]}</strong></td>`).join('')}
+          <td><strong>${totalNotes}</strong></td>
+          <td><strong>&#8377;${fmt(total)}</strong></td>
+        </tr>
+      </tbody>
+    </table>
     <div class="pa-footer">
-      Total Cash: ₹${fmt(total)} | Entries: ${filtered.length}
-      <br>Cash Counter Ledger · Printed ${new Date().toLocaleDateString('en-IN')}
+      Total Cash: &#8377;${fmt(total)} &nbsp;|&nbsp; Entries: ${filtered.length} &nbsp;|&nbsp; Notes: ${totalNotes}
+      <br>Cash Counter Ledger &middot; Printed ${new Date().toLocaleDateString('en-IN')}
     </div>`;
 
   const container = document.getElementById('print-preview-container');
   const inner     = document.getElementById('print-preview-inner');
-  inner.innerHTML = html;
-  inner.className = `print-area print-${isThermal ? 'thermal' : 'a4'}`;
+  inner.innerHTML  = html;
+  inner.className  = 'print-area print-a4';
   container.style.display = 'block';
   container.scrollIntoView({ behavior: 'smooth' });
-  showToast(`📄 ${isThermal ? 'Thermal' : 'A4'} report ready — tap Print`);
+  showToast('📄 A4 report ready — tap Print');
 }
 
 function exportCSV() {
