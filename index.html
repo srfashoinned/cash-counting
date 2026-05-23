@@ -7,209 +7,80 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-
-  body{
-    font-family:Arial,sans-serif;
-    background:#111827;
-    color:#f9fafb;
-    min-height:100vh;
-    padding:20px;
-  }
-
+  body{font-family:Arial,sans-serif;background:#111827;color:#f9fafb;min-height:100vh;padding:20px}
   .wrap{max-width:700px;margin:auto}
-
-  .header{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:24px;
-  }
+  .header{display:flex;align-items:center;gap:10px;margin-bottom:24px}
   .header i{font-size:24px;color:#9ca3af}
   .header h1{font-size:22px;font-weight:500}
-
-  .section-label{
-    font-size:11px;
-    font-weight:600;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:#6b7280;
-    margin-bottom:10px;
-  }
-
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
-    gap:10px;
-    margin-bottom:16px;
-  }
-
-  .card{
-    background:#1f2937;
-    border:1px solid #374151;
-    border-radius:12px;
-    padding:14px 10px;
-    text-align:center;
-  }
-
-  .denom{
-    font-size:13px;
-    font-weight:500;
-    color:#9ca3af;
-    margin-bottom:8px;
-  }
-
-  .card input{
-    width:100%;
-    background:#111827;
-    border:1px solid #374151;
-    border-radius:8px;
-    color:#f9fafb;
-    font-size:20px;
-    font-weight:500;
-    text-align:center;
-    padding:8px 4px;
-    outline:none;
-    transition:border-color .15s;
-  }
+  .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin-bottom:10px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:16px}
+  .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:14px 10px;text-align:center}
+  .denom{font-size:13px;font-weight:500;color:#9ca3af;margin-bottom:8px}
+  .card input{width:100%;background:#111827;border:1px solid #374151;border-radius:8px;color:#f9fafb;font-size:20px;font-weight:500;text-align:center;padding:8px 4px;outline:none;transition:border-color .15s}
   .card input:focus{border-color:#3b82f6}
-  .card input::-webkit-inner-spin-button,
-  .card input::-webkit-outer-spin-button{-webkit-appearance:none}
-
-  .sub{
-    font-size:12px;
-    color:#6b7280;
-    margin-top:6px;
-    min-height:16px;
-  }
-
-  .divider{
-    height:1px;
-    background:#1f2937;
-    margin:20px 0;
-  }
-
-  .summary-box{
-    background:#1f2937;
-    border:1px solid #374151;
-    border-radius:12px;
-    padding:14px 18px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
-  }
-
+  .card input::-webkit-inner-spin-button,.card input::-webkit-outer-spin-button{-webkit-appearance:none}
+  .sub{font-size:12px;color:#6b7280;margin-top:6px;min-height:16px}
+  .divider{height:1px;background:#1f2937;margin:20px 0}
+  .summary-box{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
   .summary-box .lbl{font-size:13px;color:#9ca3af}
   .summary-box .val{font-size:22px;font-weight:500;color:#f9fafb}
-
-  .running-box{
-    background:#1f2937;
-    border:2px solid #3b82f6;
-    border-radius:12px;
-    padding:14px 18px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-  }
+  .running-box{background:#1f2937;border:2px solid #3b82f6;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
   .running-box .lbl{font-size:13px;color:#9ca3af}
   .running-box .val{font-size:28px;font-weight:500;color:#60a5fa}
-
-  .actions{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-bottom:6px;
-  }
-
-  button{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:7px;
-    height:46px;
-    border:none;
-    border-radius:10px;
-    font-size:14px;
-    font-weight:600;
-    cursor:pointer;
-    transition:filter .15s;
-  }
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+  button{display:flex;align-items:center;justify-content:center;gap:7px;height:46px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:filter .15s}
   button:hover{filter:brightness(.9)}
-
   .btn-add{background:#065f46;color:#6ee7b7}
   .btn-reset{background:#7f1d1d;color:#fca5a5}
-  .btn-print{
-    grid-column:1/-1;
-    background:#1e3a5f;
-    color:#93c5fd;
-  }
-
+  .btn-print{grid-column:1/-1;background:#1e3a5f;color:#93c5fd}
   .history{margin-top:16px}
-  .hist-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:9px 0;
-    border-bottom:1px solid #1f2937;
-    font-size:13px;
-    color:#6b7280;
-  }
+  .hist-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #1f2937;font-size:13px;color:#6b7280}
   .hist-item .hval{font-weight:500;color:#f9fafb}
-
-  .toast{
-    position:fixed;
-    bottom:24px;
-    left:50%;
-    transform:translateX(-50%) translateY(60px);
-    background:#1f2937;
-    border:1px solid #374151;
-    border-radius:10px;
-    padding:10px 22px;
-    font-size:14px;
-    font-weight:500;
-    color:#f9fafb;
-    transition:transform .25s ease,opacity .25s ease;
-    opacity:0;
-    pointer-events:none;
-    z-index:99;
-  }
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:#1f2937;border:1px solid #374151;border-radius:10px;padding:10px 22px;font-size:14px;font-weight:500;color:#f9fafb;transition:transform .25s ease,opacity .25s ease;opacity:0;pointer-events:none;z-index:99}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-
-  /* ===== PRINT ===== */
   #printSection{display:none}
 
   @media print{
     html,body{
-      width:80mm;
-      margin:0!important;
-      padding:0!important;
-      background:#fff!important;
-      color:#000;
+      width:80mm !important;
+      margin:0 !important;
+      padding:0 !important;
+      background:#fff !important;
+      color:#000 !important;
     }
-    body *{visibility:hidden}
-    #printSection,#printSection *{visibility:visible}
+    body > *{display:none !important}
     #printSection{
-      display:block!important;
-      position:absolute;
-      left:0;top:0;
-      width:76mm;
-      padding:3mm;
-      background:#fff;
-      font-family:Arial,sans-serif;
+      display:block !important;
+      width:72mm !important;
+      margin:0 !important;
+      padding:2mm !important;
+      background:#fff !important;
+      color:#000 !important;
+      font-family:Arial,sans-serif !important;
     }
-    .pt{text-align:center;font-size:22px;font-weight:900;margin:6px 0}
-    .ps{text-align:center;font-size:14px;margin:2px 0}
-    .ph{background:#000;color:#fff;text-align:center;padding:7px;font-size:16px;font-weight:900;margin:10px 0 6px}
-    table{width:100%;border-collapse:collapse;margin-bottom:4px}
-    th{border-bottom:2px solid #000;padding:7px 3px;font-size:14px;text-align:left;font-weight:900}
-    th:last-child,td:last-child{text-align:right}
-    th:nth-child(2),td:nth-child(2){text-align:center}
-    td{border-bottom:1px solid #bbb;padding:7px 3px;font-size:14px;font-weight:700}
-    .pst{text-align:right;font-size:15px;font-weight:900;margin:6px 0 10px}
-    .pgrand{background:#000;color:#fff;text-align:center;padding:12px;font-size:22px;font-weight:900;margin:10px 0}
-    .pruntotal{text-align:right;font-size:14px;font-weight:800;margin:6px 0}
-    .pft{text-align:center;font-size:12px;margin-top:14px}
+    * {
+      color:#000 !important;
+      background:transparent !important;
+      border-color:#000 !important;
+      font-family:Arial,sans-serif !important;
+    }
+    .p-shop{text-align:center;font-size:15pt;font-weight:900;margin:0 0 2mm}
+    .p-sub{text-align:center;font-size:9pt;font-weight:700;margin:0 0 1mm}
+    .p-date{text-align:center;font-size:8pt;font-weight:700;margin:0 0 3mm}
+    .p-divider{border:none;border-top:1.5px solid #000;margin:2mm 0}
+    .p-sec{font-size:9pt;font-weight:900;text-align:center;border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:1mm 0;margin:2mm 0}
+    .p-batch-label{font-size:8pt;font-weight:900;margin:2mm 0 1mm}
+    table{width:100%;border-collapse:collapse;margin-bottom:1mm}
+    th{font-size:8pt;font-weight:900;border-bottom:1px solid #000;padding:1mm 1mm;text-align:left}
+    th:nth-child(2){text-align:center}
+    th:last-child{text-align:right}
+    td{font-size:8pt;font-weight:700;border-bottom:0.5px solid #555;padding:1mm 1mm;text-align:left}
+    td:nth-child(2){text-align:center}
+    td:last-child{text-align:right}
+    .p-batch-total{text-align:right;font-size:9pt;font-weight:900;margin:1mm 0 3mm}
+    .p-grand{text-align:center;font-size:13pt;font-weight:900;border-top:2px solid #000;border-bottom:2px solid #000;padding:2mm 0;margin:2mm 0}
+    .p-running{text-align:right;font-size:9pt;font-weight:900;margin:1mm 0}
+    .p-footer{text-align:center;font-size:7pt;font-weight:700;margin-top:3mm}
     @page{size:80mm auto;margin:0}
   }
 </style>
@@ -217,7 +88,6 @@
 <body>
 
 <div class="wrap">
-
   <div class="header">
     <i class="ti ti-wallet"></i>
     <h1>Cash Counter</h1>
@@ -233,13 +103,13 @@
 
   <div class="summary-box">
     <span class="lbl"><i class="ti ti-calculator" style="font-size:15px;vertical-align:-2px;margin-right:5px"></i>This batch</span>
-    <span class="val" id="batchTotal">₹0</span>
+    <span class="val" id="batchTotal">&#8377;0</span>
   </div>
 
   <div class="running-box">
     <div>
       <div class="lbl">Running total</div>
-      <div class="val" id="runningTotal">₹0</div>
+      <div class="val" id="runningTotal">&#8377;0</div>
     </div>
     <i class="ti ti-history" style="font-size:22px;color:#4b5563"></i>
   </div>
@@ -257,7 +127,6 @@
   </div>
 
   <div class="history" id="historyList"></div>
-
 </div>
 
 <div class="toast" id="toast"></div>
@@ -268,10 +137,10 @@ const oldNotes=[10,20,50];
 const newNotes=[100,200,500];
 const allNotes=[...oldNotes,...newNotes];
 let runningTotal=0;
-let history=[];
+let batches=[];
 
-function renderGrid(notes,containerId){
-  const g=document.getElementById(containerId);
+function renderGrid(notes,id){
+  const g=document.getElementById(id);
   g.innerHTML='';
   notes.forEach(n=>{
     const d=document.createElement('div');
@@ -282,7 +151,6 @@ function renderGrid(notes,containerId){
     g.appendChild(d);
   });
 }
-
 renderGrid(oldNotes,'oldGrid');
 renderGrid(newNotes,'newGrid');
 
@@ -293,25 +161,28 @@ function updateBatch(){
   allNotes.forEach(n=>{
     const qty=Number(document.getElementById('note'+n).value||0);
     const amt=qty*n;
-    const sub=document.getElementById('sub'+n);
-    sub.innerHTML=qty>0?fmt(amt):'';
+    document.getElementById('sub'+n).innerHTML=qty>0?fmt(amt):'';
     total+=amt;
   });
   document.getElementById('batchTotal').innerHTML=fmt(total);
 }
 
-function addBatch(){
-  let total=0;
+function getCurrentRows(){
   const rows=[];
+  let total=0;
   allNotes.forEach(n=>{
     const qty=Number(document.getElementById('note'+n).value||0);
     const amt=qty*n;
-    if(qty>0) rows.push({note:n,qty,amt});
-    total+=amt;
+    if(qty>0){rows.push({note:n,qty,amt});total+=amt;}
   });
+  return{rows,total};
+}
+
+function addBatch(){
+  const{rows,total}=getCurrentRows();
   if(total===0){showToast('Enter at least one quantity');return;}
   runningTotal+=total;
-  history.unshift({total,rows,time:new Date()});
+  batches.push({rows,total,time:new Date()});
   document.getElementById('runningTotal').innerHTML=fmt(runningTotal);
   showToast(fmt(total)+' added');
   renderHistory();
@@ -327,8 +198,7 @@ function clearInputs(){
 }
 
 function resetAll(){
-  runningTotal=0;
-  history=[];
+  runningTotal=0;batches=[];
   document.getElementById('runningTotal').innerHTML=fmt(0);
   document.getElementById('historyList').innerHTML='';
   clearInputs();
@@ -337,57 +207,54 @@ function resetAll(){
 
 function renderHistory(){
   const el=document.getElementById('historyList');
-  if(!history.length){el.innerHTML='';return;}
-  el.innerHTML=history.slice(0,5).map((h,i)=>`
+  if(!batches.length){el.innerHTML='';return;}
+  el.innerHTML=[...batches].reverse().slice(0,5).map((b,i)=>`
     <div class="hist-item">
-      <span>Batch ${history.length-i} &nbsp;&middot;&nbsp; ${h.time.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>
-      <span class="hval">${fmt(h.total)}</span>
+      <span>Batch ${batches.length-i} &nbsp;&middot;&nbsp; ${b.time.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>
+      <span class="hval">${fmt(b.total)}</span>
     </div>`).join('');
 }
 
 function showToast(msg){
   const t=document.getElementById('toast');
-  t.innerHTML=msg;
-  t.classList.add('show');
+  t.innerHTML=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-function buildTableRows(noteList){
-  let html='',total=0;
-  noteList.forEach(n=>{
-    const qty=Number(document.getElementById('note'+n).value||0);
-    const amt=qty*n;
-    if(qty>0){
-      html+=`<tr><td>&#8377;${n}</td><td>${qty}</td><td>&#8377;${amt.toLocaleString('en-IN')}</td></tr>`;
-      total+=amt;
-    }
-  });
-  return{html,total};
+function tableRows(rows){
+  return rows.map(r=>`<tr><td>Rs.${r.note}</td><td>${r.qty}</td><td>Rs.${r.amt.toLocaleString('en-IN')}</td></tr>`).join('');
 }
 
 function doPrint(){
-  const old=buildTableRows(oldNotes);
-  const nw=buildTableRows(newNotes);
-  const batchGrand=old.total+nw.total;
+  if(!batches.length){
+    const{rows,total}=getCurrentRows();
+    if(total===0){showToast('Add a batch or enter quantities first');return;}
+    batches.push({rows,total,time:new Date()});
+    runningTotal+=total;
+    document.getElementById('runningTotal').innerHTML=fmt(runningTotal);
+    renderHistory();
+    clearInputs();
+  }
   const now=new Date();
+  let html='';
+  html+=`<div class="p-shop">CASH LEDGER</div>`;
+  html+=`<div class="p-sub">Thermal Report</div>`;
+  html+=`<div class="p-date">${now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`;
+  html+=`<hr class="p-divider">`;
+
+  batches.forEach((b,i)=>{
+    html+=`<div class="p-batch-label">--- Batch ${i+1} &nbsp; ${b.time.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})} ---</div>`;
+    html+=`<table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${tableRows(b.rows)}</tbody></table>`;
+    html+=`<div class="p-batch-total">Batch Total: Rs.${b.total.toLocaleString('en-IN')}</div>`;
+  });
+
+  html+=`<div class="p-grand">GRAND TOTAL &nbsp; Rs.${runningTotal.toLocaleString('en-IN')}</div>`;
+  html+=`<div class="p-footer">Cash Counter Ledger -- Thank You</div>`;
+
   const ps=document.getElementById('printSection');
-  ps.innerHTML=`
-    <div class="pt">&#8377; Cash Ledger</div>
-    <div class="ps">Thermal Report</div>
-    <div class="ps">${now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} &nbsp; ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>
-    ${old.html?`<div class="ph">Older Notes</div>
-    <table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead>
-    <tbody>${old.html}</tbody></table>
-    <div class="pst">Old Total &nbsp; &#8377;${old.total.toLocaleString('en-IN')}</div>`:''}
-    ${nw.html?`<div class="ph">New Notes</div>
-    <table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead>
-    <tbody>${nw.html}</tbody></table>
-    <div class="pst">New Total &nbsp; &#8377;${nw.total.toLocaleString('en-IN')}</div>`:''}
-    <div class="pgrand">Grand Total &nbsp; &#8377;${batchGrand.toLocaleString('en-IN')}</div>
-    ${runningTotal>0?`<div class="pruntotal">Running Total &nbsp; &#8377;${runningTotal.toLocaleString('en-IN')}</div>`:''}
-    <div class="pft">Cash Counter Ledger &mdash; Thank You</div>`;
+  ps.innerHTML=html;
   ps.style.display='block';
-  window.print();
+  setTimeout(()=>window.print(),100);
 }
 </script>
 </body>
