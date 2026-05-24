@@ -595,7 +595,7 @@ body::before{
       <div class="bt-dot off" id="btDot"></div>
       <div class="bt-txt">
         <div class="bt-name" id="btName">Not connected</div>
-        <div class="bt-sub" id="btSub">Tap Connect to find Printer0001</div>
+        <div class="bt-sub" id="btSub">Tap Connect to search Bluetooth printers</div>
       </div>
       <button class="bt-action" id="btConnBtn" onclick="btConnect()">Connect</button>
     </div>
@@ -859,7 +859,6 @@ function doPrint(){
    ================================================================ */
 
 // SPP Serial Port Profile UUIDs for BT thermal printers
-const BT_SPP_SERVICE  = '00001101-0000-1000-8000-00805f9b34fb';
 // Generic BLE print service UUIDs (common in cheap thermal printers)
 const BLE_PRINT_SERVICES = [
   '000018f0-0000-1000-8000-00805f9b34fb', // common thermal BLE
@@ -893,95 +892,217 @@ function setBtUI(state,name='',sub=''){
 }
 
 async function btConnect(){
-  if(!navigator.bluetooth){showToast('Web Bluetooth not supported in this browser');btLog('❌ Web Bluetooth API not available. Use Chrome on Android/desktop.');return}
-  setBtUI('scanning','Searching…','Looking for Printer0001…');btLog('🔍 Requesting Bluetooth device…');
-  try{
-    btDevice=await navigator.bluetooth.requestDevice({
-      filters:[{name:'Printer0001'},{namePrefix:'Printer'}],
-      optionalServices:[...BLE_PRINT_SERVICES,BT_SPP_SERVICE]
+
+  if (!navigator.bluetooth) {
+    showToast('Bluetooth not supported in this browser');
+    btLog('❌ Use Chrome browser only');
+    return;
+  }
+
+  if (location.protocol !== 'https:' &&
+      location.hostname !== 'localhost' &&
+      location.hostname !== '127.0.0.1') {
+
+    showToast('Bluetooth requires HTTPS');
+    btLog('❌ Open from HTTPS website');
+    return;
+  }
+
+  try {
+
+    setBtUI('scanning', 'Searching...', 'Select your thermal printer');
+    btLog('🔍 Searching all Bluetooth printers...');
+
+    btDevice = await navigator.bluetooth.requestDevice({
+
+      acceptAllDevices: true,
+
+      optionalServices: [
+        '000018f0-0000-1000-8000-00805f9b34fb',
+        '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+        '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
+      ]
+
     });
-    btLog(`📡 Found: ${btDevice.name}`);
-    setBtUI('scanning',btDevice.name,'Connecting to GATT server…');
-    const server=await btDevice.gatt.connect();
-    btLog('✅ GATT connected');
-    // Try each known service
-    btChar=null;
-    for(let sUUID of BLE_PRINT_SERVICES){
-      try{
-        const svc=await server.getPrimaryService(sUUID);
-        btLog(`📦 Service found: ${sUUID.slice(0,8)}…`);
-        for(let cUUID of BLE_WRITE_CHARS){
-          try{
-            const ch=await svc.getCharacteristic(cUUID);
-            btChar=ch;btLog(`✍️ Write char: ${cUUID.slice(0,8)}…`);break;
-          }catch(e){}
-        }
-        if(btChar)break;
-      }catch(e){}
-    }
-    if(!btChar){
-      // Fallback: list all services and grab first writable characteristic
-      btLog('🔎 Scanning all services for writable characteristic…');
-      try{
-        const svcs=await server.getPrimaryServices();
-        outer: for(const svc of svcs){
-          btLog(`  Service: ${svc.uuid}`);
-          const chars=await svc.getCharacteristics();
-          for(const ch of chars){
-            if(ch.properties.write||ch.properties.writeWithoutResponse){
-              btChar=ch;btLog(`  ✅ Using char: ${ch.uuid}`);break outer;
-            }
+
+    btLog('✅ Selected: ' + btDevice.name);
+
+    const server = await btDevice.gatt.connect();
+
+    btLog('✅ Connected to GATT');
+
+    const services = await server.getPrimaryServices();
+
+    btLog('📦 Services found: ' + services.length);
+
+    btChar = null;
+
+    for (const service of services) {
+
+      try {
+
+        const chars = await service.getCharacteristics();
+
+        for (const char of chars) {
+
+          if (
+            char.properties.write ||
+            char.properties.writeWithoutResponse
+          ) {
+
+            btChar = char;
+
+            btLog('✅ Writable characteristic found');
+            break;
           }
         }
-      }catch(e){btLog('  ⚠️ Could not enumerate services: '+e.message)}
+
+      } catch (e) {}
+
+      if (btChar) break;
     }
-    if(!btChar){setBtUI('error','No print channel','Could not find writable characteristic');btLog('❌ No writable characteristic found. This printer may need a native app.');return}
-    btDevice.addEventListener('gattserverdisconnected',()=>{btConnected=false;setBtUI('off','Disconnected','Tap Connect to reconnect');btLog('🔌 Disconnected')});
-    btConnected=true;setBtUI('on',btDevice.name,`Ready to print`);btLog('🖨️ Printer ready!');
-  }catch(e){
-    if(e.name==='NotFoundError'){setBtUI('off','Not found','No printer selected');btLog('ℹ️ No device selected or not found')}
-    else{setBtUI('error','Failed',e.message);btLog('❌ Error: '+e.message)}
+
+    if (!btChar) {
+
+      btLog('❌ No writable characteristic');
+      setBtUI(
+        'error',
+        'Unsupported Printer',
+        'Printer does not support BLE printing'
+      );
+
+      return;
+    }
+
+    btConnected = true;
+
+    setBtUI(
+      'on',
+      btDevice.name || 'Thermal Printer',
+      'Ready to print'
+    );
+
+    btLog('🖨️ Printer ready');
+
+    btDevice.addEventListener(
+      'gattserverdisconnected',
+      () => {
+
+        btConnected = false;
+        btChar = null;
+
+        setBtUI(
+          'off',
+          'Disconnected',
+          'Reconnect printer'
+        );
+
+        btLog('🔌 Printer disconnected');
+      }
+    );
+
+  } catch (e) {
+
+    console.error(e);
+
+    setBtUI(
+      'error',
+      'Connection Failed',
+      e.message
+    );
+
+    btLog('❌ ' + e.message);
+
+    showToast(e.message);
   }
 }
 
 async function btDisconnect(){
-  if(btDevice&&btDevice.gatt.connected){await btDevice.gatt.disconnect()}
+  if(btDevice&&btDevice.gatt.connected){btDevice.gatt.disconnect()}
   btConnected=false;btChar=null;setBtUI('off');btLog('🔌 Disconnected manually');
 }
 
 // Build ESC/POS receipt bytes
-function buildEscPos(lines){
-  const ESC=0x1B,GS=0x1D;
-  const enc=new TextEncoder();
-  const buf=[];
-  const push=(...b)=>buf.push(...b);
-  const text=(s,nl=true)=>{buf.push(...enc.encode(nl?s+'\n':s))};
-  // Init
-  push(ESC,0x40);
+function buildEscPos(lines) {
+
+  const encoder = new TextEncoder();
+
+  let data = [];
+
+  const push = (...bytes) => {
+    data.push(...bytes);
+  };
+
+  const text = (txt = '') => {
+    data.push(...encoder.encode(txt + '\n'));
+  };
+
+  // Initialize printer
+  push(0x1B, 0x40);
+
+  // Center
+  push(0x1B, 0x61, 0x01);
+
+  // Bold ON
+  push(0x1B, 0x45, 0x01);
+
+  // Double size text
+  push(0x1D, 0x21, 0x11);
+
+  text('RUPAYA');
+
+  // Normal size
+  push(0x1D, 0x21, 0x00);
+
+  text('Cash Ledger');
+
+  // Bold OFF
+  push(0x1B, 0x45, 0x00);
+
+  const loc =
+    document.getElementById('locName')
+    .value
+    .trim();
+
+  if (loc) {
+    text(loc);
+  }
+
+  text(
+    new Date().toLocaleString('en-IN')
+  );
+
+  text('--------------------------------');
+
+  // Left align
+  push(0x1B, 0x61, 0x00);
+
+  for (const line of lines) {
+    text(line);
+  }
+
+  text('--------------------------------');
+
   // Center align
-  push(ESC,0x61,0x01);
-  push(ESC,0x45,1); // bold on
-  push(ESC,0x21,0x30); // double height+width
-  text('RUPAYA LEDGER');
-  push(ESC,0x21,0x00);push(ESC,0x45,0);
-  // Location / date
-  const loc=document.getElementById('locName').value.trim();
-  if(loc)text(loc);
-  text(new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}));
-  // Separator
-  text('--------------------------------');
-  // Left align for table
-  push(ESC,0x61,0x00);
-  lines.forEach(l=>text(l));
-  // Footer
-  push(ESC,0x61,0x01);
-  text('--------------------------------');
-  text('Printed by Rupaya');
-  text('Thank you!');
-  // Feed and cut
-  push(GS,0x56,0x42,0x00); // full cut
-  push(ESC,0x64,0x05); // feed 5 lines
-  return new Uint8Array(buf);
+  push(0x1B, 0x61, 0x01);
+
+  // Bold ON
+  push(0x1B, 0x45, 0x01);
+
+  text('THANK YOU');
+
+  // Bold OFF
+  push(0x1B, 0x45, 0x00);
+
+  text('Printed via Rupaya');
+
+  // Feed lines
+  push(0x1B, 0x64, 0x04);
+
+  // Partial cut
+  push(0x1D, 0x56, 0x41, 0x10);
+
+  return new Uint8Array(data);
 }
 
 function padEnd(s,n){return (s+'').padEnd(n,' ').slice(0,n)}
@@ -1030,27 +1151,74 @@ function buildReceiptLines(mode){
   return lines;
 }
 
-async function btPrint(){
-  if(!btConnected||!btChar){showToast('Connect printer first');return}
-  const mode=document.getElementById('btPrintMode').value;
-  const lines=buildReceiptLines(mode);
-  if(!lines){showToast('No data to print');return}
-  const bytes=buildEscPos(lines);
-  btLog(`🖨️ Sending ${bytes.length} bytes…`);
-  try{
-    // Send in chunks of 512 bytes (BLE MTU limit)
-    const CHUNK=512;
-    for(let i=0;i<bytes.length;i+=CHUNK){
-      const chunk=bytes.slice(i,i+CHUNK);
-      if(btChar.properties.writeWithoutResponse){
-        await btChar.writeValueWithoutResponse(chunk);
+async function btPrint() {
+
+  if (!btConnected || !btChar) {
+    showToast('Connect printer first');
+    return;
+  }
+
+  const mode =
+    document.getElementById('btPrintMode').value;
+
+  const lines = buildReceiptLines(mode);
+
+  if (!lines) {
+    showToast('No data to print');
+    return;
+  }
+
+  try {
+
+    const bytes = buildEscPos(lines);
+
+    btLog('🖨️ Printing started...');
+
+    const CHUNK_SIZE = 120;
+
+    for (
+      let i = 0;
+      i < bytes.length;
+      i += CHUNK_SIZE
+    ) {
+
+      const chunk =
+        bytes.slice(i, i + CHUNK_SIZE);
+
+      if (
+        btChar.properties.writeWithoutResponse
+      ) {
+
+        await btChar.writeValueWithoutResponse(
+          chunk
+        );
+
       } else {
-        await btChar.writeValue(chunk);
+
+        if (btChar.writeValueWithoutResponse) {
+  await btChar.writeValueWithoutResponse(chunk);
+} else {
+  await btChar.writeValue(chunk);
+}
       }
-      await new Promise(r=>setTimeout(r,50));
+
+      await new Promise(resolve =>
+        setTimeout(resolve, 40)
+      );
     }
-    btLog('✅ Print job sent!');showToast('Sent to printer ✓');
-  }catch(e){btLog('❌ Print error: '+e.message);showToast('Print failed: '+e.message)}
+
+    btLog('✅ Print completed');
+
+    showToast('Printed successfully');
+
+  } catch (e) {
+
+    console.error(e);
+
+    btLog('❌ Print failed: ' + e.message);
+
+    showToast('Print failed');
+  }
 }
 
 function openBTSheet(){document.getElementById('btOverlay').classList.remove('hide')}
