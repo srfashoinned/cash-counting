@@ -2,260 +2,903 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cash Counter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Rupaya — Cash Ledger</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Arial,sans-serif;background:#111827;color:#f9fafb;min-height:100vh;padding:20px}
-  .wrap{max-width:700px;margin:auto}
-  .header{display:flex;align-items:center;gap:10px;margin-bottom:24px}
-  .header i{font-size:24px;color:#9ca3af}
-  .header h1{font-size:22px;font-weight:500}
-  .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin-bottom:10px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:16px}
-  .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:14px 10px;text-align:center}
-  .denom{font-size:13px;font-weight:500;color:#9ca3af;margin-bottom:8px}
-  .card input{width:100%;background:#111827;border:1px solid #374151;border-radius:8px;color:#f9fafb;font-size:20px;font-weight:500;text-align:center;padding:8px 4px;outline:none;transition:border-color .15s}
-  .card input:focus{border-color:#3b82f6}
-  .card input::-webkit-inner-spin-button,.card input::-webkit-outer-spin-button{-webkit-appearance:none}
-  .sub{font-size:12px;color:#6b7280;margin-top:6px;min-height:16px}
-  .divider{height:1px;background:#1f2937;margin:20px 0}
-  .summary-box{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .summary-box .lbl{font-size:13px;color:#9ca3af}
-  .summary-box .val{font-size:22px;font-weight:500;color:#f9fafb}
-  .running-box{background:#1f2937;border:2px solid #3b82f6;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-  .running-box .lbl{font-size:13px;color:#9ca3af}
-  .running-box .val{font-size:28px;font-weight:500;color:#60a5fa}
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
-  button{display:flex;align-items:center;justify-content:center;gap:7px;height:46px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:filter .15s}
-  button:hover{filter:brightness(.9)}
-  .btn-add{background:#065f46;color:#6ee7b7}
-  .btn-reset{background:#7f1d1d;color:#fca5a5}
-  .btn-print{grid-column:1/-1;background:#1e3a5f;color:#93c5fd}
-  .history{margin-top:16px}
-  .hist-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #1f2937;font-size:13px;color:#6b7280}
-  .hist-item .hval{font-weight:500;color:#f9fafb}
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:#1f2937;border:1px solid #374151;border-radius:10px;padding:10px 22px;font-size:14px;font-weight:500;color:#f9fafb;transition:transform .25s ease,opacity .25s ease;opacity:0;pointer-events:none;z-index:99}
-  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-  #printSection{display:none}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0a0e1a;
+  --navy2:#111827;
+  --navy3:#1c2436;
+  --navy4:#242d42;
+  --gold:#f5a623;
+  --gold2:#e8941a;
+  --gold3:#ffd080;
+  --gold-dim:#3a2a08;
+  --teal:#00c9a7;
+  --teal-dim:#002a24;
+  --red:#ff5f5f;
+  --red-dim:#2a0f0f;
+  --green:#4ade80;
+  --green-dim:#0a2a18;
+  --text:#f0f4ff;
+  --text2:#8899bb;
+  --text3:#4a5568;
+  --border:#1e2a40;
+  --border2:#2a3850;
+  --bebas:'Bebas Neue',cursive;
+  --ui:'Nunito',sans-serif;
+}
+html{height:100%;background:var(--navy)}
+body{
+  font-family:var(--ui);
+  background:var(--navy);
+  color:var(--text);
+  min-height:100vh;
+  max-width:480px;
+  margin:0 auto;
+  position:relative;
+  overflow-x:hidden;
+}
 
-  @media print{
-    html,body{
-      width:80mm !important;
-      margin:0 !important;
-      padding:0 !important;
-      background:#fff !important;
-      color:#000 !important;
-    }
-    body > *{display:none !important}
-    #printSection{
-      display:block !important;
-      width:72mm !important;
-      margin:0 !important;
-      padding:2mm !important;
-      background:#fff !important;
-      color:#000 !important;
-      font-family:Arial,sans-serif !important;
-    }
-    * {
-      color:#000 !important;
-      background:transparent !important;
-      border-color:#000 !important;
-      font-family:Arial,sans-serif !important;
-    }
-    .p-shop{text-align:center;font-size:15pt;font-weight:900;margin:0 0 2mm}
-    .p-sub{text-align:center;font-size:9pt;font-weight:700;margin:0 0 1mm}
-    .p-date{text-align:center;font-size:8pt;font-weight:700;margin:0 0 3mm}
-    .p-divider{border:none;border-top:1.5px solid #000;margin:2mm 0}
-    .p-sec{font-size:9pt;font-weight:900;text-align:center;border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:1mm 0;margin:2mm 0}
-    .p-batch-label{font-size:8pt;font-weight:900;margin:2mm 0 1mm}
-    table{width:100%;border-collapse:collapse;margin-bottom:1mm}
-    th{font-size:8pt;font-weight:900;border-bottom:1px solid #000;padding:1mm 1mm;text-align:left}
-    th:nth-child(2){text-align:center}
-    th:last-child{text-align:right}
-    td{font-size:8pt;font-weight:700;border-bottom:0.5px solid #555;padding:1mm 1mm;text-align:left}
-    td:nth-child(2){text-align:center}
-    td:last-child{text-align:right}
-    .p-batch-total{text-align:right;font-size:9pt;font-weight:900;margin:1mm 0 3mm}
-    .p-grand{text-align:center;font-size:13pt;font-weight:900;border-top:2px solid #000;border-bottom:2px solid #000;padding:2mm 0;margin:2mm 0}
-    .p-running{text-align:right;font-size:9pt;font-weight:900;margin:1mm 0}
-    .p-footer{text-align:center;font-size:7pt;font-weight:700;margin-top:3mm}
-    @page{size:80mm auto;margin:0}
-  }
+/* ===== LOCK SCREEN ===== */
+#lockScreen{
+  position:fixed;inset:0;z-index:999;
+  background:var(--navy);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 28px 40px;
+}
+.lock-bg-ring{
+  position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+  width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle,#f5a62318 0%,transparent 70%);
+  pointer-events:none;
+}
+.lock-logo{
+  font-family:var(--bebas);font-size:42px;letter-spacing:.06em;
+  color:var(--gold);margin-bottom:4px;
+  text-shadow:0 0 40px #f5a62360;
+}
+.lock-tagline{font-size:12px;color:var(--text3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:36px}
+.lock-label{font-size:13px;color:var(--text2);margin-bottom:20px;letter-spacing:.06em}
+.pin-dots{display:flex;gap:16px;margin-bottom:36px}
+.pin-dot{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid var(--border2);background:transparent;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold);transform:scale(1.2)}
+.pin-dot.error{background:var(--red);border-color:var(--red);animation:dotShake .3s ease}
+@keyframes dotShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.numpad{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:12px;width:100%;max-width:300px;
+}
+.nk{
+  height:70px;border-radius:18px;
+  background:var(--navy3);border:1px solid var(--border2);
+  color:var(--text);font-family:var(--ui);
+  font-size:24px;font-weight:700;
+  cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:0;
+  transition:background .1s,transform .12s,box-shadow .12s;
+  user-select:none;-webkit-user-select:none;
+  position:relative;overflow:hidden;
+}
+.nk::after{
+  content:'';position:absolute;inset:0;
+  background:white;opacity:0;border-radius:inherit;
+  transition:opacity .1s;
+}
+.nk:active::after{opacity:.08}
+.nk:active{transform:scale(.93)}
+.nk .sub{font-size:8px;letter-spacing:.15em;color:var(--text3);font-weight:600;text-transform:uppercase;margin-top:2px}
+.nk.bio-key{font-size:26px;color:var(--gold)}
+.nk.del-key{font-size:22px;color:var(--text2)}
+.nk.zero{grid-column:2}
+.lock-err{font-size:12px;color:var(--red);min-height:18px;text-align:center;margin-top:14px}
+.lock-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:10px}
+
+/* ===== APP SHELL ===== */
+#app{display:none;flex-direction:column;min-height:100vh;padding-bottom:90px}
+#app.show{display:flex;animation:pageIn .35s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== HERO HEADER ===== */
+.hero{
+  background:linear-gradient(145deg,var(--navy2) 0%,var(--navy3) 100%);
+  padding:20px 20px 0;
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.hero-accent{
+  position:absolute;top:-60px;right:-60px;width:200px;height:200px;
+  border-radius:50%;background:radial-gradient(circle,#f5a62322 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.hero-brand{display:flex;flex-direction:column}
+.brand-name{font-family:var(--bebas);font-size:28px;letter-spacing:.06em;color:var(--gold);line-height:1}
+.brand-date{font-size:11px;color:var(--text3);margin-top:2px;font-weight:500}
+.hero-actions{display:flex;gap:8px}
+.hbtn{
+  width:40px;height:40px;border-radius:12px;
+  background:var(--navy4);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text2);font-size:18px;cursor:pointer;
+  transition:all .15s;
+}
+.hbtn:active{background:var(--border2);transform:scale(.93)}
+.hbtn.admin-on{color:var(--gold);border-color:var(--gold-dim);background:var(--gold-dim)}
+
+/* TOTAL HERO CARD */
+.total-hero{
+  background:var(--navy4);border:1px solid var(--border2);
+  border-radius:20px 20px 0 0;padding:20px 20px 24px;
+  margin:0 -0px;position:relative;
+}
+.th-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.18em;font-weight:600;margin-bottom:6px}
+.th-amount{
+  font-family:var(--bebas);font-size:52px;letter-spacing:.02em;
+  color:var(--gold);line-height:1;
+  text-shadow:0 0 30px #f5a62340;
+  transition:all .2s ease;
+}
+.th-note{font-size:12px;color:var(--text3);margin-top:4px;font-weight:500}
+.th-pills{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:.04em;
+}
+.pill-teal{background:var(--teal-dim);color:var(--teal);border:1px solid #00c9a730}
+.pill-gold{background:var(--gold-dim);color:var(--gold);border:1px solid #f5a62330}
+.pill-red{background:var(--red-dim);color:var(--red);border:1px solid #ff5f5f30}
+
+/* ===== PAGES ===== */
+.page{display:none;flex-direction:column;animation:pageIn .25s ease}
+.page.on{display:flex}
+
+/* ===== ENTRY PAGE ===== */
+.section{padding:16px 20px}
+.sec-head{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:14px;
+}
+.sec-head::before{content:'';width:3px;height:14px;border-radius:2px;background:var(--gold)}
+
+.input-grp{margin-bottom:10px}
+.input-lbl{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.inp{
+  width:100%;background:var(--navy3);
+  border:1.5px solid var(--border2);border-radius:14px;
+  padding:13px 16px;font-family:var(--ui);font-size:14px;
+  font-weight:600;color:var(--text);outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.inp::placeholder{color:var(--text3);font-weight:500}
+.inp:focus{border-color:var(--gold);box-shadow:0 0 0 4px #f5a62318}
+
+/* DENOM CARDS */
+.denom-scroll{display:flex;flex-direction:column;gap:10px}
+
+.dc{
+  background:var(--navy3);border:1.5px solid var(--border);
+  border-radius:18px;padding:0;overflow:hidden;
+  display:flex;align-items:stretch;
+  transition:border-color .2s,box-shadow .2s;
+  position:relative;
+}
+.dc:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px #f5a62318}
+.dc-left{
+  background:var(--navy4);border-right:1px solid var(--border);
+  padding:16px 14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;min-width:80px;
+  position:relative;
+}
+.dc-rs{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.1em}
+.dc-val{font-family:var(--bebas);font-size:30px;color:var(--text);line-height:1;letter-spacing:.04em}
+.dc-bar{
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:0 2px 2px 0;
+}
+.dc-bar.note-10{background:#9b59b6}
+.dc-bar.note-20{background:#3498db}
+.dc-bar.note-50{background:#e74c3c}
+.dc-bar.note-100{background:#2ecc71}
+.dc-bar.note-200{background:#f39c12}
+.dc-bar.note-500{background:#1abc9c}
+.dc-bar.note-2000{background:#e91e63}
+
+.dc-right{
+  flex:1;padding:12px 16px;
+  display:flex;flex-direction:column;justify-content:center;gap:4px;
+}
+.dc-qty-row{display:flex;align-items:center;gap:10px}
+.dc-minus,.dc-plus{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--navy4);border:1px solid var(--border2);
+  color:var(--text2);font-size:18px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .12s;flex-shrink:0;user-select:none;
+}
+.dc-minus:active,.dc-plus:active{transform:scale(.88);background:var(--border2)}
+.dc-plus{color:var(--gold);border-color:var(--gold-dim)}
+.dc-qty{
+  flex:1;background:transparent;border:none;
+  font-family:var(--bebas);font-size:32px;letter-spacing:.04em;
+  color:var(--text);text-align:center;outline:none;
+  -moz-appearance:textfield;padding:0;line-height:1;
+  min-width:0;
+}
+.dc-qty::-webkit-inner-spin-button,.dc-qty::-webkit-outer-spin-button{-webkit-appearance:none}
+.dc-sub{
+  font-size:12px;font-weight:700;color:var(--text3);
+  text-align:center;min-height:16px;
+  transition:color .15s;
+}
+.dc-sub.has-val{color:var(--gold3)}
+
+/* SAVE BUTTON */
+.save-fab{
+  width:100%;height:58px;border-radius:18px;border:none;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 100%);
+  color:var(--navy);font-family:var(--ui);font-size:16px;font-weight:800;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 8px 24px #f5a62330;
+  transition:transform .15s,box-shadow .15s,opacity .15s;
+  margin-top:4px;
+}
+.save-fab:active{transform:scale(.97);box-shadow:0 4px 12px #f5a62320;opacity:.9}
+.save-fab i{font-size:20px}
+
+/* ===== HISTORY PAGE ===== */
+.hist-item{
+  background:var(--navy3);border:1.5px solid var(--border);
+  border-radius:18px;padding:16px 18px;margin-bottom:10px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.hist-item::before{
+  content:'';position:absolute;top:0;left:0;
+  width:4px;height:100%;background:var(--gold);
+  border-radius:2px 0 0 2px;
+}
+.hi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.hi-name{font-size:15px;font-weight:800;color:var(--text)}
+.hi-loc{font-size:11px;color:var(--text3);margin-top:1px;font-weight:500}
+.hi-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.hi-amount{font-family:var(--bebas);font-size:24px;color:var(--gold);letter-spacing:.04em}
+.hi-amount.hidden-amt{font-size:13px;font-family:var(--ui);font-weight:700}
+.hi-time{font-size:11px;color:var(--text3);font-weight:500}
+.hi-denoms{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;
+}
+.hi-chip{
+  background:var(--navy4);border:1px solid var(--border2);
+  border-radius:8px;padding:3px 8px;
+  font-size:11px;font-weight:700;color:var(--text2);
+  font-family:'Nunito',sans-serif;
+}
+.hi-del{
+  position:absolute;top:14px;right:14px;
+  background:none;border:none;color:var(--text3);
+  cursor:pointer;font-size:15px;padding:4px;
+  transition:color .15s;
+}
+.hi-del:active{color:var(--red)}
+
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 24px;text-align:center;
+}
+.empty-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--navy3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:var(--text3);margin-bottom:16px;
+}
+.empty-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--text3);line-height:1.6}
+
+/* ===== ADMIN PAGE ===== */
+.admin-hero{
+  margin:16px 20px;
+  background:linear-gradient(135deg,var(--gold-dim) 0%,#2a1a00 100%);
+  border:1px solid #f5a62330;border-radius:20px;padding:20px;
+}
+.ah-title{
+  font-family:var(--bebas);font-size:14px;letter-spacing:.2em;
+  color:var(--gold3);margin-bottom:4px;
+}
+.ah-total{font-family:var(--bebas);font-size:48px;color:var(--gold);line-height:1;letter-spacing:.02em}
+.ah-sub{font-size:12px;color:var(--text3);margin-top:4px;font-weight:500}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px;margin-bottom:16px}
+.stat-card{
+  background:var(--navy3);border:1px solid var(--border);
+  border-radius:16px;padding:14px 16px;
+}
+.sc-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.14em;font-weight:700;margin-bottom:6px}
+.sc-val{font-family:var(--bebas);font-size:28px;color:var(--text);letter-spacing:.02em}
+.sc-note{font-size:11px;color:var(--text3);margin-top:2px;font-weight:500}
+
+.admin-btns{display:flex;flex-direction:column;gap:10px;padding:0 20px}
+.abtn{
+  width:100%;height:54px;border-radius:16px;border:none;
+  font-family:var(--ui);font-size:14px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform .12s,opacity .12s;
+}
+.abtn:active{transform:scale(.97);opacity:.85}
+.abtn-print{background:linear-gradient(135deg,#1a3a2a,#0d2a1a);color:var(--teal);border:1px solid #00c9a730}
+.abtn-lock{background:var(--navy3);color:var(--text2);border:1px solid var(--border2)}
+.abtn-danger{background:var(--red-dim);color:var(--red);border:1px solid #ff5f5f25}
+
+/* ===== BOTTOM NAV ===== */
+.bnav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:var(--navy2);border-top:1px solid var(--border);
+  display:flex;padding:8px 16px max(12px,env(safe-area-inset-bottom));
+  z-index:100;gap:4px;
+}
+.ni{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:6px 4px;border-radius:12px;
+  font-size:10px;font-weight:700;letter-spacing:.04em;
+  color:var(--text3);transition:all .15s;
+  text-transform:uppercase;
+}
+.ni i{font-size:22px;transition:color .15s}
+.ni.on{color:var(--gold);background:var(--gold-dim)}
+.ni.on i{color:var(--gold)}
+.ni:active{transform:scale(.93)}
+
+/* ===== MODALS ===== */
+.overlay{
+  position:fixed;inset:0;background:#00000080;
+  z-index:200;display:flex;align-items:flex-end;
+  animation:fadeIn .2s ease;
+}
+.overlay.hide{display:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.sheet{
+  background:var(--navy2);border-radius:24px 24px 0 0;
+  border-top:1px solid var(--border2);
+  padding:20px 20px max(24px,env(safe-area-inset-bottom));
+  width:100%;max-height:80vh;overflow-y:auto;
+  animation:sheetUp .25s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px}
+.sheet-title{font-size:17px;font-weight:800;margin-bottom:16px}
+.sheet-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:12px;background:var(--navy3);border-radius:14px}
+.sheet-denom{font-family:var(--bebas);font-size:22px;color:var(--text);letter-spacing:.04em;min-width:60px}
+.sheet-detail{flex:1}
+.sheet-qty{font-size:13px;color:var(--text2);font-weight:600}
+.sheet-amt{font-size:14px;font-weight:800;color:var(--gold3)}
+.sheet-total{
+  background:var(--gold-dim);border:1px solid #f5a62330;border-radius:16px;
+  padding:16px;text-align:center;margin:12px 0;
+}
+.st-lbl{font-size:11px;color:var(--gold3);font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.st-val{font-family:var(--bebas);font-size:36px;color:var(--gold);letter-spacing:.04em}
+
+.sbtn{
+  width:100%;height:54px;border-radius:16px;border:none;
+  font-family:var(--ui);font-size:15px;font-weight:800;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .12s,opacity .12s;margin-bottom:8px;
+}
+.sbtn:active{transform:scale(.97);opacity:.85}
+.sbtn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);box-shadow:0 6px 20px #f5a62328}
+.sbtn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--text2)}
+
+/* PRINT */
+#printArea{display:none}
+@media print{
+  html,body{width:80mm!important;margin:0!important;padding:0!important;background:#fff!important;color:#000!important}
+  body>*{display:none!important}
+  #printArea{display:block!important;width:74mm!important;margin:0 auto!important;padding:2mm!important;font-family:Arial,Helvetica,sans-serif!important;color:#000!important}
+  #printArea *{color:#000!important;font-family:Arial,Helvetica,sans-serif!important}
+  .pr-shop{text-align:center;font-size:16pt;font-weight:900;margin:0 0 1mm}
+  .pr-sub{text-align:center;font-size:9pt;font-weight:800;margin:0 0 1mm}
+  .pr-date{text-align:center;font-size:8pt;font-weight:800;margin:0 0 3mm}
+  .pr-rule{border:none;border-top:2px solid #000;margin:2mm 0}
+  .pr-sec{font-size:9pt;font-weight:900;text-align:center;border-top:2px solid #000;border-bottom:2px solid #000;padding:1.5mm 0;margin:2mm 0;letter-spacing:.06em;text-transform:uppercase}
+  .pr-sec-sub{font-size:7.5pt;font-weight:800;text-align:center;margin:-1mm 0 2mm}
+  table{width:100%;border-collapse:collapse;margin-bottom:0}
+  th{font-size:8pt;font-weight:900;border-bottom:1.5px solid #000;padding:1mm 1.5mm;text-align:left;text-transform:uppercase}
+  th:nth-child(2){text-align:center}th:last-child{text-align:right}
+  td{font-size:9pt;font-weight:800;padding:1.2mm 1.5mm;border-bottom:.5px solid #777;text-align:left}
+  td:nth-child(2){text-align:center}td:last-child{text-align:right;font-weight:900}
+  .pr-btotal{text-align:right;font-size:10pt;font-weight:900;border-top:1.5px solid #000;padding:1.5mm 1.5mm 0;margin:0 0 3mm}
+  .pr-grand{text-align:center;font-size:14pt;font-weight:900;border-top:3px solid #000;border-bottom:3px solid #000;padding:2.5mm 0;margin:2mm 0}
+  .pr-gval{font-size:18pt;font-weight:900;display:block;margin-top:1mm}
+  .pr-foot{text-align:center;font-size:7.5pt;font-weight:800;margin-top:3mm;border-top:1px solid #000;padding-top:1.5mm}
+  @page{size:80mm auto;margin:0}
+}
+
+.toast{
+  position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--navy3);color:var(--text);font-family:var(--ui);
+  font-size:13px;font-weight:700;padding:10px 20px;border-radius:24px;
+  border:1px solid var(--border2);opacity:0;pointer-events:none;
+  transition:all .22s;z-index:999;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <div class="header">
-    <i class="ti ti-wallet"></i>
-    <h1>Cash Counter</h1>
+<!-- ===== LOCK SCREEN ===== -->
+<div id="lockScreen">
+  <div class="lock-bg-ring"></div>
+  <div class="lock-logo">RUPAYA</div>
+  <div class="lock-tagline">Cash Ledger · Admin Access</div>
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
   </div>
-
-  <p class="section-label">Older notes</p>
-  <div class="grid" id="oldGrid"></div>
-
-  <p class="section-label">New notes</p>
-  <div class="grid" id="newGrid"></div>
-
-  <div class="divider"></div>
-
-  <div class="summary-box">
-    <span class="lbl"><i class="ti ti-calculator" style="font-size:15px;vertical-align:-2px;margin-right:5px"></i>This batch</span>
-    <span class="val" id="batchTotal">&#8377;0</span>
+  <div class="numpad">
+    <button class="nk" onclick="nkp('1')">1</button>
+    <button class="nk" onclick="nkp('2')">2<div class="sub">ABC</div></button>
+    <button class="nk" onclick="nkp('3')">3<div class="sub">DEF</div></button>
+    <button class="nk" onclick="nkp('4')">4<div class="sub">GHI</div></button>
+    <button class="nk" onclick="nkp('5')">5<div class="sub">JKL</div></button>
+    <button class="nk" onclick="nkp('6')">6<div class="sub">MNO</div></button>
+    <button class="nk" onclick="nkp('7')">7<div class="sub">PQRS</div></button>
+    <button class="nk" onclick="nkp('8')">8<div class="sub">TUV</div></button>
+    <button class="nk" onclick="nkp('9')">9<div class="sub">WXYZ</div></button>
+    <button class="nk bio-key" onclick="tryBio()"><i class="ti ti-fingerprint"></i></button>
+    <button class="nk zero" onclick="nkp('0')">0</button>
+    <button class="nk del-key" onclick="nkd()"><i class="ti ti-backspace"></i></button>
   </div>
+  <div class="lock-err" id="lockErr"></div>
+  <div class="lock-hint">Touch ID · Face ID · Fingerprint supported</div>
+</div>
 
-  <div class="running-box">
-    <div>
-      <div class="lbl">Running total</div>
-      <div class="val" id="runningTotal">&#8377;0</div>
+<!-- ===== APP ===== -->
+<div id="app">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-accent"></div>
+    <div class="hero-top">
+      <div class="hero-brand">
+        <div class="brand-name">RUPAYA</div>
+        <div class="brand-date" id="topDate"></div>
+      </div>
+      <div class="hero-actions">
+        <div class="hbtn" id="adminHBtn" onclick="tapAdminBtn()" title="Admin">
+          <i class="ti ti-shield-lock"></i>
+        </div>
+        <div class="hbtn" onclick="openSaveSheet()" title="Save batch">
+          <i class="ti ti-device-floppy"></i>
+        </div>
+      </div>
     </div>
-    <i class="ti ti-history" style="font-size:22px;color:#4b5563"></i>
+    <div class="total-hero">
+      <div class="th-label">Current batch</div>
+      <div class="th-amount" id="heroAmount">₹0</div>
+      <div class="th-note" id="heroNote">Enter denominations below</div>
+      <div class="th-pills" id="heroPills"></div>
+    </div>
   </div>
 
-  <div class="actions">
-    <button class="btn-add" onclick="addBatch()">
-      <i class="ti ti-plus"></i> Add batch
-    </button>
-    <button class="btn-reset" onclick="resetAll()">
-      <i class="ti ti-trash"></i> Reset
-    </button>
-    <button class="btn-print" onclick="doPrint()">
-      <i class="ti ti-printer"></i> Print thermal report
-    </button>
+  <!-- ENTRY PAGE -->
+  <div class="page on" id="pageEntry">
+    <div class="section" style="padding-top:20px">
+      <div class="sec-head">Batch Info</div>
+      <div class="input-grp">
+        <div class="input-lbl">Batch Label</div>
+        <input class="inp" type="text" id="batchLabel" placeholder="e.g. Day 3 · Evening shift" maxlength="60">
+      </div>
+      <div class="input-grp">
+        <div class="input-lbl">Location / Counter</div>
+        <input class="inp" type="text" id="locName" placeholder="e.g. Counter 1 · Main Branch" maxlength="40">
+      </div>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div class="sec-head">Denomination Count</div>
+      <div class="denom-scroll" id="denomList"></div>
+    </div>
+    <div class="section" style="padding-top:0">
+      <button class="save-fab" onclick="openSaveSheet()">
+        <i class="ti ti-device-floppy"></i> Save Batch
+      </button>
+    </div>
   </div>
 
-  <div class="history" id="historyList"></div>
+  <!-- HISTORY PAGE -->
+  <div class="page" id="pageHistory">
+    <div class="section" style="padding-top:20px">
+      <div class="sec-head">Saved Batches</div>
+      <div id="histArea"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN PAGE -->
+  <div class="page" id="pageAdmin">
+    <div class="admin-hero">
+      <div class="ah-title">Grand Total · Admin View</div>
+      <div class="ah-total" id="adminGrand">₹0</div>
+      <div class="ah-sub" id="adminSub">—</div>
+    </div>
+    <div class="stat-grid" id="statGrid"></div>
+    <div class="admin-btns">
+      <button class="abtn abtn-print" onclick="doPrint()">
+        <i class="ti ti-printer"></i> Print Thermal Report
+      </button>
+      <button class="abtn abtn-lock" onclick="lockAdmin()">
+        <i class="ti ti-lock"></i> Lock Admin
+      </button>
+      <button class="abtn abtn-danger" onclick="confirmReset()">
+        <i class="ti ti-trash"></i> Clear All Data
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <div class="ni on" id="ni-entry" onclick="goPage('entry')">
+    <i class="ti ti-calculator"></i>Entry
+  </div>
+  <div class="ni" id="ni-history" onclick="goPage('history')">
+    <i class="ti ti-clock-history"></i>History
+  </div>
+  <div class="ni" id="ni-admin" onclick="tapNavAdmin()">
+    <i class="ti ti-shield-lock"></i>Admin
+  </div>
+</div>
+
+<!-- SAVE SHEET -->
+<div class="overlay hide" id="saveOverlay" onclick="closeSaveSheet(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Save Batch?</div>
+    <div id="sheetContent"></div>
+    <button class="sbtn sbtn-gold" onclick="confirmSave()">
+      <i class="ti ti-check"></i> Confirm & Save
+    </button>
+    <button class="sbtn sbtn-outline" onclick="document.getElementById('saveOverlay').classList.add('hide')">
+      Cancel
+    </button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<div id="printSection"></div>
+<div id="printArea"></div>
 
 <script>
-const oldNotes=[10,20,50];
-const newNotes=[100,200,500];
-const allNotes=[...oldNotes,...newNotes];
-let runningTotal=0;
-let batches=[];
+const DENOMS=[10,20,50,100,200,500,2000];
+const COLORS={10:'#9b59b6',20:'#3498db',50:'#e74c3c',100:'#2ecc71',200:'#f39c12',500:'#1abc9c',2000:'#e91e63'};
+const LS='rupaya_v1';
+const PIN='7865';
+let adminUnlocked=false,pinBuf='';
 
-function renderGrid(notes,id){
-  const g=document.getElementById(id);
-  g.innerHTML='';
-  notes.forEach(n=>{
-    const d=document.createElement('div');
-    d.className='card';
-    d.innerHTML=`<div class="denom">&#8377;${n}</div>
-      <input type="number" id="note${n}" min="0" placeholder="0" oninput="updateBatch()">
-      <div class="sub" id="sub${n}"></div>`;
-    g.appendChild(d);
-  });
+/* ---- BUILD DENOMS ---- */
+const dl=document.getElementById('denomList');
+DENOMS.forEach(d=>{
+  dl.innerHTML+=`<div class="dc" id="dc${d}">
+    <div class="dc-left">
+      <div class="dc-bar note-${d}"></div>
+      <div class="dc-rs">₹</div>
+      <div class="dc-val">${d>=1000?d/1000+'K':d}</div>
+    </div>
+    <div class="dc-right">
+      <div class="dc-qty-row">
+        <div class="dc-minus" onclick="step(${d},-1)">−</div>
+        <input class="dc-qty" type="number" id="d${d}" min="0" placeholder="0"
+          oninput="recalc()" onwheel="return false" inputmode="numeric">
+        <div class="dc-plus" onclick="step(${d},1)">+</div>
+      </div>
+      <div class="dc-sub" id="ds${d}"></div>
+    </div>
+  </div>`;
+});
+
+function step(d,dir){
+  const inp=document.getElementById('d'+d);
+  const v=Math.max(0,(Number(inp.value)||0)+dir);
+  inp.value=v||'';recalc();
 }
-renderGrid(oldNotes,'oldGrid');
-renderGrid(newNotes,'newGrid');
 
-function fmt(n){return'&#8377;'+n.toLocaleString('en-IN')}
+function inr(n){return(n<0?'−':'')+'₹'+Math.abs(n).toLocaleString('en-IN')}
 
-function updateBatch(){
-  let total=0;
-  allNotes.forEach(n=>{
-    const qty=Number(document.getElementById('note'+n).value||0);
-    const amt=qty*n;
-    document.getElementById('sub'+n).innerHTML=qty>0?fmt(amt):'';
+function getCurrent(){
+  let total=0;const rows=[];
+  DENOMS.forEach(d=>{
+    const qty=Number(document.getElementById('d'+d).value||0);
+    const amt=qty*d;
+    const sub=document.getElementById('ds'+d);
+    if(qty>0){sub.textContent=inr(amt);sub.className='dc-sub has-val';}
+    else{sub.textContent='';sub.className='dc-sub';}
+    if(qty>0)rows.push({d,qty,amt});
     total+=amt;
   });
-  document.getElementById('batchTotal').innerHTML=fmt(total);
+  return{total,rows};
 }
 
-function getCurrentRows(){
-  const rows=[];
-  let total=0;
-  allNotes.forEach(n=>{
-    const qty=Number(document.getElementById('note'+n).value||0);
-    const amt=qty*n;
-    if(qty>0){rows.push({note:n,qty,amt});total+=amt;}
-  });
-  return{rows,total};
+function recalc(){
+  const{total,rows}=getCurrent();
+  document.getElementById('heroAmount').textContent=inr(total);
+  document.getElementById('heroNote').textContent=
+    rows.length?`${rows.length} denomination${rows.length>1?'s':''} entered`:'Enter denominations below';
+  // pills
+  const pp=document.getElementById('heroPills');
+  if(rows.length){
+    pp.innerHTML=rows.slice(0,4).map(r=>`<div class="pill pill-gold">₹${r.d}×${r.qty}</div>`).join('')+
+      (rows.length>4?`<div class="pill pill-teal">+${rows.length-4} more</div>`:'');
+  } else pp.innerHTML='';
+  if(adminUnlocked)renderAdminData();
+  persist();
 }
 
-function addBatch(){
-  const{rows,total}=getCurrentRows();
-  if(total===0){showToast('Enter at least one quantity');return;}
-  runningTotal+=total;
-  batches.push({rows,total,time:new Date()});
-  document.getElementById('runningTotal').innerHTML=fmt(runningTotal);
-  showToast(fmt(total)+' added');
-  renderHistory();
-  clearInputs();
+/* ---- LOCK / PIN ---- */
+function nkp(k){
+  if(pinBuf.length>=4)return;
+  pinBuf+=k;updDots();
+  if(pinBuf.length===4)setTimeout(checkPin,140);
 }
-
-function clearInputs(){
-  allNotes.forEach(n=>{
-    document.getElementById('note'+n).value='';
-    document.getElementById('sub'+n).innerHTML='';
-  });
-  document.getElementById('batchTotal').innerHTML=fmt(0);
-}
-
-function resetAll(){
-  runningTotal=0;batches=[];
-  document.getElementById('runningTotal').innerHTML=fmt(0);
-  document.getElementById('historyList').innerHTML='';
-  clearInputs();
-  showToast('Reset complete');
-}
-
-function renderHistory(){
-  const el=document.getElementById('historyList');
-  if(!batches.length){el.innerHTML='';return;}
-  el.innerHTML=[...batches].reverse().slice(0,5).map((b,i)=>`
-    <div class="hist-item">
-      <span>Batch ${batches.length-i} &nbsp;&middot;&nbsp; ${b.time.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>
-      <span class="hval">${fmt(b.total)}</span>
-    </div>`).join('');
-}
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.innerHTML=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
-}
-
-function tableRows(rows){
-  return rows.map(r=>`<tr><td>Rs.${r.note}</td><td>${r.qty}</td><td>Rs.${r.amt.toLocaleString('en-IN')}</td></tr>`).join('');
-}
-
-function doPrint(){
-  if(!batches.length){
-    const{rows,total}=getCurrentRows();
-    if(total===0){showToast('Add a batch or enter quantities first');return;}
-    batches.push({rows,total,time:new Date()});
-    runningTotal+=total;
-    document.getElementById('runningTotal').innerHTML=fmt(runningTotal);
-    renderHistory();
-    clearInputs();
+function nkd(){pinBuf=pinBuf.slice(0,-1);updDots();document.getElementById('lockErr').textContent=''}
+function updDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    d.classList.toggle('filled',i<pinBuf.length);
+    d.classList.remove('error');
   }
-  const now=new Date();
-  let html='';
-  html+=`<div class="p-shop">CASH LEDGER</div>`;
-  html+=`<div class="p-sub">Thermal Report</div>`;
-  html+=`<div class="p-date">${now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`;
-  html+=`<hr class="p-divider">`;
-
-  batches.forEach((b,i)=>{
-    html+=`<div class="p-batch-label">--- Batch ${i+1} &nbsp; ${b.time.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})} ---</div>`;
-    html+=`<table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${tableRows(b.rows)}</tbody></table>`;
-    html+=`<div class="p-batch-total">Batch Total: Rs.${b.total.toLocaleString('en-IN')}</div>`;
-  });
-
-  html+=`<div class="p-grand">GRAND TOTAL &nbsp; Rs.${runningTotal.toLocaleString('en-IN')}</div>`;
-  html+=`<div class="p-footer">Cash Counter Ledger -- Thank You</div>`;
-
-  const ps=document.getElementById('printSection');
-  ps.innerHTML=html;
-  ps.style.display='block';
-  setTimeout(()=>window.print(),100);
 }
+function checkPin(){
+  if(pinBuf===PIN){doUnlock();}
+  else{
+    for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('error');
+    document.getElementById('lockErr').textContent='Wrong PIN. Try again.';
+    setTimeout(()=>{pinBuf='';updDots();},500);
+  }
+}
+function doUnlock(){
+  adminUnlocked=true;
+  document.getElementById('lockScreen').style.display='none';
+  document.getElementById('adminHBtn').classList.add('admin-on');
+  document.getElementById('app').style.display='flex';
+  document.getElementById('app').classList.add('show');
+  goPage('admin');renderAdminData();renderHistory();
+}
+function lockAdmin(){
+  adminUnlocked=false;pinBuf='';
+  document.getElementById('adminHBtn').classList.remove('admin-on');
+  goPage('entry');toast('Admin locked');
+}
+function showLock(){
+  pinBuf='';updDots();
+  document.getElementById('lockErr').textContent='';
+  document.getElementById('lockScreen').style.display='flex';
+}
+function tapAdminBtn(){adminUnlocked?goPage('admin'):showLock()}
+function tapNavAdmin(){adminUnlocked?(goPage('admin'),renderAdminData()):showLock()}
+
+/* ---- BIOMETRIC ---- */
+async function tryBio(){
+  if(!window.PublicKeyCredential){toast('Biometrics not supported here');return;}
+  try{
+    const full=load();
+    if(!full.credId){
+      const ch=crypto.getRandomValues(new Uint8Array(32));
+      const cr=await navigator.credentials.create({publicKey:{
+        challenge:ch,rp:{name:'Rupaya'},
+        user:{id:new Uint8Array(16),name:'admin',displayName:'Admin'},
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
+        timeout:60000
+      }});
+      full.credId=Array.from(new Uint8Array(cr.rawId));save(full);
+      toast('Biometric registered!');doUnlock();return;
+    }
+    const ch2=crypto.getRandomValues(new Uint8Array(32));
+    await navigator.credentials.get({publicKey:{
+      challenge:ch2,
+      allowCredentials:[{type:'public-key',id:new Uint8Array(full.credId)}],
+      userVerification:'required',timeout:60000
+    }});
+    doUnlock();
+  }catch(e){if(e.name!=='NotAllowedError')toast('Biometric failed — use PIN');}
+}
+
+/* ---- PAGES ---- */
+function goPage(name){
+  ['entry','history','admin'].forEach(p=>{
+    document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1)).classList.remove('on');
+    document.getElementById('ni-'+p).classList.remove('on');
+  });
+  document.getElementById('page'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('on');
+  document.getElementById('ni-'+name).classList.add('on');
+  if(name==='history')renderHistory();
+}
+
+/* ---- SAVE SHEET ---- */
+function openSaveSheet(){
+  const{total,rows}=getCurrent();
+  if(total===0){toast('Enter at least one denomination first');return;}
+  const label=document.getElementById('batchLabel').value.trim()||'Unnamed batch';
+  let html=rows.map(r=>`<div class="sheet-row">
+    <div class="sheet-denom">₹${r.d}</div>
+    <div class="sheet-detail">
+      <div class="sheet-qty">${r.qty} note${r.qty>1?'s':''}</div>
+    </div>
+    <div class="sheet-amt">${inr(r.amt)}</div>
+  </div>`).join('');
+  html+=`<div class="sheet-total"><div class="st-lbl">${label}</div><div class="st-val">${inr(total)}</div></div>`;
+  document.getElementById('sheetContent').innerHTML=html;
+  document.getElementById('saveOverlay').classList.remove('hide');
+}
+function closeSaveSheet(e){if(e.target===document.getElementById('saveOverlay'))document.getElementById('saveOverlay').classList.add('hide')}
+function confirmSave(){
+  const{total,rows}=getCurrent();
+  const label=document.getElementById('batchLabel').value.trim()||('Batch '+(((load().batches)||[]).length+1));
+  const loc=document.getElementById('locName').value.trim();
+  const full=load();if(!full.batches)full.batches=[];
+  full.batches.push({id:Date.now(),label,loc,total,rows,time:new Date().toISOString()});
+  save(full);clearEntry();renderHistory();if(adminUnlocked)renderAdminData();
+  document.getElementById('saveOverlay').classList.add('hide');
+  toast('Batch saved ✓');
+}
+function clearEntry(){
+  DENOMS.forEach(d=>{document.getElementById('d'+d).value='';document.getElementById('ds'+d).textContent='';document.getElementById('ds'+d).className='dc-sub';});
+  document.getElementById('batchLabel').value='';
+  document.getElementById('heroAmount').textContent='₹0';
+  document.getElementById('heroNote').textContent='Enter denominations below';
+  document.getElementById('heroPills').innerHTML='';
+  const full=load();full.live={};save(full);
+}
+
+/* ---- HISTORY ---- */
+function renderHistory(){
+  const full=load();const batches=(full.batches||[]).slice().reverse();
+  const el=document.getElementById('histArea');
+  if(!batches.length){
+    el.innerHTML=`<div class="empty-state">
+      <div class="empty-icon"><i class="ti ti-archive"></i></div>
+      <div class="empty-title">No batches yet</div>
+      <div class="empty-sub">Enter denominations on the Entry tab and save your first batch.</div>
+    </div>`;return;
+  }
+  el.innerHTML=batches.map(b=>{
+    const dt=new Date(b.time);
+    const ts=dt.toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    const chips=b.rows.map(r=>`<div class="hi-chip">₹${r.d}×${r.qty}</div>`).join('');
+    const amt=adminUnlocked
+      ?`<div class="hi-amount">${inr(b.total)}</div>`
+      :`<div class="hi-amount hidden-amt" style="color:var(--text3)"><i class="ti ti-lock" style="font-size:12px"></i> Hidden</div>`;
+    return`<div class="hist-item">
+      <button class="hi-del" onclick="delBatch(${b.id})"><i class="ti ti-x"></i></button>
+      <div class="hi-top">
+        <div>
+          <div class="hi-name">${b.label}</div>
+          ${b.loc?`<div class="hi-loc">${b.loc}</div>`:''}
+          <div class="hi-time">${ts}</div>
+        </div>
+        <div class="hi-right">${amt}</div>
+      </div>
+      <div class="hi-denoms">${chips}</div>
+    </div>`;
+  }).join('');
+}
+
+function delBatch(id){
+  if(!confirm('Remove this batch?'))return;
+  const full=load();full.batches=(full.batches||[]).filter(b=>b.id!==id);
+  save(full);renderHistory();if(adminUnlocked)renderAdminData();toast('Removed');
+}
+
+/* ---- ADMIN DATA ---- */
+function renderAdminData(){
+  const full=load();const batches=full.batches||[];
+  const{total:cur}=getCurrent();
+  const prev=batches.reduce((s,b)=>s+b.total,0);
+  const grand=cur+prev;
+  document.getElementById('adminGrand').textContent=inr(grand);
+  document.getElementById('adminSub').textContent=`${batches.length} saved batch${batches.length!==1?'es':''} + live entry`;
+  document.getElementById('statGrid').innerHTML=`
+    <div class="stat-card">
+      <div class="sc-lbl">Live batch</div>
+      <div class="sc-val">${inr(cur)}</div>
+      <div class="sc-note">Unsaved</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-lbl">Saved total</div>
+      <div class="sc-val">${inr(prev)}</div>
+      <div class="sc-note">${batches.length} batch${batches.length!==1?'es':''}</div>
+    </div>`;
+}
+
+function confirmReset(){
+  if(!confirm('Delete ALL data permanently?'))return;
+  clearEntry();const full=load();full.batches=[];full.live={};save(full);
+  renderHistory();renderAdminData();toast('All cleared');
+}
+
+/* ---- PRINT ---- */
+function doPrint(){
+  if(!adminUnlocked){toast('Admin access required');return;}
+  const full=load();const batches=full.batches||[];
+  const{total:curTotal,rows:curRows}=getCurrent();
+  const loc=document.getElementById('locName').value.trim();
+  const curLabel=document.getElementById('batchLabel').value.trim()||'Current batch';
+  const now=new Date();
+  let currentB=null,prevB=[];
+  if(curTotal>0){currentB={label:curLabel,total:curTotal,rows:curRows};prevB=batches;}
+  else if(batches.length>0){currentB=batches[batches.length-1];prevB=batches.slice(0,-1);}
+  else{toast('Nothing to print');return;}
+  const mm={};DENOMS.forEach(d=>mm[d]=0);
+  prevB.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
+  const mRows=DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}));
+  const mTotal=mRows.reduce((s,r)=>s+r.amt,0);
+  const grand=currentB.total+mTotal;
+  function tR(rows){
+    if(!rows.length)return`<tr><td colspan="3" style="font-style:italic;font-size:8pt">No entries</td></tr>`;
+    return rows.map(r=>`<tr><td>Rs.${r.d}</td><td>${r.qty}</td><td>Rs.${r.amt.toLocaleString('en-IN')}</td></tr>`).join('');
+  }
+  const dtStr=now.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  let html=`<div class="pr-shop">CASH LEDGER</div>
+  <div class="pr-sub">${loc||'Denomination Report'}</div>
+  <div class="pr-date">${dtStr}</div>
+  <hr class="pr-rule">
+  <div class="pr-sec">Current batch</div>
+  <div class="pr-sec-sub">${currentB.label}</div>
+  <table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead>
+  <tbody>${tR(currentB.rows)}</tbody></table>
+  <div class="pr-btotal">Total: Rs.${currentB.total.toLocaleString('en-IN')}</div>`;
+  if(prevB.length>0){html+=`<hr class="pr-rule">
+  <div class="pr-sec">All Previous Batches</div>
+  <div class="pr-sec-sub">${prevB.length} batch${prevB.length>1?'es':''} merged</div>
+  <table><thead><tr><th>Note</th><th>Total Qty</th><th>Amount</th></tr></thead>
+  <tbody>${tR(mRows)}</tbody></table>
+  <div class="pr-btotal">Combined: Rs.${mTotal.toLocaleString('en-IN')}</div>`;}
+  html+=`<hr class="pr-rule">
+  <div class="pr-grand">GRAND TOTAL<span class="pr-gval">Rs.${grand.toLocaleString('en-IN')}</span></div>
+  <div class="pr-foot">Rupaya Cash Ledger · ${now.toLocaleDateString('en-IN')} · ${loc||''}</div>`;
+  document.getElementById('printArea').innerHTML=html;
+  setTimeout(()=>window.print(),80);
+}
+
+/* ---- UTILS ---- */
+function persist(){
+  const full=load();const live={};
+  DENOMS.forEach(d=>{live['d'+d]=document.getElementById('d'+d).value||'';});
+  live.label=document.getElementById('batchLabel').value;
+  live.loc=document.getElementById('locName').value;
+  full.live=live;save(full);
+}
+function restoreLive(){
+  const full=load();const live=full.live||{};
+  DENOMS.forEach(d=>{if(live['d'+d])document.getElementById('d'+d).value=live['d'+d];});
+  if(live.label)document.getElementById('batchLabel').value=live.label;
+  if(live.loc)document.getElementById('locName').value=live.loc;
+  recalc();
+}
+document.getElementById('batchLabel').addEventListener('input',persist);
+document.getElementById('locName').addEventListener('input',persist);
+function load(){try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch(e){return{}}}
+function save(o){localStorage.setItem(LS,JSON.stringify(o))}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500)}
+function updateDate(){document.getElementById('topDate').textContent=new Date().toLocaleString('en-IN',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
+
+// Init — show app directly, lock only when admin tapped
+document.getElementById('lockScreen').style.display='none';
+document.getElementById('app').style.display='flex';
+document.getElementById('app').classList.add('show');
+restoreLive();renderHistory();updateDate();setInterval(updateDate,30000);
 </script>
 </body>
 </html>
