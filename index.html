@@ -1250,5 +1250,74 @@ document.getElementById('lockScreen').style.display='none';
 document.getElementById('app').style.display='flex';document.getElementById('app').classList.add('show');
 restoreLive();renderHistory();updateDate();setInterval(updateDate,30000);
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://hjwmcldmhclyzumuqoeb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_twC8kvjp0sV68uC1Ck5lhg_vfc8yBtm";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function cloudSave(fullData){
+  try {
+    await supabaseClient.from('cash_data').delete().neq('id',0);
+
+    await supabaseClient.from('cash_data').insert([{
+      data: JSON.stringify(fullData)
+    }]);
+
+    console.log("Cloud save success");
+  } catch(err) {
+    console.log("Cloud save failed", err);
+  }
+}
+
+async function cloudLoad(){
+  try {
+    const { data, error } = await supabaseClient
+      .from('cash_data')
+      .select('*')
+      .order('id', { ascending:false })
+      .limit(1);
+
+    if(error) {
+      console.log(error);
+      return null;
+    }
+
+    if(data && data.length > 0) {
+      return JSON.parse(data[0].data);
+    }
+
+    return null;
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
+}
+
+async function save(data){
+  localStorage.setItem(LS, JSON.stringify(data));
+  await cloudSave(data);
+}
+
+function load(){
+  try {
+    return JSON.parse(localStorage.getItem(LS) || '{"batches":[],"live":{}}');
+  } catch(e) {
+    return {batches:[],live:{}};
+  }
+}
+
+window.addEventListener('load', async () => {
+  const cloudData = await cloudLoad();
+
+  if(cloudData){
+    localStorage.setItem(LS, JSON.stringify(cloudData));
+    location.reload();
+  }
+});
+</script>
+
 </body>
 </html>
