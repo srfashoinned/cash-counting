@@ -2,905 +2,975 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Rupaya — Cash Ledger</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rupaya — Note Counter</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#0c0c0f;
-  --bg2:#141418;
-  --bg3:#1c1c22;
-  --bg4:#252530;
-  --surface:#1e1e26;
-  --surface2:#27272f;
-  --border:rgba(255,255,255,.07);
-  --border2:rgba(255,255,255,.12);
-  --text:#f0f0f5;
-  --text2:#9090a8;
-  --text3:#5a5a72;
-  --accent:#f5a623;
-  --accent2:#e8670a;
-  --accent-dim:rgba(245,166,35,.12);
-  --accent-glow:rgba(245,166,35,.25);
-  --green:#22c55e;
-  --green-dim:rgba(34,197,94,.1);
-  --red:#ef4444;
-  --red-dim:rgba(239,68,68,.1);
-  --blue:#3b82f6;
-  --purple:#a855f7;
-  --font:'Space Grotesk',sans-serif;
-  --display:'Syne',sans-serif;
-  --mono:'JetBrains Mono',monospace;
+:root {
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --border: #2a2a35;
+  --gold: #f0b429;
+  --gold2: #ffd166;
+  --green: #06d6a0;
+  --blue: #118ab2;
+  --pink: #ff6b9d;
+  --text: #f0ede8;
+  --muted: #888;
+  --r100: #4CAF50;
+  --r200: #2196F3;
+  --r500: #FF9800;
+  --r50: #9C27B0;
+  --r20: #F44336;
+  --r10: #00BCD4;
+  --r2: #E91E63;
+  --r1: #795548;
+  --note-h: 52px;
 }
-html,body{min-height:100%;background:var(--bg);overflow-x:hidden}
-body{font-family:var(--font);color:var(--text);max-width:430px;margin:0 auto;position:relative}
 
-/* noise overlay */
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.6}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* LOCK SCREEN */
-#lockScreen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 60px}
-.lk-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(245,166,35,.12) 0%,transparent 70%);pointer-events:none}
-.lk-badge{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 0 40px var(--accent-glow)}
-.lk-badge span{font-family:var(--display);font-size:36px;font-weight:800;color:#000}
-.lk-t{font-family:var(--display);font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px}
-.lk-s{font-size:11px;color:var(--text3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:32px}
-.lk-hint{font-size:12px;color:var(--text3);margin-bottom:14px}
-.pin-dots{display:flex;gap:12px;margin-bottom:32px}
-.pin-dot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border2);background:transparent;transition:all .18s cubic-bezier(.34,1.56,.64,1)}
-.pin-dot.filled{background:var(--accent);border-color:var(--accent);transform:scale(1.25);box-shadow:0 0 10px var(--accent-glow)}
-.pin-dot.error{background:var(--red);border-color:var(--red);animation:errShake .35s}
-@keyframes errShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
-.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:264px}
-.nk{height:60px;border-radius:14px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--display);font-size:22px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:all .1s;user-select:none}
-.nk:active{background:var(--surface2);transform:scale(.88);border-color:var(--border2)}
-.nk .sub{font-size:7px;letter-spacing:.18em;color:var(--text3);font-family:var(--font);font-weight:600;text-transform:uppercase;margin-top:1px}
-.nk.bio-key{color:var(--accent);border-color:rgba(245,166,35,.2);background:var(--accent-dim)}
-.nk.del-key{color:var(--text2)}
-.nk.zero{grid-column:2}
-.lk-err{font-size:12px;color:var(--red);min-height:18px;text-align:center;margin-top:10px;font-weight:600}
-
-/* APP */
-#app{display:none;flex-direction:column;min-height:100vh;padding-bottom:80px;position:relative;z-index:1}
-#app.show{display:flex;animation:fadeUp .3s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* HEADER */
-.hdr{background:var(--bg);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
-.hdr-left{display:flex;align-items:center;gap:10px}
-.hdr-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center}
-.hdr-logo span{font-family:var(--display);font-size:16px;font-weight:800;color:#000}
-.hdr-info{}
-.hdr-title{font-family:var(--display);font-size:16px;font-weight:800;color:var(--text);line-height:1}
-.hdr-date{font-size:10px;color:var(--text3);font-weight:500;margin-top:1px}
-.hdr-actions{display:flex;gap:6px}
-.hbtn{width:34px;height:34px;border-radius:9px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px;transition:all .15s}
-.hbtn:active{transform:scale(.88)}
-.hbtn.admin-on{color:var(--accent);border-color:rgba(245,166,35,.3);background:var(--accent-dim)}
-
-/* HERO BALANCE */
-.hero{margin:14px 14px 10px;background:var(--surface);border-radius:20px;border:1px solid var(--border);overflow:hidden;position:relative}
-.hero-inner{padding:18px 18px 16px;position:relative;z-index:1}
-.hero-glow{position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,var(--accent-glow) 0%,transparent 70%);pointer-events:none}
-.hero-tag{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
-.hero-amt{font-family:var(--display);font-size:44px;font-weight:800;color:var(--text);line-height:1;letter-spacing:-.02em}
-.hero-amt span{color:var(--accent)}
-.hero-sub{font-size:12px;color:var(--text3);margin-top:6px;font-weight:500}
-.hero-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-.hchip{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700;color:var(--text2);font-family:var(--mono)}
-
-/* ACTION ROW */
-.act-row{display:flex;gap:8px;padding:0 14px 12px}
-.abtn{flex:1;height:42px;border-radius:10px;border:none;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .13s}
-.abtn:active{transform:scale(.93);opacity:.8}
-.abtn-primary{background:var(--accent);color:#000}
-.abtn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text2)}
-.abtn i{font-size:15px}
-
-/* PAGES */
-.page{display:none;flex-direction:column;animation:fadeUp .2s ease}
-.page.on{display:flex}
-
-/* SECTION */
-.sec{padding:0 14px 14px}
-.sec-hd{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.sec-hd-line{flex:1;height:1px;background:var(--border);margin-left:10px}
-
-/* INPUTS */
-.inp-row{display:flex;gap:8px;margin-bottom:10px}
-.inp-group{flex:1;display:flex;flex-direction:column;gap:4px}
-.inp-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
-.inp{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:var(--font);font-size:13px;font-weight:500;color:var(--text);outline:none;transition:border-color .2s}
-.inp::placeholder{color:var(--text3)}
-.inp:focus{border-color:var(--accent)}
-select.inp{cursor:pointer}
-
-/* DENOM GRID */
-.denom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.dc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:all .2s;position:relative;overflow:hidden}
-.dc.active{border-color:var(--accent);background:rgba(245,166,35,.06)}
-.dc.disabled-note{opacity:.35;pointer-events:none;filter:grayscale(1)}
-.dc-top{display:flex;align-items:center;justify-content:space-between}
-.dc-val{font-family:var(--display);font-size:20px;font-weight:800;color:var(--text)}
-.dc-badge{font-size:9px;font-weight:700;background:var(--accent-dim);color:var(--accent);border-radius:5px;padding:2px 6px;font-family:var(--mono);opacity:0;transition:opacity .2s}
-.dc.active .dc-badge{opacity:1}
-.dc-toggle{width:22px;height:22px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:var(--text3);transition:all .15s;pointer-events:all}
-.dc-toggle:active{transform:scale(.85)}
-.dc.disabled-note .dc-toggle{opacity:1;pointer-events:all;filter:none}
-.dc-controls{display:flex;align-items:center;gap:4px}
-.dc-btn{width:28px;height:28px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;user-select:none;flex-shrink:0}
-.dc-btn:active{transform:scale(.82)}
-.dc-btn.plus{color:var(--accent);border-color:rgba(245,166,35,.2);background:var(--accent-dim)}
-.dc-inp{flex:1;background:transparent;border:none;font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text);text-align:center;outline:none;-moz-appearance:textfield;padding:0;min-width:0}
-.dc-inp::-webkit-inner-spin-button,.dc-inp::-webkit-outer-spin-button{-webkit-appearance:none}
-.dc-sub{font-size:10px;font-weight:600;color:var(--text3);font-family:var(--mono)}
-.dc.active .dc-sub{color:var(--accent)}
-.dc.full{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px}
-.dc.full .dc-controls{flex:1;justify-content:flex-end}
-.dc.full .dc-val{font-size:22px}
-
-/* HISTORY */
-.srch-wrap{padding:0 14px 10px;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin:0 14px 10px}
-.srch-wrap{padding:10px 12px}
-.srch-wrap i{color:var(--text3);font-size:14px}
-.srch-inp{flex:1;border:none;outline:none;font-family:var(--font);font-size:13px;font-weight:500;color:var(--text);background:transparent}
-.srch-inp::placeholder{color:var(--text3)}
-
-.stats-row{display:flex;gap:8px;padding:0 14px 10px}
-.stat-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
-.stat-lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
-.stat-val{font-family:var(--display);font-size:16px;font-weight:800;color:var(--text)}
-.stat-val.accent{color:var(--accent)}
-
-.hi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:8px;position:relative;overflow:hidden;transition:border-color .2s}
-.hi-bar{position:absolute;left:0;top:0;bottom:0;width:3px}
-.hi-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
-.hi-name{font-size:13px;font-weight:700;color:var(--text)}
-.hi-meta{font-size:10px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:5px}
-.hi-amt{font-family:var(--display);font-size:18px;font-weight:800;color:var(--accent)}
-.hi-amt.locked{font-size:11px;font-family:var(--font);color:var(--text3)}
-.hi-chips{display:flex;flex-wrap:wrap;gap:4px}
-.hi-chip{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 6px;font-size:9px;font-weight:700;color:var(--text3);font-family:var(--mono)}
-.hi-del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:4px;border-radius:6px;transition:all .15s;display:flex}
-.hi-del:active{color:var(--red);background:var(--red-dim)}
-
-.empty-s{display:flex;flex-direction:column;align-items:center;padding:48px 20px;text-align:center}
-.empty-ic{width:56px;height:56px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--text3);margin-bottom:12px}
-.empty-t{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:4px;font-family:var(--display)}
-.empty-s2{font-size:12px;color:var(--text3);line-height:1.7}
-
-/* ADMIN */
-.adm-hero{margin:14px 14px 10px;background:var(--surface);border-radius:20px;border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
-.adm-hero-glow{position:absolute;bottom:-30px;right:-30px;width:150px;height:150px;background:radial-gradient(circle,var(--accent-glow) 0%,transparent 70%);pointer-events:none}
-.adm-tag{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
-.adm-total{font-family:var(--display);font-size:44px;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-.02em}
-.adm-sub{font-size:12px;color:var(--text3);margin-top:4px;font-weight:500}
-
-.adm-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px}
-.adm-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
-.adm-card-lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
-.adm-card-val{font-family:var(--display);font-size:22px;font-weight:800;color:var(--text)}
-.adm-card-note{font-size:10px;color:var(--text3);margin-top:2px}
-
-.denom-breakdown{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:0 14px 10px;overflow:hidden}
-.db-header{padding:11px 14px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3)}
-.db-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.03)}
-.db-row:last-child{border-bottom:none}
-.db-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.db-note{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text2);min-width:40px}
-.db-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
-.db-bar-fill{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.34,1.56,.64,1)}
-.db-qty{font-size:10px;color:var(--text3);font-family:var(--mono);min-width:52px;text-align:right}
-.db-amt{font-size:10px;color:var(--text2);font-family:var(--mono);min-width:58px;text-align:right;font-weight:700}
-
-.adm-actions{display:flex;flex-direction:column;gap:7px;padding:0 14px 18px}
-.aab{width:100%;height:46px;border-radius:11px;border:none;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .13s}
-.aab:active{transform:scale(.97);opacity:.8}
-.aab i{font-size:15px}
-.aab-primary{background:var(--accent);color:#000}
-.aab-dark{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.aab-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.15)}
-.aab-red{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.15)}
-
-/* BOTTOM NAV */
-.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg);border-top:1px solid var(--border);display:flex;padding:6px 12px max(12px,env(safe-area-inset-bottom));z-index:100;gap:4px}
-.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--text3);transition:all .15s;text-transform:uppercase}
-.ni i{font-size:19px;transition:all .15s}
-.ni.on{color:var(--accent);background:var(--accent-dim)}
-.ni:active{transform:scale(.88)}
-
-/* OVERLAYS */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;animation:fadeIn .2s ease;backdrop-filter:blur(4px)}
-.overlay.hide{display:none}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.sheet{background:var(--bg2);border-radius:24px 24px 0 0;border-top:1px solid var(--border2);padding:0 18px max(28px,env(safe-area-inset-bottom));width:100%;max-height:88vh;overflow-y:auto;animation:sheetUp .26s cubic-bezier(.34,1.56,.64,1)}
-@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sh-handle{width:32px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 16px}
-.sh-title{font-family:var(--display);font-size:20px;font-weight:800;margin-bottom:14px;color:var(--text)}
-
-/* SAVE SHEET */
-.sh-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;padding:10px 12px;background:var(--surface);border-radius:10px;border:1px solid var(--border)}
-.sh-note{font-family:var(--display);font-size:16px;font-weight:800;color:var(--text);min-width:46px}
-.sh-qty{font-size:11px;color:var(--text3);font-weight:500;font-family:var(--mono)}
-.sh-amt{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);margin-left:auto}
-.sh-total-box{background:var(--accent);border-radius:14px;padding:16px;text-align:center;margin:10px 0 12px}
-.sh-total-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(0,0,0,.6);margin-bottom:4px}
-.sh-total-val{font-family:var(--display);font-size:36px;font-weight:800;color:#000;line-height:1}
-.sbtn{width:100%;height:48px;border-radius:12px;border:none;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .12s;margin-bottom:7px}
-.sbtn:active{transform:scale(.97);opacity:.85}
-.sbtn-fill{background:var(--accent);color:#000}
-.sbtn-out{background:transparent;border:1px solid var(--border2);color:var(--text2)}
-
-/* BT SHEET */
-.bt-status{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
-.bt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;transition:background .3s}
-.bt-dot.off{background:var(--text3)}
-.bt-dot.scanning{background:var(--accent);animation:pulse 1s infinite}
-.bt-dot.on{background:var(--green)}
-.bt-dot.error{background:var(--red)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.bt-txt{flex:1}
-.bt-name{font-size:13px;font-weight:700;color:var(--text)}
-.bt-sub{font-size:11px;color:var(--text3)}
-.bt-action{height:30px;padding:0 12px;border-radius:8px;border:none;background:var(--accent);color:#000;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:opacity .13s;white-space:nowrap}
-.bt-action:active{opacity:.75}
-.bt-action.secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
-.bt-log{background:var(--bg);border-radius:10px;padding:10px;font-family:var(--mono);font-size:10px;color:var(--text3);max-height:110px;overflow-y:auto;margin-bottom:10px;line-height:1.8;display:none}
-.bt-log.show{display:block}
-
-/* TOAST */
-.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%) translateY(6px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:12px;font-weight:700;padding:9px 18px;border-radius:30px;opacity:0;pointer-events:none;transition:all .2s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.4)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* PRINT */
-#printArea{display:none}
-@media print{
-  html,body{width:80mm!important;margin:0!important;padding:0!important;background:#fff!important;color:#000!important}
-  body>*{display:none!important}
-  #printArea{display:block!important;width:74mm!important;margin:0 auto!important;padding:2mm!important;font-family:Arial,sans-serif!important;color:#000!important}
-  #printArea *{color:#000!important;font-family:Arial,sans-serif!important}
-  .pr-shop{text-align:center;font-size:16pt;font-weight:900;margin:0 0 1mm}
-  .pr-sub{text-align:center;font-size:9pt;font-weight:800;margin:0 0 1mm}
-  .pr-date{text-align:center;font-size:8pt;font-weight:800;margin:0 0 3mm}
-  .pr-rule{border:none;border-top:2px solid #000;margin:2mm 0}
-  .pr-sec{font-size:9pt;font-weight:900;text-align:center;border-top:2px solid #000;border-bottom:2px solid #000;padding:1.5mm 0;margin:2mm 0;letter-spacing:.06em;text-transform:uppercase}
-  .pr-sec-sub{font-size:7.5pt;font-weight:800;text-align:center;margin:-1mm 0 2mm}
-  table{width:100%;border-collapse:collapse}
-  th{font-size:8pt;font-weight:900;border-bottom:1.5px solid #000;padding:1mm 1.5mm;text-align:left;text-transform:uppercase}
-  th:nth-child(2){text-align:center}th:last-child{text-align:right}
-  td{font-size:9pt;font-weight:800;padding:1.2mm 1.5mm;border-bottom:.5px solid #888;text-align:left}
-  td:nth-child(2){text-align:center}td:last-child{text-align:right;font-weight:900}
-  .pr-btotal{text-align:right;font-size:10pt;font-weight:900;border-top:1.5px solid #000;padding:1.5mm 0 0;margin:0 0 3mm}
-  .pr-grand{text-align:center;font-size:14pt;font-weight:900;border-top:3px solid #000;border-bottom:3px solid #000;padding:2.5mm 0;margin:2mm 0}
-  .pr-gval{font-size:18pt;font-weight:900;display:block;margin-top:1mm}
-  .pr-foot{text-align:center;font-size:7.5pt;font-weight:800;margin-top:3mm;border-top:1px solid #000;padding-top:1.5mm}
-  @page{size:80mm auto;margin:0}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
+
+/* === BACKGROUND PARTICLES === */
+#bg-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; opacity: 0.4;
+}
+
+/* === HEADER === */
+header {
+  position: relative; z-index: 10;
+  padding: 2rem 2rem 1rem;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+}
+.logo span { color: var(--gold); }
+.logo-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.header-total {
+  text-align: right;
+}
+.header-total-label {
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.header-total-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--gold);
+  transition: all 0.3s;
+}
+
+/* === MAIN LAYOUT === */
+main {
+  position: relative; z-index: 10;
+  max-width: 900px; margin: 0 auto;
+  padding: 2rem;
+}
+
+/* === NOTE ROWS (Primary 3) === */
+.primary-notes {
+  display: flex; flex-direction: column; gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.note-row {
+  display: flex; align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  gap: 1.5rem;
+  transition: border-color 0.2s, transform 0.1s;
+  cursor: default;
+}
+.note-row:hover { border-color: #444; transform: translateY(-1px); }
+.note-row.active { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold)33; }
+
+.note-chip {
+  width: 72px; height: 40px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1.1rem;
+  flex-shrink: 0;
+  position: relative; overflow: hidden;
+}
+.note-chip::after {
+  content: '₹'; position: absolute; right: 4px; top: 2px;
+  font-size: 0.6rem; opacity: 0.5;
+}
+.chip-100 { background: linear-gradient(135deg, #1a4a1e, #2d7a33); color: #7fff88; border: 1px solid #2d7a33; }
+.chip-200 { background: linear-gradient(135deg, #1a2e4a, #1e5588); color: #7fbfff; border: 1px solid #1e5588; }
+.chip-500 { background: linear-gradient(135deg, #4a2a1a, #884422); color: #ffb87f; border: 1px solid #884422; }
+.chip-50 { background: linear-gradient(135deg, #3a1a4a, #6b2e8a); color: #df9fff; border: 1px solid #6b2e8a; }
+.chip-20 { background: linear-gradient(135deg, #4a1a1a, #882222); color: #ff9f9f; border: 1px solid #882222; }
+.chip-10 { background: linear-gradient(135deg, #1a3d4a, #1e7788); color: #7fefff; border: 1px solid #1e7788; }
+.chip-2 { background: linear-gradient(135deg, #4a1a3a, #882268); color: #ff9fdf; border: 1px solid #882268; }
+.chip-1 { background: linear-gradient(135deg, #2e1a0a, #5a3212); color: #ffd7a0; border: 1px solid #5a3212; }
+
+.note-label {
+  flex: 1;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.note-label strong {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0;
+  margin-bottom: 2px;
+}
+
+.note-input-wrap {
+  position: relative;
+  display: flex; align-items: center;
+}
+.note-input {
+  width: 90px; height: 44px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+.note-input::-webkit-inner-spin-button,
+.note-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.note-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold)22;
+}
+.note-input::placeholder { color: #444; }
+
+.note-multiplier {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 0 0.5rem;
+}
+
+.note-value {
+  min-width: 110px;
+  text-align: right;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold);
+  transition: all 0.2s;
+}
+.note-value.zero { color: #444; font-weight: 400; font-size: 1rem; }
+
+/* === DENOMINATION TOGGLES === */
+.denom-section {
+  margin-bottom: 2rem;
+}
+.denom-header {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.denom-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.denom-toggles {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+}
+.denom-toggle {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.denom-toggle:hover { border-color: #555; color: var(--text); }
+.denom-toggle.active { border-color: var(--gold); color: var(--gold); background: var(--gold)11; }
+.denom-toggle .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* === BATCH SECTION === */
+.batch-section { margin-bottom: 2rem; }
+
+.batch-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.batch-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.batch-title span { color: var(--gold); }
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.btn:hover { background: var(--surface2); border-color: #555; }
+.btn.btn-gold {
+  background: var(--gold)22;
+  border-color: var(--gold)66;
+  color: var(--gold);
+}
+.btn.btn-gold:hover { background: var(--gold)33; }
+.btn.btn-green {
+  background: var(--green)22;
+  border-color: var(--green)66;
+  color: var(--green);
+}
+.btn.btn-green:hover { background: var(--green)33; }
+
+.batch-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.batch-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  display: flex; align-items: center; gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.batch-item:hover { border-color: #444; }
+.batch-item.current { border-color: var(--green)88; background: var(--green)08; }
+
+.batch-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  width: 60px; flex-shrink: 0;
+}
+.batch-notes {
+  flex: 1;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.batch-notes .note-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  margin-right: 4px;
+  color: var(--text);
+}
+.batch-total {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+.batch-delete {
+  width: 28px; height: 28px;
+  border-radius: 50%; border: none;
+  background: transparent; color: var(--muted);
+  cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.batch-delete:hover { background: #ff444422; color: #ff4444; }
+
+/* === CURRENT BATCH PANEL === */
+.current-panel {
+  background: var(--surface);
+  border: 1px solid var(--green)44;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.current-panel::before {
+  content: 'CURRENT BATCH';
+  position: absolute; top: 12px; right: 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--green)88;
+}
+.current-total {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--green);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s;
+}
+.current-breakdown {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+/* === GRAND TOTAL === */
+.grand-total-bar {
+  background: var(--gold)11;
+  border: 1px solid var(--gold)44;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2rem;
+}
+.gt-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold)aa;
+}
+.gt-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+/* === ACTION BAR === */
+.action-bar {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+/* === CONFETTI === */
+#confetti-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 9999;
+}
+
+/* === TOAST === */
+.toast {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.6rem 1.5rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text);
+  z-index: 9998;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.hidden { opacity: 0; }
+
+/* === COIN ANIMATION === */
+.coin-pop {
+  position: fixed; z-index: 9997;
+  font-size: 1.5rem; pointer-events: none;
+  animation: coinFly 0.8s ease forwards;
+}
+@keyframes coinFly {
+  0% { transform: translateY(0) scale(0); opacity: 1; }
+  60% { transform: translateY(-60px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+}
+
+/* === PRINT STYLES === */
+@media print {
+  body { background: white; color: black; }
+  #bg-canvas, #confetti-canvas, .toast, .action-bar, .denom-section { display: none; }
+  .print-only { display: block !important; }
+  .no-print { display: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+.print-only { display: none; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.pulse { animation: pulse 0.3s ease; }
+
+/* === SECONDARY DENOM ROWS (hidden by default) === */
+.secondary-notes {
+  display: flex; flex-direction: column; gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.note-row.hidden-denom {
+  display: none;
+}
+
+/* number bump animation */
+@keyframes bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.15); color: var(--gold2); }
+  100% { transform: scale(1); }
+}
+.bump { animation: bump 0.25s ease; }
 </style>
 </head>
 <body>
 
-<!-- LOCK SCREEN -->
-<div id="lockScreen">
-  <div class="lk-glow"></div>
-  <div class="lk-badge"><span>₹</span></div>
-  <div class="lk-t">Rupaya</div>
-  <div class="lk-s">Cash Ledger · Secure</div>
-  <div class="lk-hint">Enter admin PIN to continue</div>
-  <div class="pin-dots" id="pinDots">
-    <div class="pin-dot" id="pd0"></div>
-    <div class="pin-dot" id="pd1"></div>
-    <div class="pin-dot" id="pd2"></div>
-    <div class="pin-dot" id="pd3"></div>
-  </div>
-  <div class="numpad">
-    <button class="nk" onclick="nkp('1')">1</button>
-    <button class="nk" onclick="nkp('2')">2<div class="sub">ABC</div></button>
-    <button class="nk" onclick="nkp('3')">3<div class="sub">DEF</div></button>
-    <button class="nk" onclick="nkp('4')">4<div class="sub">GHI</div></button>
-    <button class="nk" onclick="nkp('5')">5<div class="sub">JKL</div></button>
-    <button class="nk" onclick="nkp('6')">6<div class="sub">MNO</div></button>
-    <button class="nk" onclick="nkp('7')">7<div class="sub">PQRS</div></button>
-    <button class="nk" onclick="nkp('8')">8<div class="sub">TUV</div></button>
-    <button class="nk" onclick="nkp('9')">9<div class="sub">WXYZ</div></button>
-    <button class="nk bio-key" onclick="tryBio()"><i class="ti ti-fingerprint"></i></button>
-    <button class="nk zero" onclick="nkp('0')">0</button>
-    <button class="nk del-key" onclick="nkd()"><i class="ti ti-backspace"></i></button>
-  </div>
-  <div class="lk-err" id="lockErr"></div>
-</div>
+<canvas id="bg-canvas"></canvas>
+<canvas id="confetti-canvas"></canvas>
+<div class="toast hidden" id="toast"></div>
 
-<!-- APP -->
-<div id="app">
+<header>
+  <div>
+    <div class="logo">रुपया<span>.</span></div>
+    <div class="logo-sub">Note Counter v2</div>
+  </div>
+  <div class="header-total">
+    <div class="header-total-label">Grand Total</div>
+    <div class="header-total-value" id="header-grand-total">₹0</div>
+  </div>
+</header>
 
-  <!-- HEADER -->
-  <div class="hdr">
-    <div class="hdr-left">
-      <div class="hdr-logo"><span>₹</span></div>
-      <div class="hdr-info">
-        <div class="hdr-title">Rupaya</div>
-        <div class="hdr-date" id="topDate"></div>
-      </div>
-    </div>
-    <div class="hdr-actions">
-      <div class="hbtn" id="adminHBtn" onclick="tapAdminBtn()" title="Admin"><i class="ti ti-shield-lock"></i></div>
-      <div class="hbtn" onclick="openSaveSheet()" title="Save"><i class="ti ti-device-floppy"></i></div>
+<main>
+
+  <!-- DENOMINATION TOGGLES -->
+  <div class="denom-section">
+    <div class="denom-header">All Denominations</div>
+    <div class="denom-toggles" id="denom-toggles">
+      <div class="denom-toggle active" data-denom="100" onclick="toggleDenom(this)"><span class="dot"></span>₹100</div>
+      <div class="denom-toggle active" data-denom="200" onclick="toggleDenom(this)"><span class="dot"></span>₹200</div>
+      <div class="denom-toggle active" data-denom="500" onclick="toggleDenom(this)"><span class="dot"></span>₹500</div>
+      <div class="denom-toggle" data-denom="50" onclick="toggleDenom(this)"><span class="dot"></span>₹50</div>
+      <div class="denom-toggle" data-denom="20" onclick="toggleDenom(this)"><span class="dot"></span>₹20</div>
+      <div class="denom-toggle" data-denom="10" onclick="toggleDenom(this)"><span class="dot"></span>₹10</div>
+      <div class="denom-toggle" data-denom="2" onclick="toggleDenom(this)"><span class="dot"></span>₹2</div>
+      <div class="denom-toggle" data-denom="1" onclick="toggleDenom(this)"><span class="dot"></span>₹1</div>
     </div>
   </div>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-inner">
-      <div class="hero-tag">Live Batch Total</div>
-      <div class="hero-amt"><span>₹</span><span id="heroNum">0</span></div>
-      <div class="hero-sub" id="heroSub">Enter denominations below</div>
-      <div class="hero-chips" id="heroChips"></div>
-    </div>
+  <!-- NOTE INPUT ROWS -->
+  <div class="primary-notes" id="note-rows">
+    <!-- rows generated by JS -->
   </div>
 
-  <!-- ACTION ROW -->
-  <div class="act-row">
-    <button class="abtn abtn-primary" onclick="openSaveSheet()"><i class="ti ti-device-floppy"></i>Save Batch</button>
-    <button class="abtn abtn-ghost" onclick="openBTSheet()"><i class="ti ti-bluetooth"></i>BT Print</button>
-    <button class="abtn abtn-ghost" onclick="clearEntry()"><i class="ti ti-refresh"></i>Reset</button>
+  <!-- CURRENT BATCH PANEL -->
+  <div class="current-panel">
+    <div class="current-total" id="current-total">₹0</div>
+    <div class="current-breakdown" id="current-breakdown">No notes entered yet</div>
   </div>
 
-  <!-- ENTRY PAGE -->
-  <div class="page on" id="pageEntry">
-    <div class="sec">
-      <div class="sec-hd">Batch Details <div class="sec-hd-line"></div></div>
-      <div class="inp-row">
-        <div class="inp-group">
-          <div class="inp-lbl">Batch Name</div>
-          <input class="inp" type="text" id="batchLabel" placeholder="Evening shift…" maxlength="60">
-        </div>
-        <div class="inp-group">
-          <div class="inp-lbl">Location</div>
-          <input class="inp" type="text" id="locName" placeholder="Counter 1…" maxlength="40">
-        </div>
-      </div>
-    </div>
-    <div class="sec" style="padding-top:0">
-      <div class="sec-hd">Denomination Count <span style="font-size:9px;color:var(--text3);font-weight:500;letter-spacing:0;text-transform:none;margin-left:4px">tap × to disable</span><div class="sec-hd-line"></div></div>
-      <div class="denom-grid" id="denomList"></div>
-    </div>
+  <!-- ACTION BAR -->
+  <div class="action-bar no-print">
+    <button class="btn btn-green" onclick="saveBatch()">＋ Save as Batch</button>
+    <button class="btn" onclick="clearCurrent()">⌫ Clear Current</button>
+    <button class="btn btn-gold" onclick="printCurrent()">🖨 Print Current</button>
+    <button class="btn btn-gold" onclick="printAll()">🖨 Print All</button>
   </div>
 
-  <!-- HISTORY PAGE -->
-  <div class="page" id="pageHistory">
-    <div class="stats-row" id="statsRow" style="display:none">
-      <div class="stat-card"><div class="stat-lbl">Batches</div><div class="stat-val" id="sBatches">0</div></div>
-      <div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val accent" id="sTotal">₹0</div></div>
-      <div class="stat-card"><div class="stat-lbl">Average</div><div class="stat-val" id="sAvg">₹0</div></div>
+  <!-- SAVED BATCHES -->
+  <div class="batch-section" id="batch-section" style="display:none">
+    <div class="batch-header">
+      <div class="batch-title">Saved Batches <span id="batch-count-label"></span></div>
+      <button class="btn" onclick="clearAllBatches()">🗑 Clear All Batches</button>
     </div>
-    <div class="srch-wrap">
-      <i class="ti ti-search"></i>
-      <input class="srch-inp" type="text" id="searchInp" placeholder="Search batches…" oninput="renderHistory()">
-    </div>
-    <div class="sec" style="padding-top:0">
-      <div id="histArea"></div>
-    </div>
+    <div class="batch-list" id="batch-list"></div>
   </div>
 
-  <!-- ADMIN PAGE -->
-  <div class="page" id="pageAdmin">
-    <div class="adm-hero">
-      <div class="adm-hero-glow"></div>
-      <div class="adm-tag">Grand Total · All Batches</div>
-      <div class="adm-total" id="adminGrand">₹0</div>
-      <div class="adm-sub" id="adminSub">—</div>
+  <!-- GRAND TOTAL BAR -->
+  <div class="grand-total-bar">
+    <div>
+      <div class="gt-label">Grand Total (All Batches + Current)</div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--muted);margin-top:4px" id="gt-breakdown"></div>
     </div>
-    <div class="adm-cards" id="adminGrid"></div>
-    <div class="denom-breakdown" id="denomBk"></div>
-    <div class="adm-actions">
-      <button class="aab aab-primary" onclick="openSaveSheet()"><i class="ti ti-device-floppy"></i>Save Current Batch</button>
-      <button class="aab aab-dark" onclick="openBTSheet()"><i class="ti ti-bluetooth"></i>Bluetooth Print</button>
-      <button class="aab aab-green" onclick="doPrint()"><i class="ti ti-printer"></i>Browser / WiFi Print</button>
-      <button class="aab aab-green" onclick="exportCSV()"><i class="ti ti-file-spreadsheet"></i>Export CSV</button>
-      <button class="aab aab-dark" onclick="lockAdmin()"><i class="ti ti-lock"></i>Lock Admin</button>
-      <button class="aab aab-red" onclick="confirmReset()"><i class="ti ti-trash"></i>Clear All Data</button>
-    </div>
+    <div class="gt-value" id="grand-total-display">₹0</div>
   </div>
 
-</div>
+</main>
 
-<!-- BOTTOM NAV -->
-<div class="bnav">
-  <div class="ni on" id="ni-entry" onclick="goPage('entry')"><i class="ti ti-calculator"></i>Entry</div>
-  <div class="ni" id="ni-history" onclick="goPage('history')"><i class="ti ti-clock-history"></i>History</div>
-  <div class="ni" id="ni-admin" onclick="tapNavAdmin()"><i class="ti ti-shield-lock"></i>Admin</div>
-</div>
-
-<!-- SAVE SHEET -->
-<div class="overlay hide" id="saveOverlay" onclick="closeSaveSheet(event)">
-  <div class="sheet">
-    <div class="sh-handle"></div>
-    <div class="sh-title">Save Batch</div>
-    <div id="sheetContent"></div>
-    <button class="sbtn sbtn-fill" onclick="confirmSave()"><i class="ti ti-check"></i>Confirm & Save</button>
-    <button class="sbtn sbtn-out" onclick="document.getElementById('saveOverlay').classList.add('hide')">Cancel</button>
-  </div>
-</div>
-
-<!-- BT SHEET -->
-<div class="overlay hide" id="btOverlay" onclick="closeBTSheet(event)">
-  <div class="sheet">
-    <div class="sh-handle"></div>
-    <div class="sh-title"><i class="ti ti-bluetooth" style="color:var(--accent);margin-right:6px"></i>Bluetooth Printer</div>
-
-    <div class="bt-status" id="btStatus">
-      <div class="bt-dot off" id="btDot"></div>
-      <div class="bt-txt">
-        <div class="bt-name" id="btName">Not connected</div>
-        <div class="bt-sub" id="btSub">Tap Connect to search printers</div>
-      </div>
-      <button class="bt-action" id="btConnBtn" onclick="btConnect()">Connect</button>
-    </div>
-
-    <div class="bt-log" id="btLog"></div>
-
-    <div style="margin-bottom:10px">
-      <div class="inp-lbl" style="margin-bottom:6px">Print report type</div>
-      <select class="inp" id="btPrintMode" style="font-size:13px">
-        <option value="grand_denom">Grand Total — All denominations breakdown</option>
-        <option value="batches_then_current">All saved batches + current batch</option>
-        <option value="current">Current batch only</option>
-      </select>
-    </div>
-
-    <button class="sbtn sbtn-fill" id="btPrintBtn" onclick="btPrint()" disabled style="opacity:.5">
-      <i class="ti ti-printer"></i>Print via Bluetooth
-    </button>
-    <button class="sbtn sbtn-out" onclick="document.getElementById('btOverlay').classList.add('hide')">Close</button>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-<div id="printArea"></div>
+<!-- PRINT TEMPLATE (hidden, used for printing) -->
+<div class="print-only" id="print-area"></div>
 
 <script>
-const ALL_DENOMS=[10,20,50,100,200,500,2000];
-const DCOLORS={10:'#a855f7',20:'#3b82f6',50:'#ef4444',100:'#22c55e',200:'#f59e0b',500:'#06b6d4',2000:'#ec4899'};
-const LS='rupaya_v3';
-const PIN='7865';
-let adminUnlocked=false,pinBuf='';
-let btDevice=null,btChar=null,btConnected=false;
+// =================== DATA ====================
+const DENOMS = [
+  { v: 500, chip: 'chip-500', label: '500 rupee notes', key: 'd500' },
+  { v: 200, chip: 'chip-200', label: '200 rupee notes', key: 'd200' },
+  { v: 100, chip: 'chip-100', label: '100 rupee notes', key: 'd100' },
+  { v: 50,  chip: 'chip-50',  label: '50 rupee notes',  key: 'd50'  },
+  { v: 20,  chip: 'chip-20',  label: '20 rupee notes',  key: 'd20'  },
+  { v: 10,  chip: 'chip-10',  label: '10 rupee notes',  key: 'd10'  },
+  { v: 2,   chip: 'chip-2',   label: '2 rupee coins',   key: 'd2'   },
+  { v: 1,   chip: 'chip-1',   label: '1 rupee coins',   key: 'd1'   },
+];
+const PRIMARY = [100, 200, 500];
+let enabledDenoms = new Set([100, 200, 500]);
+let batches = [];
+let currentValues = {};
+DENOMS.forEach(d => currentValues[d.v] = 0);
 
-/* ---- GET ENABLED DENOMS ---- */
-function getDisabled(){try{return JSON.parse(localStorage.getItem('rupaya_disabled')||'[]')}catch(e){return[]}}
-function saveDisabled(arr){localStorage.setItem('rupaya_disabled',JSON.stringify(arr))}
-function isDenomEnabled(d){return!getDisabled().includes(d)}
-function toggleDenom(d){
-  const dis=getDisabled();
-  const idx=dis.indexOf(d);
-  if(idx===-1)dis.push(d);else dis.splice(idx,1);
-  saveDisabled(dis);
-  const el=document.getElementById('dc'+d);
-  el.classList.toggle('disabled-note',!isDenomEnabled(d));
-  // reset value if disabling
-  if(!isDenomEnabled(d)){
-    document.getElementById('d'+d).value='';
-    document.getElementById('ds'+d).textContent='—';
-    document.getElementById('badge'+d).textContent='×0';
-    el.classList.remove('active');
-  }
-  recalc();
+// =================== AUDIO ====================
+const AC = window.AudioContext ? new AudioContext() : null;
+function beep(freq=440, dur=0.08, vol=0.15, type='sine') {
+  if (!AC) return;
+  try {
+    const o = AC.createOscillator();
+    const g = AC.createGain();
+    o.connect(g); g.connect(AC.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + dur);
+    o.start(); o.stop(AC.currentTime + dur);
+  } catch(e){}
 }
-function getEnabledDenoms(){return ALL_DENOMS.filter(d=>isDenomEnabled(d))}
+function playAdd() { beep(600,0.06,0.1,'sine'); setTimeout(()=>beep(800,0.06,0.08,'sine'),60); }
+function playSave() {
+  [400,500,650,800].forEach((f,i) => setTimeout(()=>beep(f,0.08,0.12,'sine'),i*60));
+}
+function playClear() { beep(300,0.1,0.1,'sawtooth'); }
+function playPrint() { beep(880,0.05); setTimeout(()=>beep(1100,0.05),80); setTimeout(()=>beep(880,0.05),160); }
 
-/* ---- BUILD DENOM GRID ---- */
-const dl=document.getElementById('denomList');
-ALL_DENOMS.forEach(d=>{
-  const full=d===2000?'dc full':'dc';
-  dl.innerHTML+=`<div class="${full}" data-d="${d}" id="dc${d}">
-    <div class="dc-top">
-      <div class="dc-val">₹${d>=1000?(d/1000)+'K':d}</div>
-      <div style="display:flex;align-items:center;gap:5px">
-        <div class="dc-badge" id="badge${d}">×0</div>
-        <div class="dc-toggle" onclick="toggleDenom(${d})" title="Enable/Disable"><i class="ti ti-x" style="font-size:10px"></i></div>
-      </div>
-    </div>
-    <div class="dc-controls">
-      <div class="dc-btn" onclick="step(${d},-1)">−</div>
-      <input class="dc-inp" type="number" id="d${d}" min="0" placeholder="0" oninput="onDI(${d})" onwheel="return false" inputmode="numeric">
-      <div class="dc-btn plus" onclick="step(${d},1)">+</div>
-    </div>
-    <div class="dc-sub" id="ds${d}">—</div>
-  </div>`;
+// =================== CONFETTI ====================
+const confCanvas = document.getElementById('confetti-canvas');
+const confCtx = confCanvas.getContext('2d');
+let confParticles = [];
+function resizeConf() {
+  confCanvas.width = window.innerWidth;
+  confCanvas.height = window.innerHeight;
+}
+resizeConf();
+window.addEventListener('resize', resizeConf);
+
+function launchConfetti(x, y, count=30) {
+  const colors = ['#f0b429','#06d6a0','#118ab2','#ff6b9d','#ffd166','#7fff88'];
+  for(let i=0;i<count;i++) {
+    confParticles.push({
+      x, y,
+      vx: (Math.random()-0.5)*10,
+      vy: -(Math.random()*8+4),
+      color: colors[Math.floor(Math.random()*colors.length)],
+      size: Math.random()*6+3,
+      life: 1, rot: Math.random()*360,
+      rotSpeed: (Math.random()-0.5)*10
+    });
+  }
+  requestAnimationFrame(animConf);
+}
+function animConf() {
+  confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);
+  confParticles = confParticles.filter(p => p.life > 0);
+  confParticles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.3;
+    p.life -= 0.018; p.rot += p.rotSpeed;
+    confCtx.save();
+    confCtx.globalAlpha = p.life;
+    confCtx.translate(p.x, p.y);
+    confCtx.rotate(p.rot * Math.PI/180);
+    confCtx.fillStyle = p.color;
+    confCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size/2);
+    confCtx.restore();
+  });
+  if(confParticles.length > 0) requestAnimationFrame(animConf);
+}
+
+// =================== BG PARTICLES ====================
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+let particles = [];
+function resizeBg() {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+}
+resizeBg();
+window.addEventListener('resize', resizeBg);
+
+for(let i=0;i<30;i++) particles.push({
+  x: Math.random()*window.innerWidth,
+  y: Math.random()*window.innerHeight,
+  r: Math.random()*2+0.5,
+  vx: (Math.random()-0.5)*0.3,
+  vy: (Math.random()-0.5)*0.3,
+  color: ['#f0b42933','#06d6a022','#118ab222'][Math.floor(Math.random()*3)]
 });
 
-// Apply disabled state on load
-getDisabled().forEach(d=>{const el=document.getElementById('dc'+d);if(el)el.classList.add('disabled-note')});
-
-function step(d,dir){
-  if(!isDenomEnabled(d))return;
-  const i=document.getElementById('d'+d);
-  i.value=Math.max(0,(parseInt(i.value)||0)+dir)||'';
-  onDI(d);
-}
-function onDI(d){
-  if(!isDenomEnabled(d))return;
-  const qty=parseInt(document.getElementById('d'+d).value||0);
-  const dc=document.getElementById('dc'+d);
-  document.getElementById('ds'+d).textContent=qty>0?inr(qty*d):'—';
-  document.getElementById('badge'+d).textContent='×'+qty;
-  dc.classList.toggle('active',qty>0);
-  recalc();
-}
-
-function inr(n){return(n<0?'−':'')+'₹'+Math.abs(n).toLocaleString('en-IN')}
-
-function getCurrent(){
-  let total=0;const rows=[];
-  getEnabledDenoms().forEach(d=>{
-    const qty=parseInt(document.getElementById('d'+d).value||0);
-    if(qty>0)rows.push({d,qty,amt:qty*d});
-    total+=qty*d;
+function animBg() {
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>bgCanvas.width) p.vx*=-1;
+    if(p.y<0||p.y>bgCanvas.height) p.vy*=-1;
+    bgCtx.beginPath();
+    bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    bgCtx.fillStyle = p.color;
+    bgCtx.fill();
   });
-  return{total,rows};
+  requestAnimationFrame(animBg);
+}
+animBg();
+
+// =================== TOAST ====================
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.add('hidden'), 2200);
 }
 
-function recalc(){
-  const{total,rows}=getCurrent();
-  document.getElementById('heroNum').textContent=total.toLocaleString('en-IN');
-  document.getElementById('heroSub').textContent=rows.length?`${rows.length} denom · ${rows.reduce((s,r)=>s+r.qty,0)} notes`:'Enter denominations below';
-  const pp=document.getElementById('heroChips');
-  pp.innerHTML=rows.map(r=>`<div class="hchip">₹${r.d}×${r.qty}</div>`).join('');
-  if(adminUnlocked)renderAdminData();
-  persist();
+// =================== COIN POP ====================
+function coinPop(el) {
+  const rect = el.getBoundingClientRect();
+  const div = document.createElement('div');
+  div.className = 'coin-pop';
+  div.textContent = '💰';
+  div.style.left = (rect.left + rect.width/2) + 'px';
+  div.style.top = (rect.top + rect.height/2) + 'px';
+  document.body.appendChild(div);
+  setTimeout(()=>div.remove(), 900);
 }
 
-/* ---- LOCK ---- */
-function nkp(k){if(pinBuf.length>=4)return;pinBuf+=k;updDots();if(pinBuf.length===4)setTimeout(checkPin,150)}
-function nkd(){pinBuf=pinBuf.slice(0,-1);updDots();document.getElementById('lockErr').textContent=''}
-function updDots(){for(let i=0;i<4;i++){document.getElementById('pd'+i).classList.toggle('filled',i<pinBuf.length);document.getElementById('pd'+i).classList.remove('error')}}
-function checkPin(){
-  if(pinBuf===PIN){doUnlock();}
-  else{for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('error');document.getElementById('lockErr').textContent='Wrong PIN. Try again.';setTimeout(()=>{pinBuf='';updDots()},600);}
-}
-function doUnlock(){
-  adminUnlocked=true;
-  document.getElementById('lockScreen').style.display='none';
-  document.getElementById('adminHBtn').classList.add('admin-on');
-  document.getElementById('app').style.display='flex';
-  document.getElementById('app').classList.add('show');
-  goPage('admin');renderAdminData();renderHistory();
-}
-function lockAdmin(){adminUnlocked=false;pinBuf='';document.getElementById('adminHBtn').classList.remove('admin-on');goPage('entry');showToast('Admin locked')}
-function showLock(){pinBuf='';updDots();document.getElementById('lockErr').textContent='';document.getElementById('lockScreen').style.display='flex'}
-function tapAdminBtn(){adminUnlocked?goPage('admin'):showLock()}
-function tapNavAdmin(){if(adminUnlocked){goPage('admin');renderAdminData();}else showLock()}
-
-async function tryBio(){
-  if(!window.PublicKeyCredential){showToast('Biometrics not available');return}
-  try{
-    const full=load();
-    if(!full.credId){
-      const ch=crypto.getRandomValues(new Uint8Array(32));
-      const cr=await navigator.credentials.create({publicKey:{challenge:ch,rp:{name:'Rupaya'},user:{id:new Uint8Array(16),name:'admin',displayName:'Admin'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
-      full.credId=Array.from(new Uint8Array(cr.rawId));save(full);showToast('Biometric registered!');doUnlock();return;
-    }
-    const ch2=crypto.getRandomValues(new Uint8Array(32));
-    await navigator.credentials.get({publicKey:{challenge:ch2,allowCredentials:[{type:'public-key',id:new Uint8Array(full.credId)}],userVerification:'required',timeout:60000}});
-    doUnlock();
-  }catch(e){if(e.name!=='NotAllowedError')showToast('Biometric failed — use PIN')}
-}
-
-/* ---- PAGES ---- */
-function goPage(n){
-  ['entry','history','admin'].forEach(p=>{document.getElementById('page'+cap(p)).classList.remove('on');document.getElementById('ni-'+p).classList.remove('on')});
-  document.getElementById('page'+cap(n)).classList.add('on');document.getElementById('ni-'+n).classList.add('on');
-  if(n==='history')renderHistory();
-  if(n==='admin')renderAdminData();
-}
-function cap(s){return s[0].toUpperCase()+s.slice(1)}
-
-/* ---- SAVE SHEET ---- */
-function openSaveSheet(){
-  const{total,rows}=getCurrent();
-  if(!total){showToast('Add at least one denomination first');return}
-  const label=document.getElementById('batchLabel').value.trim()||'Unnamed Batch';
-  document.getElementById('sheetContent').innerHTML=
-    rows.map(r=>`<div class="sh-row"><div class="sh-note">₹${r.d}</div><div class="sh-qty">${r.qty} note${r.qty>1?'s':''}</div><div class="sh-amt">${inr(r.amt)}</div></div>`).join('')+
-    `<div class="sh-total-box"><div class="sh-total-lbl">${label}</div><div class="sh-total-val">${inr(total)}</div></div>`;
-  document.getElementById('saveOverlay').classList.remove('hide');
-}
-function closeSaveSheet(e){if(e.target===document.getElementById('saveOverlay'))document.getElementById('saveOverlay').classList.add('hide')}
-function confirmSave(){
-  const{total,rows}=getCurrent();
-  const label=document.getElementById('batchLabel').value.trim()||('Batch '+((load().batches||[]).length+1));
-  const loc=document.getElementById('locName').value.trim();
-  const full=load();if(!full.batches)full.batches=[];
-  full.batches.push({id:Date.now(),label,loc,total,rows,time:new Date().toISOString()});
-  save(full);clearEntry();renderHistory();if(adminUnlocked)renderAdminData();
-  document.getElementById('saveOverlay').classList.add('hide');showToast('Batch saved ✓');
-}
-function clearEntry(){
-  getEnabledDenoms().forEach(d=>{document.getElementById('d'+d).value='';document.getElementById('ds'+d).textContent='—';document.getElementById('dc'+d).classList.remove('active');document.getElementById('badge'+d).textContent='×0'});
-  document.getElementById('batchLabel').value='';
-  document.getElementById('heroNum').textContent='0';document.getElementById('heroSub').textContent='Enter denominations below';document.getElementById('heroChips').innerHTML='';
-  const f=load();f.live={};save(f);
-}
-
-/* ---- HISTORY ---- */
-function renderHistory(){
-  const full=load();const q=(document.getElementById('searchInp').value||'').toLowerCase();
-  let batches=(full.batches||[]).slice().reverse();
-  if(q)batches=batches.filter(b=>(b.label+b.loc).toLowerCase().includes(q));
-  const allB=full.batches||[];const sTotal=allB.reduce((s,b)=>s+b.total,0);
-  const row=document.getElementById('statsRow');
-  if(allB.length){
-    row.style.display='flex';
-    document.getElementById('sBatches').textContent=allB.length;
-    document.getElementById('sTotal').textContent=adminUnlocked?inr(sTotal):'🔒';
-    document.getElementById('sAvg').textContent=adminUnlocked?inr(Math.round(sTotal/allB.length)):'—';
-  } else row.style.display='none';
-  const el=document.getElementById('histArea');
-  if(!batches.length){el.innerHTML=`<div class="empty-s"><div class="empty-ic"><i class="ti ti-archive"></i></div><div class="empty-t">${q?'No results':'No batches yet'}</div><div class="empty-s2">${q?'Try a different keyword.':'Go to Entry tab and save your first batch.'}</div></div>`;return}
-  const colors=[DCOLORS[500],DCOLORS[100],DCOLORS[20],DCOLORS[2000]];
-  el.innerHTML=batches.map((b,i)=>{
-    const ts=new Date(b.time).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-    const chips=b.rows.map(r=>`<div class="hi-chip">₹${r.d}×${r.qty}</div>`).join('');
-    const amt=adminUnlocked?`<div class="hi-amt">${inr(b.total)}</div>`:`<div class="hi-amt locked"><i class="ti ti-lock" style="font-size:10px"></i></div>`;
-    return`<div class="hi"><div class="hi-bar" style="background:${colors[i%4]}"></div>
-      <button class="hi-del" onclick="delBatch(${b.id})"><i class="ti ti-x"></i></button>
-      <div class="hi-head"><div><div class="hi-name">${b.label}</div><div class="hi-meta">${b.loc?`<span><i class="ti ti-map-pin" style="font-size:9px"></i> ${b.loc}</span>`:''}<span>${ts}</span></div></div><div>${amt}</div></div>
-      <div class="hi-chips">${chips}</div></div>`;
-  }).join('');
-}
-function delBatch(id){if(!confirm('Remove this batch?'))return;const f=load();f.batches=(f.batches||[]).filter(b=>b.id!==id);save(f);renderHistory();if(adminUnlocked)renderAdminData();showToast('Removed')}
-
-/* ---- ADMIN DATA ---- */
-function renderAdminData(){
-  const full=load();const batches=full.batches||[];
-  const{total:cur,rows:curRows}=getCurrent();const prev=batches.reduce((s,b)=>s+b.total,0);
-  document.getElementById('adminGrand').textContent=inr(cur+prev);
-  document.getElementById('adminSub').textContent=`${batches.length} saved batch${batches.length!==1?'es':''} + live ${inr(cur)}`;
-  document.getElementById('adminGrid').innerHTML=`
-    <div class="adm-card"><div class="adm-card-lbl">Live Batch</div><div class="adm-card-val">${inr(cur)}</div><div class="adm-card-note">Unsaved</div></div>
-    <div class="adm-card"><div class="adm-card-lbl">Saved Total</div><div class="adm-card-val">${inr(prev)}</div><div class="adm-card-note">${batches.length} batch${batches.length!==1?'es':''}</div></div>`;
-  const mm={};ALL_DENOMS.forEach(d=>mm[d]=0);
-  batches.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
-  curRows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty);
-  const maxQ=Math.max(1,...ALL_DENOMS.map(d=>mm[d]));
-  const rows=ALL_DENOMS.filter(d=>mm[d]>0);
-  const bk=document.getElementById('denomBk');
-  if(rows.length){
-    bk.style.display='';
-    bk.innerHTML=`<div class="db-header">Denomination Breakdown</div>`+
-      rows.map(d=>`<div class="db-row"><div class="db-dot" style="background:${DCOLORS[d]}"></div><div class="db-note">₹${d}</div><div class="db-bar-wrap"><div class="db-bar-fill" style="width:${Math.round(mm[d]/maxQ*100)}%;background:${DCOLORS[d]}"></div></div><div class="db-qty">${mm[d]} notes</div><div class="db-amt">${inr(mm[d]*d)}</div></div>`).join('');
-  } else bk.style.display='none';
-}
-function confirmReset(){if(!confirm('Delete ALL data?'))return;clearEntry();const f=load();f.batches=[];f.live={};save(f);renderHistory();renderAdminData();showToast('Cleared')}
-
-/* ---- EXPORT CSV ---- */
-function exportCSV(){
-  if(!adminUnlocked){showToast('Admin required');return}
-  const batches=load().batches||[];if(!batches.length){showToast('No data');return}
-  let csv='Batch,Location,Date,Time,Total,'+ALL_DENOMS.map(d=>'₹'+d).join(',')+'\n';
-  batches.forEach(b=>{
-    const dt=new Date(b.time);const qm={};b.rows.forEach(r=>qm[r.d]=r.qty);
-    csv+=`"${b.label}","${b.loc||''}","${dt.toLocaleDateString('en-IN')}","${dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}",${b.total},${ALL_DENOMS.map(d=>qm[d]||0).join(',')}\n`;
+// =================== RENDER ROWS ====================
+function renderRows() {
+  const container = document.getElementById('note-rows');
+  container.innerHTML = '';
+  DENOMS.forEach(d => {
+    if (!enabledDenoms.has(d.v)) return;
+    const row = document.createElement('div');
+    row.className = 'note-row' + (currentValues[d.v] > 0 ? ' active' : '');
+    row.id = 'row-' + d.v;
+    row.innerHTML = `
+      <div class="note-chip ${d.chip}">${d.v}</div>
+      <div class="note-label"><strong>₹${d.v}</strong>${d.label}</div>
+      <div class="note-input-wrap">
+        <input type="number" min="0" class="note-input" id="input-${d.v}"
+          value="${currentValues[d.v] || ''}"
+          placeholder="0"
+          oninput="onInput(${d.v}, this)"
+          onkeydown="handleKey(event, ${d.v})"
+        >
+      </div>
+      <div class="note-multiplier">×</div>
+      <div class="note-value ${currentValues[d.v] ? '' : 'zero'}" id="val-${d.v}">
+        ${currentValues[d.v] ? '₹' + fmt(currentValues[d.v] * d.v) : '—'}
+      </div>
+    `;
+    container.appendChild(row);
   });
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rupaya.csv';a.click();showToast('Exported ✓');
 }
 
-/* ---- BROWSER PRINT ---- */
-function doPrint(){
-  if(!adminUnlocked){showToast('Admin required');return}
-  const full=load();const batches=full.batches||[];
-  const{total:curT,rows:curR}=getCurrent();
-  const loc=document.getElementById('locName').value.trim();
-  const curLabel=document.getElementById('batchLabel').value.trim()||'Current Batch';
-  const now=new Date();
-  // Always build grand denomination breakdown
-  const mm={};ALL_DENOMS.forEach(d=>mm[d]=0);
-  batches.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
-  curR.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty);
-  const mR=ALL_DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}));
-  const grand=mR.reduce((s,r)=>s+r.amt,0);
-  function tR(rr){if(!rr.length)return`<tr><td colspan="3" style="font-style:italic">No entries</td></tr>`;return rr.map(r=>`<tr><td>Rs.${r.d}</td><td>${r.qty}</td><td>Rs.${r.amt.toLocaleString('en-IN')}</td></tr>`).join('')}
-  const dtStr=now.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  let html=`<div class="pr-shop">RUPAYA CASH LEDGER</div><div class="pr-sub">${loc||'Denomination Report'}</div><div class="pr-date">${dtStr}</div><hr class="pr-rule">`;
-  // Section 1: Grand denomination breakdown
-  html+=`<div class="pr-sec">Grand Total — All Denominations</div><div class="pr-sec-sub">${batches.length} saved + live batch</div>
-  <table><thead><tr><th>Note</th><th>Count</th><th>Amount</th></tr></thead><tbody>${tR(mR)}</tbody></table>
-  <div class="pr-btotal">Grand Total: Rs.${grand.toLocaleString('en-IN')}</div><hr class="pr-rule">`;
-  // Section 2: Previous saved batches
-  if(batches.length){
-    const prevTotal=batches.reduce((s,b)=>s+b.total,0);
-    const prevMM={};ALL_DENOMS.forEach(d=>prevMM[d]=0);
-    batches.forEach(b=>b.rows.forEach(r=>prevMM[r.d]=(prevMM[r.d]||0)+r.qty));
-    const prevR=ALL_DENOMS.filter(d=>prevMM[d]>0).map(d=>({d,qty:prevMM[d],amt:prevMM[d]*d}));
-    html+=`<div class="pr-sec">Previous Saved Batches</div><div class="pr-sec-sub">${batches.length} batch${batches.length!==1?'es':''} combined</div>
-    <table><thead><tr><th>Note</th><th>Count</th><th>Amount</th></tr></thead><tbody>${tR(prevR)}</tbody></table>
-    <div class="pr-btotal">Saved Total: Rs.${prevTotal.toLocaleString('en-IN')}</div><hr class="pr-rule">`;
+function handleKey(e, denom) {
+  if (e.key === 'Enter') {
+    const idx = DENOMS.findIndex(d=>d.v===denom && enabledDenoms.has(d.v));
+    const active = DENOMS.filter(d=>enabledDenoms.has(d.v));
+    const next = active[idx+1];
+    if(next) document.getElementById('input-'+next.v)?.focus();
   }
-  // Section 3: Current batch
-  if(curT>0){
-    html+=`<div class="pr-sec">Current Batch</div><div class="pr-sec-sub">${curLabel}</div>
-    <table><thead><tr><th>Note</th><th>Count</th><th>Amount</th></tr></thead><tbody>${tR(curR)}</tbody></table>
-    <div class="pr-btotal">Batch Total: Rs.${curT.toLocaleString('en-IN')}</div><hr class="pr-rule">`;
-  }
-  html+=`<div class="pr-grand">GRAND TOTAL<span class="pr-gval">Rs.${grand.toLocaleString('en-IN')}</span></div><div class="pr-foot">Rupaya · ${now.toLocaleDateString('en-IN')} · ${loc||''}</div>`;
-  document.getElementById('printArea').innerHTML=html;setTimeout(()=>window.print(),80);
 }
 
-/* ================================================================
-   BLUETOOTH THERMAL PRINTING — ESC/POS via Web Bluetooth API
-   ================================================================ */
-const BLE_PRINT_SERVICES=['000018f0-0000-1000-8000-00805f9b34fb','49535343-fe7d-4ae5-8fa9-9fafd205e455','6e400001-b5a3-f393-e0a9-e50e24dcca9e'];
-const BLE_WRITE_CHARS=['000018f1-0000-1000-8000-00805f9b34fb','49535343-8841-43f4-a8d4-ecbe34729bb3','6e400002-b5a3-f393-e0a9-e50e24dcca9e'];
-
-function btLog(msg){const el=document.getElementById('btLog');el.classList.add('show');el.innerHTML+=`<div>${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})} — ${msg}</div>`;el.scrollTop=el.scrollHeight}
-function setBtUI(state,name='',sub=''){
-  const dot=document.getElementById('btDot');const nm=document.getElementById('btName');const sb=document.getElementById('btSub');const btn=document.getElementById('btConnBtn');const pBtn=document.getElementById('btPrintBtn');
-  dot.className='bt-dot '+state;
-  nm.textContent=name||{off:'Not connected',scanning:'Scanning…',on:'Connected',error:'Connection failed'}[state]||name;
-  if(sub)sb.textContent=sub;
-  if(state==='on'){btn.textContent='Disconnect';btn.onclick=btDisconnect;pBtn.disabled=false;pBtn.style.opacity='1';}
-  else if(state==='scanning'){btn.textContent='Cancel';btn.onclick=()=>{if(btDevice)btDevice.gatt.disconnect();setBtUI('off');};}
-  else{btn.textContent='Connect';btn.onclick=btConnect;pBtn.disabled=true;pBtn.style.opacity='.5';}
-}
-
-async function btConnect(){
-  if(!navigator.bluetooth){showToast('Bluetooth not supported in this browser');btLog('❌ Use Chrome browser only');return}
-  if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){showToast('Bluetooth requires HTTPS');btLog('❌ Open from HTTPS website');return}
-  try{
-    setBtUI('scanning','Searching...','Select your thermal printer');btLog('🔍 Searching all Bluetooth printers...');
-    btDevice=await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:['000018f0-0000-1000-8000-00805f9b34fb','49535343-fe7d-4ae5-8fa9-9fafd205e455','6e400001-b5a3-f393-e0a9-e50e24dcca9e']});
-    btLog('✅ Selected: '+btDevice.name);
-    const server=await btDevice.gatt.connect();btLog('✅ Connected to GATT');
-    const services=await server.getPrimaryServices();btLog('📦 Services found: '+services.length);
-    btChar=null;
-    for(const service of services){
-      try{const chars=await service.getCharacteristics();for(const char of chars){if(char.properties.write||char.properties.writeWithoutResponse){btChar=char;btLog('✅ Writable characteristic found');break;}}}catch(e){}
-      if(btChar)break;
-    }
-    if(!btChar){btLog('❌ No writable characteristic');setBtUI('error','Unsupported Printer','Printer does not support BLE printing');return}
-    btConnected=true;setBtUI('on',btDevice.name||'Thermal Printer','Ready to print');btLog('🖨️ Printer ready');
-    btDevice.addEventListener('gattserverdisconnected',()=>{btConnected=false;btChar=null;setBtUI('off','Disconnected','Reconnect printer');btLog('🔌 Printer disconnected')});
-  }catch(e){console.error(e);setBtUI('error','Connection Failed',e.message);btLog('❌ '+e.message);showToast(e.message)}
-}
-
-async function btDisconnect(){if(btDevice&&btDevice.gatt.connected)btDevice.gatt.disconnect();btConnected=false;btChar=null;setBtUI('off');btLog('🔌 Disconnected manually')}
-
-function buildEscPos(lines){
-  const encoder=new TextEncoder();let data=[];
-  const push=(...bytes)=>data.push(...bytes);
-  const text=(txt='')=>data.push(...encoder.encode(txt+'\n'));
-  push(0x1B,0x40);push(0x1B,0x61,0x01);push(0x1B,0x45,0x01);push(0x1D,0x21,0x11);text('RUPAYA');push(0x1D,0x21,0x00);text('Cash Ledger');push(0x1B,0x45,0x00);
-  const loc=document.getElementById('locName').value.trim();if(loc)text(loc);
-  text(new Date().toLocaleString('en-IN'));text('--------------------------------');push(0x1B,0x61,0x00);
-  for(const line of lines)text(line);
-  text('--------------------------------');push(0x1B,0x61,0x01);push(0x1B,0x45,0x01);text('THANK YOU');push(0x1B,0x45,0x00);text('Printed via Rupaya');push(0x1B,0x64,0x04);push(0x1D,0x56,0x41,0x10);
-  return new Uint8Array(data);
-}
-
-function padEnd(s,n){return(s+'').padEnd(n,' ').slice(0,n)}
-function padStart(s,n){return(s+'').padStart(n,' ').slice(-n)}
-
-function buildReceiptLines(mode){
-  const full=load();const batches=full.batches||[];
-  const{total:curT,rows:curR}=getCurrent();
-  const lines=[];
-
-  function addTable(rows){
-    lines.push(padEnd('NOTE',8)+padEnd('QTY',8)+padStart('AMOUNT',16));
-    lines.push('--------------------------------');
-    rows.forEach(r=>lines.push(padEnd('Rs.'+r.d,8)+padEnd(''+r.qty,8)+padStart('Rs.'+r.amt.toLocaleString('en-IN'),16)));
-  }
-
-  if(mode==='grand_denom'){
-    // Grand total of ALL currency with denomination breakdown
-    const mm={};ALL_DENOMS.forEach(d=>mm[d]=0);
-    batches.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
-    curR.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty);
-    const mR=ALL_DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}));
-    const grand=mR.reduce((s,r)=>s+r.amt,0);
-    if(!mR.length)return null;
-    lines.push('  [GRAND TOTAL — ALL DENOMINATIONS]');lines.push('');
-    addTable(mR);lines.push('');
-    lines.push('================================');
-    lines.push('  GRAND TOTAL');
-    lines.push('  Rs.'+grand.toLocaleString('en-IN'));
-    lines.push('  Notes: '+mR.reduce((s,r)=>s+r.qty,0)+' total notes');
-    lines.push('================================');
-
-  } else if(mode==='batches_then_current'){
-    // All saved batches combined first, then current batch below
-    if(!batches.length&&!curT)return null;
-    if(batches.length){
-      const prevMM={};ALL_DENOMS.forEach(d=>prevMM[d]=0);
-      batches.forEach(b=>b.rows.forEach(r=>prevMM[r.d]=(prevMM[r.d]||0)+r.qty));
-      const prevR=ALL_DENOMS.filter(d=>prevMM[d]>0).map(d=>({d,qty:prevMM[d],amt:prevMM[d]*d}));
-      const prevT=batches.reduce((s,b)=>s+b.total,0);
-      lines.push('  [ALL PREVIOUS BATCHES]');lines.push('  '+batches.length+' batches combined');lines.push('');
-      addTable(prevR);lines.push('');
-      lines.push(padStart('SAVED TOTAL: Rs.'+prevT.toLocaleString('en-IN'),32));
-      lines.push('');lines.push('--------------------------------');lines.push('');
-    }
-    if(curT>0){
-      const curLabel=document.getElementById('batchLabel').value.trim()||'Current Batch';
-      lines.push('  [CURRENT BATCH]');lines.push('  '+curLabel);lines.push('');
-      addTable(curR);lines.push('');
-      lines.push(padStart('BATCH TOTAL: Rs.'+curT.toLocaleString('en-IN'),32));
-    }
-
+function onInput(denom, el) {
+  if(AC && AC.state === 'suspended') AC.resume();
+  const val = parseInt(el.value) || 0;
+  currentValues[denom] = Math.max(0, val);
+  const row = document.getElementById('row-' + denom);
+  const valEl = document.getElementById('val-' + denom);
+  const total = currentValues[denom] * denom;
+  if (currentValues[denom] > 0) {
+    row.classList.add('active');
+    valEl.classList.remove('zero');
+    valEl.textContent = '₹' + fmt(total);
+    valEl.classList.remove('bump');
+    requestAnimationFrame(()=>{ valEl.classList.add('bump'); });
+    playAdd();
   } else {
-    // current only
-    if(!curT&&!batches.length)return null;
-    const src=curT>0?{label:document.getElementById('batchLabel').value.trim()||'Current Batch',total:curT,rows:curR}:batches[batches.length-1];
-    lines.push('  [CURRENT BATCH]');lines.push('  '+src.label);lines.push('');
-    addTable(src.rows);lines.push('');
-    lines.push(padStart('TOTAL: Rs.'+src.total.toLocaleString('en-IN'),32));
+    row.classList.remove('active');
+    valEl.classList.add('zero');
+    valEl.textContent = '—';
   }
-  return lines;
+  updateTotals();
 }
 
-async function btPrint(){
-  if(!btConnected||!btChar){showToast('Connect printer first');return}
-  const mode=document.getElementById('btPrintMode').value;
-  const lines=buildReceiptLines(mode);
-  if(!lines){showToast('No data to print');return}
-  try{
-    const bytes=buildEscPos(lines);btLog('🖨️ Printing started...');
-    const CHUNK_SIZE=120;
-    for(let i=0;i<bytes.length;i+=CHUNK_SIZE){
-      const chunk=bytes.slice(i,i+CHUNK_SIZE);
-      if(btChar.properties.writeWithoutResponse){await btChar.writeValueWithoutResponse(chunk);}
-      else{if(btChar.writeValueWithoutResponse)await btChar.writeValueWithoutResponse(chunk);else await btChar.writeValue(chunk);}
-      await new Promise(r=>setTimeout(r,40));
+function fmt(n) {
+  return n.toLocaleString('en-IN');
+}
+
+// =================== TOTALS ====================
+function getCurrentTotal() {
+  return DENOMS.reduce((s, d) => s + (currentValues[d.v] || 0) * d.v, 0);
+}
+function getBatchesTotal() {
+  return batches.reduce((s, b) => s + b.total, 0);
+}
+function getGrandTotal() {
+  return getCurrentTotal() + getBatchesTotal();
+}
+
+function updateTotals() {
+  const cur = getCurrentTotal();
+  const gt = getGrandTotal();
+
+  // current batch panel
+  document.getElementById('current-total').textContent = '₹' + fmt(cur);
+  const brkEl = document.getElementById('current-breakdown');
+  const parts = DENOMS.filter(d=>enabledDenoms.has(d.v) && currentValues[d.v]>0)
+    .map(d=>`${d.v}×${currentValues[d.v]} = ₹${fmt(d.v*currentValues[d.v])}`);
+  brkEl.innerHTML = parts.length ? parts.join('<br>') : 'No notes entered yet';
+
+  // grand total
+  document.getElementById('grand-total-display').textContent = '₹' + fmt(gt);
+  document.getElementById('header-grand-total').textContent = '₹' + fmt(gt);
+
+  // gt breakdown
+  const batchCount = batches.length;
+  let gtBreak = '';
+  if(batchCount>0) gtBreak += `${batchCount} batch${batchCount>1?'es':''}: ₹${fmt(getBatchesTotal())}  +  `;
+  gtBreak += `current: ₹${fmt(cur)}`;
+  document.getElementById('gt-breakdown').textContent = gtBreak;
+}
+
+// =================== DENOMINATION TOGGLES ====================
+function toggleDenom(el) {
+  if(AC && AC.state === 'suspended') AC.resume();
+  const d = parseInt(el.dataset.denom);
+  if(enabledDenoms.has(d)) {
+    if(enabledDenoms.size <= 1) { showToast('Need at least one denomination!'); return; }
+    enabledDenoms.delete(d);
+    el.classList.remove('active');
+    currentValues[d] = 0;
+  } else {
+    enabledDenoms.add(d);
+    el.classList.add('active');
+  }
+  beep(enabledDenoms.has(d)?600:300, 0.07);
+  renderRows();
+  updateTotals();
+}
+
+// =================== BATCH MANAGEMENT ====================
+function getBatchSnapshot() {
+  return DENOMS
+    .filter(d=>enabledDenoms.has(d.v) && currentValues[d.v]>0)
+    .map(d=>({ v: d.v, count: currentValues[d.v], chip: d.chip }));
+}
+
+function saveBatch() {
+  if(AC && AC.state === 'suspended') AC.resume();
+  const total = getCurrentTotal();
+  if(total === 0) { showToast('Nothing to save — enter some notes first!'); return; }
+  const snap = getBatchSnapshot();
+  const batch = {
+    id: Date.now(),
+    num: batches.length + 1,
+    notes: snap,
+    total
+  };
+  batches.push(batch);
+  playSave();
+  launchConfetti(window.innerWidth/2, window.innerHeight/2, 50);
+  showToast(`Batch ${batch.num} saved — ₹${fmt(total)}`);
+  clearCurrent(true);
+  renderBatches();
+  updateTotals();
+}
+
+function clearCurrent(silent=false) {
+  if(AC && AC.state === 'suspended') AC.resume();
+  DENOMS.forEach(d => currentValues[d.v] = 0);
+  DENOMS.forEach(d => {
+    const inp = document.getElementById('input-'+d.v);
+    if(inp) inp.value = '';
+    const row = document.getElementById('row-'+d.v);
+    if(row) row.classList.remove('active');
+    const val = document.getElementById('val-'+d.v);
+    if(val) { val.classList.add('zero'); val.textContent = '—'; }
+  });
+  if(!silent) { playClear(); showToast('Current cleared'); }
+  updateTotals();
+}
+
+function deleteBatch(id) {
+  batches = batches.filter(b=>b.id!==id);
+  batches.forEach((b,i)=>b.num=i+1);
+  renderBatches();
+  updateTotals();
+  showToast('Batch removed');
+  beep(300,0.1);
+}
+
+function clearAllBatches() {
+  if(!batches.length) return;
+  batches = [];
+  renderBatches();
+  updateTotals();
+  playClear();
+  showToast('All batches cleared');
+}
+
+function renderBatches() {
+  const section = document.getElementById('batch-section');
+  const list = document.getElementById('batch-list');
+  if(!batches.length) { section.style.display='none'; return; }
+  section.style.display='block';
+  document.getElementById('batch-count-label').textContent = `(${batches.length})`;
+  list.innerHTML = '';
+  batches.forEach(b => {
+    const item = document.createElement('div');
+    item.className = 'batch-item';
+    item.id = 'batch-' + b.id;
+    const noteTags = b.notes.map(n =>
+      `<span class="note-tag" style="background:${chipBg(n.v)};color:${chipFg(n.v)}">₹${n.v}×${n.count}</span>`
+    ).join('');
+    item.innerHTML = `
+      <div class="batch-num">BATCH ${b.num}</div>
+      <div class="batch-notes">${noteTags}</div>
+      <div class="batch-total">₹${fmt(b.total)}</div>
+      <button class="batch-delete" onclick="deleteBatch(${b.id})" title="Remove">×</button>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function chipBg(v) {
+  const map={500:'#4a2a1a',200:'#1a2e4a',100:'#1a4a1e',50:'#3a1a4a',20:'#4a1a1a',10:'#1a3d4a',2:'#4a1a3a',1:'#2e1a0a'};
+  return map[v]||'#222';
+}
+function chipFg(v) {
+  const map={500:'#ffb87f',200:'#7fbfff',100:'#7fff88',50:'#df9fff',20:'#ff9f9f',10:'#7fefff',2:'#ff9fdf',1:'#ffd7a0'};
+  return map[v]||'#fff';
+}
+
+// =================== PRINT ====================
+function buildPrintHTML(mode) {
+  // mode: 'current' | 'all'
+  const styles = `
+    <style>
+      body { font-family: 'Courier New', monospace; max-width: 420px; margin: 0 auto; padding: 20px; }
+      h1 { font-size: 18px; text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; }
+      h2 { font-size: 13px; margin: 16px 0 8px; background: #000; color: #fff; padding: 4px 8px; }
+      table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 12px; }
+      td, th { padding: 4px 8px; border-bottom: 1px solid #ccc; }
+      th { font-weight: bold; text-align: left; }
+      td:last-child, th:last-child { text-align: right; }
+      .subtotal { font-weight: bold; border-top: 2px solid #000; font-size: 13px; }
+      .grand { font-size: 15px; font-weight: bold; background: #000; color: #fff; padding: 8px; text-align: right; margin-top: 16px; }
+      .meta { font-size: 10px; color: #888; text-align: center; margin-top: 16px; }
+    </style>
+  `;
+
+  const noteRow = (v, count) =>
+    `<tr><td>₹${v}</td><td>${count} notes</td><td>₹${fmt(v*count)}</td></tr>`;
+
+  let body = '';
+  const now = new Date().toLocaleString('en-IN');
+
+  if(mode === 'current') {
+    const cur = getCurrentTotal();
+    const snap = getBatchSnapshot();
+    body = `<h1>रुपया — Current Batch</h1>`;
+    body += `<table><tr><th>Denom</th><th>Count</th><th>Value</th></tr>`;
+    snap.forEach(n => body += noteRow(n.v, n.count));
+    body += `<tr class="subtotal"><td colspan="2">Total</td><td>₹${fmt(cur)}</td></tr></table>`;
+  } else {
+    // all batches + current + grand total
+    body = `<h1>रुपया — Full Report</h1>`;
+
+    if(batches.length) {
+      body += `<h2>Previous Batches</h2>`;
+      batches.forEach(b => {
+        body += `<h2 style="background:#444">Batch ${b.num}</h2>`;
+        body += `<table><tr><th>Denom</th><th>Count</th><th>Value</th></tr>`;
+        b.notes.forEach(n => body += noteRow(n.v, n.count));
+        body += `<tr class="subtotal"><td colspan="2">Batch ${b.num} Total</td><td>₹${fmt(b.total)}</td></tr></table>`;
+      });
+      body += `<table><tr class="subtotal"><td colspan="2">All Batches Subtotal</td><td>₹${fmt(getBatchesTotal())}</td></tr></table>`;
     }
-    btLog('✅ Print completed');showToast('Printed successfully');
-  }catch(e){console.error(e);btLog('❌ Print failed: '+e.message);showToast('Print failed')}
+
+    const curTotal = getCurrentTotal();
+    const curSnap = getBatchSnapshot();
+    if(curTotal > 0) {
+      body += `<h2>Current Batch (Latest)</h2>`;
+      body += `<table><tr><th>Denom</th><th>Count</th><th>Value</th></tr>`;
+      curSnap.forEach(n => body += noteRow(n.v, n.count));
+      body += `<tr class="subtotal"><td colspan="2">Current Total</td><td>₹${fmt(curTotal)}</td></tr></table>`;
+    }
+
+    body += `<div class="grand">GRAND TOTAL: ₹${fmt(getGrandTotal())}</div>`;
+  }
+
+  body += `<div class="meta">Printed on ${now} · रुपया Note Counter</div>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Print</title>${styles}</head><body>${body}</body></html>`;
 }
 
-function openBTSheet(){document.getElementById('btOverlay').classList.remove('hide')}
-function closeBTSheet(e){if(e.target===document.getElementById('btOverlay'))document.getElementById('btOverlay').classList.add('hide')}
-
-/* ---- PERSIST ---- */
-function persist(){
-  const f=load();const live={};
-  getEnabledDenoms().forEach(d=>{live['d'+d]=document.getElementById('d'+d).value||''});
-  live.label=document.getElementById('batchLabel').value;live.loc=document.getElementById('locName').value;
-  f.live=live;save(f);
+function printCurrent() {
+  if(AC && AC.state === 'suspended') AC.resume();
+  if(getCurrentTotal() === 0) { showToast('Nothing to print!'); return; }
+  playPrint();
+  const w = window.open('','_blank','width=480,height=600');
+  w.document.write(buildPrintHTML('current'));
+  w.document.close();
+  setTimeout(()=>{ w.focus(); w.print(); }, 400);
 }
-function restoreLive(){
-  const live=(load().live)||{};
-  getEnabledDenoms().forEach(d=>{if(live['d'+d]){document.getElementById('d'+d).value=live['d'+d];onDI(d);}});
-  if(live.label)document.getElementById('batchLabel').value=live.label;
-  if(live.loc)document.getElementById('locName').value=live.loc;
-  recalc();
+
+function printAll() {
+  if(AC && AC.state === 'suspended') AC.resume();
+  if(getGrandTotal() === 0) { showToast('Nothing to print!'); return; }
+  playPrint();
+  const w = window.open('','_blank','width=480,height=700');
+  w.document.write(buildPrintHTML('all'));
+  w.document.close();
+  setTimeout(()=>{ w.focus(); w.print(); }, 400);
 }
-document.getElementById('batchLabel').addEventListener('input',persist);
-document.getElementById('locName').addEventListener('input',persist);
-function load(){try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch(e){return{}}}
-function save(o){localStorage.setItem(LS,JSON.stringify(o))}
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600)}
-function updateDate(){document.getElementById('topDate').textContent=new Date().toLocaleString('en-IN',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
 
-// INIT
-document.getElementById('lockScreen').style.display='none';
-document.getElementById('app').style.display='flex';
-document.getElementById('app').classList.add('show');
-restoreLive();renderHistory();updateDate();setInterval(updateDate,30000);
-</script>
+// =================== INIT ====================
+renderRows();
+updateTotals();
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL="https://hjwmcldmhclyzumuqoeb.supabase.co";
-const SUPABASE_KEY="sb_publishable_twC8kvjp0sV68uC1Ck5lhg_vfc8yBtm";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-async function cloudSave(fullData){try{await supabaseClient.from('cash_data').delete().neq('id',0);await supabaseClient.from('cash_data').insert([{data:JSON.stringify(fullData)}]);console.log("Cloud save success")}catch(err){console.log("Cloud save failed",err)}}
-async function cloudLoad(){try{const{data,error}=await supabaseClient.from('cash_data').select('*').order('id',{ascending:false}).limit(1);if(error){console.log(error);return null}if(data&&data.length>0)return JSON.parse(data[0].data);return null}catch(err){console.log(err);return null}}
-async function save(data){localStorage.setItem(LS,JSON.stringify(data));await cloudSave(data);}
-function load(){try{return JSON.parse(localStorage.getItem(LS)||'{"batches":[],"live":{}}')}catch(e){return{batches:[],live:{}}}}
-window.addEventListener('load',async()=>{const cloudData=await cloudLoad();if(cloudData){localStorage.setItem(LS,JSON.stringify(cloudData));location.reload();}});
+// Wake AudioContext on first user gesture
+document.addEventListener('click', ()=>{ if(AC&&AC.state==='suspended') AC.resume(); }, {once:true});
 </script>
 </body>
 </html>
