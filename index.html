@@ -4,407 +4,255 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Rupaya — Cash Ledger</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --cream:#fdf8f0;
-  --cream2:#f7f0e4;
-  --cream3:#efe5d3;
-  --ink:#1a1209;
-  --ink2:#3d2e1a;
-  --ink3:#6b5740;
-  --ink4:#9c8570;
-  --saffron:#e8670a;
-  --saffron2:#d45c08;
-  --saffron-light:#fff0e6;
-  --saffron-mid:#fdd5b4;
-  --green:#1a7a4a;
-  --green-light:#e8f5ee;
-  --red:#c0392b;
-  --red-light:#fbeaea;
-  --border:#ddd0bc;
-  --border2:#c9b99f;
-  --shadow:0 2px 12px rgba(26,18,9,.08);
-  --shadow2:0 4px 24px rgba(26,18,9,.12);
-  --playfair:'Playfair Display',serif;
-  --dm:'DM Sans',sans-serif;
-  --mono:'DM Mono',monospace;
-  --r8:8px;--r12:12px;--r16:16px;--r20:20px;--r24:24px;
+  --bg:#0c0c0f;
+  --bg2:#141418;
+  --bg3:#1c1c22;
+  --bg4:#252530;
+  --surface:#1e1e26;
+  --surface2:#27272f;
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(255,255,255,.12);
+  --text:#f0f0f5;
+  --text2:#9090a8;
+  --text3:#5a5a72;
+  --accent:#f5a623;
+  --accent2:#e8670a;
+  --accent-dim:rgba(245,166,35,.12);
+  --accent-glow:rgba(245,166,35,.25);
+  --green:#22c55e;
+  --green-dim:rgba(34,197,94,.1);
+  --red:#ef4444;
+  --red-dim:rgba(239,68,68,.1);
+  --blue:#3b82f6;
+  --purple:#a855f7;
+  --font:'Space Grotesk',sans-serif;
+  --display:'Syne',sans-serif;
+  --mono:'JetBrains Mono',monospace;
 }
-html,body{min-height:100%;background:var(--cream);overflow-x:hidden}
-body{font-family:var(--dm);color:var(--ink);max-width:430px;margin:0 auto;position:relative}
+html,body{min-height:100%;background:var(--bg);overflow-x:hidden}
+body{font-family:var(--font);color:var(--text);max-width:430px;margin:0 auto;position:relative}
 
-/* Subtle paper texture */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
-}
+/* noise overlay */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.6}
 
 /* LOCK SCREEN */
-#lockScreen{
-  position:fixed;inset:0;z-index:999;
-  background:var(--ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:0 32px 60px;
-}
-.lk-circle{
-  width:96px;height:96px;border-radius:50%;
-  background:var(--saffron);
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:20px;
-  box-shadow:0 0 0 16px rgba(232,103,10,.15),0 0 0 32px rgba(232,103,10,.07);
-}
-.lk-symbol{font-family:var(--playfair);font-size:38px;font-weight:900;color:#fff}
-.lk-title{font-family:var(--playfair);font-size:30px;font-weight:900;color:#fff;margin-bottom:4px;letter-spacing:-.01em}
-.lk-sub{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;font-weight:500;margin-bottom:36px}
-.lk-hint{font-size:12px;color:rgba(255,255,255,.3);margin-bottom:18px;font-weight:500}
-.pin-dots{display:flex;gap:14px;margin-bottom:28px}
-.pin-dot{
-  width:13px;height:13px;border-radius:50%;
-  border:2px solid rgba(255,255,255,.25);background:transparent;
-  transition:all .2s cubic-bezier(.34,1.56,.64,1);
-}
-.pin-dot.filled{background:var(--saffron);border-color:var(--saffron);transform:scale(1.3)}
+#lockScreen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 60px}
+.lk-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(245,166,35,.12) 0%,transparent 70%);pointer-events:none}
+.lk-badge{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 0 40px var(--accent-glow)}
+.lk-badge span{font-family:var(--display);font-size:36px;font-weight:800;color:#000}
+.lk-t{font-family:var(--display);font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px}
+.lk-s{font-size:11px;color:var(--text3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:32px}
+.lk-hint{font-size:12px;color:var(--text3);margin-bottom:14px}
+.pin-dots{display:flex;gap:12px;margin-bottom:32px}
+.pin-dot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border2);background:transparent;transition:all .18s cubic-bezier(.34,1.56,.64,1)}
+.pin-dot.filled{background:var(--accent);border-color:var(--accent);transform:scale(1.25);box-shadow:0 0 10px var(--accent-glow)}
 .pin-dot.error{background:var(--red);border-color:var(--red);animation:errShake .35s}
-@keyframes errShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
-
-.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:270px}
-.nk{
-  height:64px;border-radius:var(--r16);
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
-  color:#fff;font-family:var(--playfair);font-size:22px;font-weight:700;
-  cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-  transition:all .12s;user-select:none;
-}
-.nk:active{background:rgba(255,255,255,.15);transform:scale(.91)}
-.nk .sub{font-size:7px;letter-spacing:.2em;color:rgba(255,255,255,.35);font-family:var(--dm);font-weight:600;text-transform:uppercase}
-.nk.bio-key{color:var(--saffron);border-color:rgba(232,103,10,.3);background:rgba(232,103,10,.1)}
-.nk.del-key{color:rgba(255,255,255,.6)}
+@keyframes errShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:264px}
+.nk{height:60px;border-radius:14px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--display);font-size:22px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:all .1s;user-select:none}
+.nk:active{background:var(--surface2);transform:scale(.88);border-color:var(--border2)}
+.nk .sub{font-size:7px;letter-spacing:.18em;color:var(--text3);font-family:var(--font);font-weight:600;text-transform:uppercase;margin-top:1px}
+.nk.bio-key{color:var(--accent);border-color:rgba(245,166,35,.2);background:var(--accent-dim)}
+.nk.del-key{color:var(--text2)}
 .nk.zero{grid-column:2}
-.lk-err{font-size:12px;color:#ff8a80;min-height:18px;text-align:center;margin-top:12px;font-weight:600}
+.lk-err{font-size:12px;color:var(--red);min-height:18px;text-align:center;margin-top:10px;font-weight:600}
 
 /* APP */
-#app{display:none;flex-direction:column;min-height:100vh;padding-bottom:84px;position:relative;z-index:1}
-#app.show{display:flex;animation:fadeUp .35s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+#app{display:none;flex-direction:column;min-height:100vh;padding-bottom:80px;position:relative;z-index:1}
+#app.show{display:flex;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
 /* HEADER */
-.hdr{
-  background:var(--ink);
-  padding:14px 18px 12px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:50;
-}
+.hdr{background:var(--bg);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
 .hdr-left{display:flex;align-items:center;gap:10px}
-.hdr-icon{
-  width:34px;height:34px;border-radius:10px;background:var(--saffron);
-  display:flex;align-items:center;justify-content:center;
-}
-.hdr-icon span{font-family:var(--playfair);font-size:18px;font-weight:900;color:#fff}
-.hdr-title{font-family:var(--playfair);font-size:20px;font-weight:900;color:#fff;letter-spacing:-.01em}
-.hdr-date{font-size:10px;color:rgba(255,255,255,.4);font-weight:500;margin-top:1px}
-.hdr-btns{display:flex;gap:8px}
-.hbtn{
-  height:36px;padding:0 12px;border-radius:var(--r8);
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  color:rgba(255,255,255,.7);font-size:17px;cursor:pointer;
-  font-family:var(--dm);font-size:12px;font-weight:600;
-  transition:all .15s;white-space:nowrap;
-}
-.hbtn i{font-size:16px}
-.hbtn:active{background:rgba(255,255,255,.15);transform:scale(.93)}
-.hbtn.admin-on{color:var(--saffron);border-color:rgba(232,103,10,.4);background:rgba(232,103,10,.15)}
+.hdr-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center}
+.hdr-logo span{font-family:var(--display);font-size:16px;font-weight:800;color:#000}
+.hdr-info{}
+.hdr-title{font-family:var(--display);font-size:16px;font-weight:800;color:var(--text);line-height:1}
+.hdr-date{font-size:10px;color:var(--text3);font-weight:500;margin-top:1px}
+.hdr-actions{display:flex;gap:6px}
+.hbtn{width:34px;height:34px;border-radius:9px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px;transition:all .15s}
+.hbtn:active{transform:scale(.88)}
+.hbtn.admin-on{color:var(--accent);border-color:rgba(245,166,35,.3);background:var(--accent-dim)}
 
-/* BALANCE CARD */
-.bal-wrap{background:var(--ink);padding:0 18px 20px}
-.bal-card{
-  background:var(--saffron);border-radius:var(--r20);
-  padding:20px;position:relative;overflow:hidden;
-}
-.bal-card::after{
-  content:'₹';position:absolute;right:-10px;bottom:-20px;
-  font-family:var(--playfair);font-size:140px;font-weight:900;
-  color:rgba(0,0,0,.08);line-height:1;pointer-events:none;
-}
-.bal-tag{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
-.bal-amt{font-family:var(--playfair);font-size:48px;font-weight:900;color:#fff;letter-spacing:-.02em;line-height:1;margin-bottom:4px}
-.bal-sub{font-size:12px;color:rgba(255,255,255,.75);font-weight:500;margin-bottom:12px}
-.bal-chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{
-  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);
-  border-radius:6px;padding:3px 8px;
-  font-size:11px;font-weight:700;color:#fff;font-family:var(--mono);
-}
+/* HERO BALANCE */
+.hero{margin:14px 14px 10px;background:var(--surface);border-radius:20px;border:1px solid var(--border);overflow:hidden;position:relative}
+.hero-inner{padding:18px 18px 16px;position:relative;z-index:1}
+.hero-glow{position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,var(--accent-glow) 0%,transparent 70%);pointer-events:none}
+.hero-tag{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.hero-amt{font-family:var(--display);font-size:44px;font-weight:800;color:var(--text);line-height:1;letter-spacing:-.02em}
+.hero-amt span{color:var(--accent)}
+.hero-sub{font-size:12px;color:var(--text3);margin-top:6px;font-weight:500}
+.hero-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.hchip{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700;color:var(--text2);font-family:var(--mono)}
 
-/* QUICK BUTTONS */
-.qb-row{background:var(--ink);display:flex;gap:0;border-top:1px solid rgba(255,255,255,.08)}
-.qb{
-  flex:1;height:48px;border:none;
-  font-family:var(--dm);font-size:13px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
-  transition:opacity .13s,transform .13s;
-}
-.qb:active{opacity:.7;transform:scale(.97)}
-.qb-save{background:var(--saffron);color:#fff}
-.qb-bt{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);border-left:1px solid rgba(255,255,255,.08)}
-.qb-reset{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);border-left:1px solid rgba(255,255,255,.08)}
-.qb i{font-size:16px}
+/* ACTION ROW */
+.act-row{display:flex;gap:8px;padding:0 14px 12px}
+.abtn{flex:1;height:42px;border-radius:10px;border:none;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .13s}
+.abtn:active{transform:scale(.93);opacity:.8}
+.abtn-primary{background:var(--accent);color:#000}
+.abtn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.abtn i{font-size:15px}
 
 /* PAGES */
-.page{display:none;flex-direction:column;animation:fadeUp .22s ease}
+.page{display:none;flex-direction:column;animation:fadeUp .2s ease}
 .page.on{display:flex}
 
 /* SECTION */
-.sec{padding:16px 18px}
-.sec-hd{
-  font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--ink4);margin-bottom:12px;
-  display:flex;align-items:center;gap:8px;
-}
-.sec-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec{padding:0 14px 14px}
+.sec-hd{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.sec-hd-line{flex:1;height:1px;background:var(--border);margin-left:10px}
 
 /* INPUTS */
-.inp-row{display:flex;gap:10px;margin-bottom:10px}
-.inp-group{flex:1}
-.inp-lbl{font-size:11px;font-weight:700;color:var(--ink3);margin-bottom:4px}
-.inp{
-  width:100%;background:#fff;
-  border:1.5px solid var(--border);border-radius:var(--r12);
-  padding:10px 13px;font-family:var(--dm);font-size:13px;
-  font-weight:600;color:var(--ink);outline:none;
-  box-shadow:var(--shadow);
-  transition:border-color .2s,box-shadow .2s;
-}
-.inp::placeholder{color:var(--ink4);font-weight:400}
-.inp:focus{border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,103,10,.12)}
+.inp-row{display:flex;gap:8px;margin-bottom:10px}
+.inp-group{flex:1;display:flex;flex-direction:column;gap:4px}
+.inp-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.inp{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:var(--font);font-size:13px;font-weight:500;color:var(--text);outline:none;transition:border-color .2s}
+.inp::placeholder{color:var(--text3)}
+.inp:focus{border-color:var(--accent)}
+select.inp{cursor:pointer}
 
-/* DENOM CARDS — 2-col grid */
-.denom-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.dc{
-  background:#fff;border:1.5px solid var(--border);
-  border-radius:var(--r16);padding:12px 12px 10px;
-  display:flex;flex-direction:column;gap:8px;
-  box-shadow:var(--shadow);
-  transition:border-color .2s,box-shadow .2s;
-  position:relative;overflow:hidden;
-}
-.dc.active{border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,103,10,.1)}
-.dc-stripe{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r16) var(--r16) 0 0}
-.dc-top{display:flex;align-items:baseline;gap:3px}
-.dc-rs{font-size:10px;font-weight:700;color:var(--ink4)}
-.dc-val{font-family:var(--playfair);font-size:26px;font-weight:900;color:var(--ink);letter-spacing:-.01em}
-.dc-badge{
-  margin-left:auto;font-size:9px;font-weight:700;
-  background:var(--saffron-light);color:var(--saffron);
-  border-radius:5px;padding:2px 5px;opacity:0;transition:opacity .2s;font-family:var(--mono);
-  border:1px solid var(--saffron-mid);
-}
+/* DENOM GRID */
+.denom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:all .2s;position:relative;overflow:hidden}
+.dc.active{border-color:var(--accent);background:rgba(245,166,35,.06)}
+.dc.disabled-note{opacity:.35;pointer-events:none;filter:grayscale(1)}
+.dc-top{display:flex;align-items:center;justify-content:space-between}
+.dc-val{font-family:var(--display);font-size:20px;font-weight:800;color:var(--text)}
+.dc-badge{font-size:9px;font-weight:700;background:var(--accent-dim);color:var(--accent);border-radius:5px;padding:2px 6px;font-family:var(--mono);opacity:0;transition:opacity .2s}
 .dc.active .dc-badge{opacity:1}
-.dc-row{display:flex;align-items:center;gap:6px}
-.dc-btn{
-  width:28px;height:28px;border-radius:var(--r8);flex-shrink:0;
-  background:var(--cream2);border:1px solid var(--border);
-  color:var(--ink3);font-size:16px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .12s;user-select:none;
-}
-.dc-btn:active{transform:scale(.84);background:var(--cream3)}
-.dc-btn.plus{color:var(--saffron);border-color:var(--saffron-mid);background:var(--saffron-light)}
-.dc-inp{
-  flex:1;background:transparent;border:none;
-  font-family:var(--mono);font-size:24px;font-weight:500;
-  color:var(--ink);text-align:center;outline:none;
-  -moz-appearance:textfield;padding:0;min-width:0;
-}
+.dc-toggle{width:22px;height:22px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:var(--text3);transition:all .15s;pointer-events:all}
+.dc-toggle:active{transform:scale(.85)}
+.dc.disabled-note .dc-toggle{opacity:1;pointer-events:all;filter:none}
+.dc-controls{display:flex;align-items:center;gap:4px}
+.dc-btn{width:28px;height:28px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;user-select:none;flex-shrink:0}
+.dc-btn:active{transform:scale(.82)}
+.dc-btn.plus{color:var(--accent);border-color:rgba(245,166,35,.2);background:var(--accent-dim)}
+.dc-inp{flex:1;background:transparent;border:none;font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text);text-align:center;outline:none;-moz-appearance:textfield;padding:0;min-width:0}
 .dc-inp::-webkit-inner-spin-button,.dc-inp::-webkit-outer-spin-button{-webkit-appearance:none}
-.dc-sub{font-size:10px;font-weight:600;color:var(--ink4);font-family:var(--mono);min-height:14px}
-.dc.active .dc-sub{color:var(--saffron2)}
-/* 2000 note full-width */
-.dc.full{grid-column:1/-1;flex-direction:row;align-items:center;padding:10px 12px}
-.dc.full .dc-top{min-width:64px}
-.dc.full .dc-row{flex:1;justify-content:flex-end;min-width:150px}
-.dc.full .dc-sub{min-width:80px;text-align:right;font-size:11px}
+.dc-sub{font-size:10px;font-weight:600;color:var(--text3);font-family:var(--mono)}
+.dc.active .dc-sub{color:var(--accent)}
+.dc.full{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px}
+.dc.full .dc-controls{flex:1;justify-content:flex-end}
+.dc.full .dc-val{font-size:22px}
 
 /* HISTORY */
-.srch{
-  display:flex;align-items:center;gap:8px;
-  background:#fff;border:1.5px solid var(--border);border-radius:var(--r12);
-  padding:9px 13px;margin:0 18px 10px;box-shadow:var(--shadow);
-}
-.srch:focus-within{border-color:var(--saffron)}
-.srch i{color:var(--ink4);font-size:15px}
-.srch-inp{flex:1;border:none;outline:none;font-family:var(--dm);font-size:13px;font-weight:500;color:var(--ink);background:transparent}
-.srch-inp::placeholder{color:var(--ink4)}
+.srch-wrap{padding:0 14px 10px;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin:0 14px 10px}
+.srch-wrap{padding:10px 12px}
+.srch-wrap i{color:var(--text3);font-size:14px}
+.srch-inp{flex:1;border:none;outline:none;font-family:var(--font);font-size:13px;font-weight:500;color:var(--text);background:transparent}
+.srch-inp::placeholder{color:var(--text3)}
 
-.stats-band{
-  display:flex;background:#fff;border:1.5px solid var(--border);
-  border-radius:var(--r12);margin:0 18px 12px;overflow:hidden;box-shadow:var(--shadow);
-}
-.sb-cell{flex:1;padding:12px;text-align:center;position:relative}
-.sb-cell+.sb-cell::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:var(--border)}
-.sb-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--ink4);margin-bottom:3px}
-.sb-val{font-family:var(--playfair);font-size:18px;font-weight:700;color:var(--ink)}
-.sb-val.orange{color:var(--saffron)}
+.stats-row{display:flex;gap:8px;padding:0 14px 10px}
+.stat-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.stat-lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.stat-val{font-family:var(--display);font-size:16px;font-weight:800;color:var(--text)}
+.stat-val.accent{color:var(--accent)}
 
-.hi{
-  background:#fff;border:1.5px solid var(--border);
-  border-radius:var(--r16);padding:14px;margin-bottom:9px;
-  position:relative;overflow:hidden;box-shadow:var(--shadow);
-  transition:border-color .2s;
-}
-.hi-bar{position:absolute;top:0;left:0;bottom:0;width:4px}
+.hi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:8px;position:relative;overflow:hidden;transition:border-color .2s}
+.hi-bar{position:absolute;left:0;top:0;bottom:0;width:3px}
 .hi-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
-.hi-name{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px}
-.hi-meta{font-size:11px;color:var(--ink4);display:flex;align-items:center;gap:6px;font-weight:500}
-.hi-amt{font-family:var(--playfair);font-size:20px;font-weight:900;color:var(--saffron);text-align:right}
-.hi-amt.locked{font-size:12px;font-family:var(--dm);color:var(--ink4)}
-.hi-chips{display:flex;flex-wrap:wrap;gap:5px}
-.hi-chip{background:var(--cream2);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:10px;font-weight:700;color:var(--ink3);font-family:var(--mono)}
-.hi-del{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--ink4);cursor:pointer;font-size:14px;padding:4px;border-radius:6px;transition:all .15s}
-.hi-del:active{color:var(--red);background:var(--red-light)}
+.hi-name{font-size:13px;font-weight:700;color:var(--text)}
+.hi-meta{font-size:10px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:5px}
+.hi-amt{font-family:var(--display);font-size:18px;font-weight:800;color:var(--accent)}
+.hi-amt.locked{font-size:11px;font-family:var(--font);color:var(--text3)}
+.hi-chips{display:flex;flex-wrap:wrap;gap:4px}
+.hi-chip{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 6px;font-size:9px;font-weight:700;color:var(--text3);font-family:var(--mono)}
+.hi-del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:4px;border-radius:6px;transition:all .15s;display:flex}
+.hi-del:active{color:var(--red);background:var(--red-dim)}
 
-.empty-s{display:flex;flex-direction:column;align-items:center;padding:48px 24px;text-align:center}
-.empty-ic{width:60px;height:60px;border-radius:var(--r16);background:var(--cream2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--ink4);margin-bottom:14px}
-.empty-t{font-size:15px;font-weight:700;color:var(--ink2);margin-bottom:5px;font-family:var(--playfair)}
-.empty-s2{font-size:13px;color:var(--ink4);line-height:1.7}
+.empty-s{display:flex;flex-direction:column;align-items:center;padding:48px 20px;text-align:center}
+.empty-ic{width:56px;height:56px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--text3);margin-bottom:12px}
+.empty-t{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:4px;font-family:var(--display)}
+.empty-s2{font-size:12px;color:var(--text3);line-height:1.7}
 
 /* ADMIN */
-.adm-hero{
-  margin:16px 18px 12px;background:var(--ink);
-  border-radius:var(--r20);padding:20px;position:relative;overflow:hidden;
-}
-.adm-hero::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(232,103,10,.2) 0%,transparent 70%)}
-.adm-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
-.adm-total{font-family:var(--playfair);font-size:48px;font-weight:900;color:var(--saffron);line-height:1;letter-spacing:-.02em;margin-bottom:4px}
-.adm-sub{font-size:12px;color:rgba(255,255,255,.4);font-weight:500}
+.adm-hero{margin:14px 14px 10px;background:var(--surface);border-radius:20px;border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+.adm-hero-glow{position:absolute;bottom:-30px;right:-30px;width:150px;height:150px;background:radial-gradient(circle,var(--accent-glow) 0%,transparent 70%);pointer-events:none}
+.adm-tag{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.adm-total{font-family:var(--display);font-size:44px;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-.02em}
+.adm-sub{font-size:12px;color:var(--text3);margin-top:4px;font-weight:500}
 
-.adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 18px 12px}
-.adm-cell{background:#fff;border:1.5px solid var(--border);border-radius:var(--r16);padding:14px;box-shadow:var(--shadow)}
-.adm-cell-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--ink4);margin-bottom:5px}
-.adm-cell-val{font-family:var(--playfair);font-size:24px;font-weight:900;color:var(--ink)}
-.adm-cell-note{font-size:11px;color:var(--ink4);margin-top:2px;font-weight:500}
+.adm-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px}
+.adm-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
+.adm-card-lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.adm-card-val{font-family:var(--display);font-size:22px;font-weight:800;color:var(--text)}
+.adm-card-note{font-size:10px;color:var(--text3);margin-top:2px}
 
-.denom-bk{background:#fff;border:1.5px solid var(--border);border-radius:var(--r16);margin:0 18px 12px;overflow:hidden;box-shadow:var(--shadow)}
-.denom-bk-hd{padding:11px 14px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)}
-.db-row{display:flex;align-items:center;padding:9px 14px;gap:10px;border-bottom:1px solid var(--cream2)}
+.denom-breakdown{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:0 14px 10px;overflow:hidden}
+.db-header{padding:11px 14px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3)}
+.db-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.03)}
 .db-row:last-child{border-bottom:none}
-.db-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.db-note{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink);min-width:44px}
-.db-bw{flex:1;height:5px;background:var(--cream2);border-radius:3px;overflow:hidden}
-.db-bf{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.34,1.56,.64,1)}
-.db-qty{font-size:11px;color:var(--ink3);font-family:var(--mono);font-weight:500;min-width:48px;text-align:right}
-.db-amt{font-size:11px;color:var(--ink4);font-family:var(--mono);font-weight:500;min-width:64px;text-align:right}
+.db-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.db-note{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text2);min-width:40px}
+.db-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.db-bar-fill{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+.db-qty{font-size:10px;color:var(--text3);font-family:var(--mono);min-width:52px;text-align:right}
+.db-amt{font-size:10px;color:var(--text2);font-family:var(--mono);min-width:58px;text-align:right;font-weight:700}
 
-.adm-btns{display:flex;flex-direction:column;gap:9px;padding:0 18px 18px}
-.ab{
-  width:100%;height:50px;border-radius:var(--r14,var(--r12));border:none;
-  font-family:var(--dm);font-size:14px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;
-  transition:transform .13s,opacity .13s;
-}
-.ab:active{transform:scale(.97);opacity:.85}
-.ab-saffron{background:var(--saffron);color:#fff;box-shadow:0 4px 16px rgba(232,103,10,.25)}
-.ab-bt{background:var(--ink);color:#fff}
-.ab-green{background:var(--green-light);color:var(--green);border:1.5px solid rgba(26,122,74,.2)}
-.ab-lock{background:var(--cream2);color:var(--ink2);border:1.5px solid var(--border)}
-.ab-red{background:var(--red-light);color:var(--red);border:1.5px solid rgba(192,57,43,.15)}
+.adm-actions{display:flex;flex-direction:column;gap:7px;padding:0 14px 18px}
+.aab{width:100%;height:46px;border-radius:11px;border:none;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .13s}
+.aab:active{transform:scale(.97);opacity:.8}
+.aab i{font-size:15px}
+.aab-primary{background:var(--accent);color:#000}
+.aab-dark{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.aab-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.15)}
+.aab-red{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.15)}
 
 /* BOTTOM NAV */
-.bnav{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;
-  background:#fff;border-top:1.5px solid var(--border);
-  display:flex;padding:8px 16px max(14px,env(safe-area-inset-bottom));
-  z-index:100;gap:0;box-shadow:0 -2px 16px rgba(0,0,0,.06);
-}
-.ni{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  cursor:pointer;padding:6px 4px;border-radius:var(--r12);
-  font-size:9px;font-weight:700;letter-spacing:.08em;
-  color:var(--ink4);transition:all .15s;text-transform:uppercase;
-}
-.ni i{font-size:20px;transition:all .15s}
-.ni.on{color:var(--saffron)}
-.ni.on i{color:var(--saffron)}
-.ni:active{transform:scale(.9)}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg);border-top:1px solid var(--border);display:flex;padding:6px 12px max(12px,env(safe-area-inset-bottom));z-index:100;gap:4px}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--text3);transition:all .15s;text-transform:uppercase}
+.ni i{font-size:19px;transition:all .15s}
+.ni.on{color:var(--accent);background:var(--accent-dim)}
+.ni:active{transform:scale(.88)}
 
-/* SAVE SHEET */
-.overlay{
-  position:fixed;inset:0;background:rgba(26,18,9,.5);
-  z-index:200;display:flex;align-items:flex-end;
-  animation:fadeIn .2s ease;backdrop-filter:blur(3px);
-}
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;animation:fadeIn .2s ease;backdrop-filter:blur(4px)}
 .overlay.hide{display:none}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.sheet{
-  background:var(--cream);border-radius:28px 28px 0 0;
-  border-top:1.5px solid var(--border2);
-  padding:8px 20px max(28px,env(safe-area-inset-bottom));
-  width:100%;max-height:87vh;overflow-y:auto;
-  animation:sheetUp .28s cubic-bezier(.34,1.56,.64,1);
-}
+.sheet{background:var(--bg2);border-radius:24px 24px 0 0;border-top:1px solid var(--border2);padding:0 18px max(28px,env(safe-area-inset-bottom));width:100%;max-height:88vh;overflow-y:auto;animation:sheetUp .26s cubic-bezier(.34,1.56,.64,1)}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sh-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 18px}
-.sh-title{font-family:var(--playfair);font-size:22px;font-weight:900;margin-bottom:16px;color:var(--ink)}
-.sh-row{display:flex;align-items:center;gap:12px;margin-bottom:7px;padding:11px 14px;background:#fff;border-radius:var(--r12);border:1px solid var(--border)}
-.sh-note{font-family:var(--playfair);font-size:18px;font-weight:900;color:var(--ink);min-width:52px}
-.sh-detail{flex:1}
-.sh-qty{font-size:12px;color:var(--ink3);font-weight:600;font-family:var(--mono)}
-.sh-amt{font-size:13px;font-weight:700;color:var(--saffron);font-family:var(--mono)}
-.sh-total{background:var(--saffron);border-radius:var(--r16);padding:18px;text-align:center;margin:12px 0}
-.sht-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:5px}
-.sht-val{font-family:var(--playfair);font-size:40px;font-weight:900;color:#fff;letter-spacing:-.02em}
-.sbtn{
-  width:100%;height:52px;border-radius:var(--r16);border:none;
-  font-family:var(--dm);font-size:15px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:transform .12s,opacity .12s;margin-bottom:8px;
-}
+.sh-handle{width:32px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 16px}
+.sh-title{font-family:var(--display);font-size:20px;font-weight:800;margin-bottom:14px;color:var(--text)}
+
+/* SAVE SHEET */
+.sh-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;padding:10px 12px;background:var(--surface);border-radius:10px;border:1px solid var(--border)}
+.sh-note{font-family:var(--display);font-size:16px;font-weight:800;color:var(--text);min-width:46px}
+.sh-qty{font-size:11px;color:var(--text3);font-weight:500;font-family:var(--mono)}
+.sh-amt{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);margin-left:auto}
+.sh-total-box{background:var(--accent);border-radius:14px;padding:16px;text-align:center;margin:10px 0 12px}
+.sh-total-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(0,0,0,.6);margin-bottom:4px}
+.sh-total-val{font-family:var(--display);font-size:36px;font-weight:800;color:#000;line-height:1}
+.sbtn{width:100%;height:48px;border-radius:12px;border:none;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .12s;margin-bottom:7px}
 .sbtn:active{transform:scale(.97);opacity:.85}
-.sbtn-fill{background:var(--saffron);color:#fff;box-shadow:0 6px 20px rgba(232,103,10,.25)}
-.sbtn-out{background:transparent;border:1.5px solid var(--border2);color:var(--ink2)}
+.sbtn-fill{background:var(--accent);color:#000}
+.sbtn-out{background:transparent;border:1px solid var(--border2);color:var(--text2)}
 
 /* BT SHEET */
-.bt-status{
-  display:flex;align-items:center;gap:10px;
-  background:#fff;border:1.5px solid var(--border);border-radius:var(--r12);
-  padding:12px 14px;margin-bottom:10px;
-}
-.bt-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:background .3s}
-.bt-dot.off{background:var(--ink4)}
-.bt-dot.scanning{background:#f5a623;animation:pulse 1s infinite}
+.bt-status{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+.bt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.bt-dot.off{background:var(--text3)}
+.bt-dot.scanning{background:var(--accent);animation:pulse 1s infinite}
 .bt-dot.on{background:var(--green)}
 .bt-dot.error{background:var(--red)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .bt-txt{flex:1}
-.bt-name{font-size:13px;font-weight:700;color:var(--ink)}
-.bt-sub{font-size:11px;color:var(--ink4);font-weight:500}
-.bt-action{
-  height:32px;padding:0 12px;border-radius:var(--r8);border:none;
-  background:var(--saffron);color:#fff;font-family:var(--dm);font-size:12px;font-weight:700;
-  cursor:pointer;transition:opacity .13s;white-space:nowrap;
-}
-.bt-action:active{opacity:.8}
-.bt-action.secondary{background:var(--cream2);color:var(--ink2);border:1px solid var(--border)}
-.bt-log{
-  background:var(--ink);border-radius:var(--r12);padding:12px;
-  font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.6);
-  max-height:120px;overflow-y:auto;margin-bottom:10px;line-height:1.7;
-  display:none;
-}
+.bt-name{font-size:13px;font-weight:700;color:var(--text)}
+.bt-sub{font-size:11px;color:var(--text3)}
+.bt-action{height:30px;padding:0 12px;border-radius:8px;border:none;background:var(--accent);color:#000;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:opacity .13s;white-space:nowrap}
+.bt-action:active{opacity:.75}
+.bt-action.secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.bt-log{background:var(--bg);border-radius:10px;padding:10px;font-family:var(--mono);font-size:10px;color:var(--text3);max-height:110px;overflow-y:auto;margin-bottom:10px;line-height:1.8;display:none}
 .bt-log.show{display:block}
 
 /* TOAST */
-.toast{
-  position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(8px);
-  background:var(--ink);color:#fff;font-family:var(--dm);
-  font-size:13px;font-weight:700;padding:10px 20px;border-radius:30px;
-  opacity:0;pointer-events:none;transition:all .22s cubic-bezier(.34,1.56,.64,1);
-  z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.25);
-}
+.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%) translateY(6px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:12px;font-weight:700;padding:9px 18px;border-radius:30px;opacity:0;pointer-events:none;transition:all .2s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.4)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* PRINT */
@@ -437,10 +285,11 @@ body::before{
 
 <!-- LOCK SCREEN -->
 <div id="lockScreen">
-  <div class="lk-circle"><div class="lk-symbol">₹</div></div>
-  <div class="lk-title">Rupaya</div>
-  <div class="lk-sub">Cash Ledger · Secure</div>
-  <div class="lk-hint">Enter PIN to access admin</div>
+  <div class="lk-glow"></div>
+  <div class="lk-badge"><span>₹</span></div>
+  <div class="lk-t">Rupaya</div>
+  <div class="lk-s">Cash Ledger · Secure</div>
+  <div class="lk-hint">Enter admin PIN to continue</div>
   <div class="pin-dots" id="pinDots">
     <div class="pin-dot" id="pd0"></div>
     <div class="pin-dot" id="pd1"></div>
@@ -470,43 +319,40 @@ body::before{
   <!-- HEADER -->
   <div class="hdr">
     <div class="hdr-left">
-      <div class="hdr-icon"><span>₹</span></div>
-      <div>
+      <div class="hdr-logo"><span>₹</span></div>
+      <div class="hdr-info">
         <div class="hdr-title">Rupaya</div>
         <div class="hdr-date" id="topDate"></div>
       </div>
     </div>
-    <div class="hdr-btns">
-      <div class="hbtn" id="adminHBtn" onclick="tapAdminBtn()">
-        <i class="ti ti-shield-lock"></i>
-      </div>
-      <div class="hbtn" onclick="openSaveSheet()">
-        <i class="ti ti-device-floppy"></i>
-      </div>
+    <div class="hdr-actions">
+      <div class="hbtn" id="adminHBtn" onclick="tapAdminBtn()" title="Admin"><i class="ti ti-shield-lock"></i></div>
+      <div class="hbtn" onclick="openSaveSheet()" title="Save"><i class="ti ti-device-floppy"></i></div>
     </div>
   </div>
 
-  <!-- BALANCE -->
-  <div class="bal-wrap">
-    <div class="bal-card">
-      <div class="bal-tag">Live Batch Total</div>
-      <div class="bal-amt" id="heroAmt">₹0</div>
-      <div class="bal-sub" id="heroSub">Enter denominations below</div>
-      <div class="bal-chips" id="heroChips"></div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+      <div class="hero-tag">Live Batch Total</div>
+      <div class="hero-amt"><span>₹</span><span id="heroNum">0</span></div>
+      <div class="hero-sub" id="heroSub">Enter denominations below</div>
+      <div class="hero-chips" id="heroChips"></div>
     </div>
   </div>
 
-  <!-- QUICK BUTTONS -->
-  <div class="qb-row">
-    <button class="qb qb-save" onclick="openSaveSheet()"><i class="ti ti-device-floppy"></i>Save</button>
-    <button class="qb qb-bt" onclick="openBTSheet()"><i class="ti ti-bluetooth"></i>BT Print</button>
-    <button class="qb qb-reset" onclick="clearEntry()"><i class="ti ti-refresh"></i>Reset</button>
+  <!-- ACTION ROW -->
+  <div class="act-row">
+    <button class="abtn abtn-primary" onclick="openSaveSheet()"><i class="ti ti-device-floppy"></i>Save Batch</button>
+    <button class="abtn abtn-ghost" onclick="openBTSheet()"><i class="ti ti-bluetooth"></i>BT Print</button>
+    <button class="abtn abtn-ghost" onclick="clearEntry()"><i class="ti ti-refresh"></i>Reset</button>
   </div>
 
   <!-- ENTRY PAGE -->
   <div class="page on" id="pageEntry">
     <div class="sec">
-      <div class="sec-hd">Batch Details</div>
+      <div class="sec-hd">Batch Details <div class="sec-hd-line"></div></div>
       <div class="inp-row">
         <div class="inp-group">
           <div class="inp-lbl">Batch Name</div>
@@ -519,19 +365,19 @@ body::before{
       </div>
     </div>
     <div class="sec" style="padding-top:0">
-      <div class="sec-hd">Denomination Count</div>
+      <div class="sec-hd">Denomination Count <span style="font-size:9px;color:var(--text3);font-weight:500;letter-spacing:0;text-transform:none;margin-left:4px">tap × to disable</span><div class="sec-hd-line"></div></div>
       <div class="denom-grid" id="denomList"></div>
     </div>
   </div>
 
   <!-- HISTORY PAGE -->
   <div class="page" id="pageHistory">
-    <div class="stats-band" id="statsBand" style="display:none">
-      <div class="sb-cell"><div class="sb-lbl">Batches</div><div class="sb-val" id="sBatches">0</div></div>
-      <div class="sb-cell"><div class="sb-lbl">Total</div><div class="sb-val orange" id="sTotal">₹0</div></div>
-      <div class="sb-cell"><div class="sb-lbl">Average</div><div class="sb-val" id="sAvg">₹0</div></div>
+    <div class="stats-row" id="statsRow" style="display:none">
+      <div class="stat-card"><div class="stat-lbl">Batches</div><div class="stat-val" id="sBatches">0</div></div>
+      <div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val accent" id="sTotal">₹0</div></div>
+      <div class="stat-card"><div class="stat-lbl">Average</div><div class="stat-val" id="sAvg">₹0</div></div>
     </div>
-    <div class="srch">
+    <div class="srch-wrap">
       <i class="ti ti-search"></i>
       <input class="srch-inp" type="text" id="searchInp" placeholder="Search batches…" oninput="renderHistory()">
     </div>
@@ -543,19 +389,20 @@ body::before{
   <!-- ADMIN PAGE -->
   <div class="page" id="pageAdmin">
     <div class="adm-hero">
-      <div class="adm-lbl">Grand Total · All Batches</div>
+      <div class="adm-hero-glow"></div>
+      <div class="adm-tag">Grand Total · All Batches</div>
       <div class="adm-total" id="adminGrand">₹0</div>
       <div class="adm-sub" id="adminSub">—</div>
     </div>
-    <div class="adm-grid" id="adminGrid"></div>
-    <div class="denom-bk" id="denomBk"></div>
-    <div class="adm-btns">
-      <button class="ab ab-saffron" onclick="openSaveSheet()"><i class="ti ti-device-floppy"></i>Save Current Batch</button>
-      <button class="ab ab-bt" onclick="openBTSheet()"><i class="ti ti-bluetooth"></i>Bluetooth Print</button>
-      <button class="ab ab-green" onclick="doPrint()"><i class="ti ti-printer"></i>Browser / WiFi Print</button>
-      <button class="ab ab-green" onclick="exportCSV()"><i class="ti ti-file-spreadsheet"></i>Export CSV</button>
-      <button class="ab ab-lock" onclick="lockAdmin()"><i class="ti ti-lock"></i>Lock Admin</button>
-      <button class="ab ab-red" onclick="confirmReset()"><i class="ti ti-trash"></i>Clear All Data</button>
+    <div class="adm-cards" id="adminGrid"></div>
+    <div class="denom-breakdown" id="denomBk"></div>
+    <div class="adm-actions">
+      <button class="aab aab-primary" onclick="openSaveSheet()"><i class="ti ti-device-floppy"></i>Save Current Batch</button>
+      <button class="aab aab-dark" onclick="openBTSheet()"><i class="ti ti-bluetooth"></i>Bluetooth Print</button>
+      <button class="aab aab-green" onclick="doPrint()"><i class="ti ti-printer"></i>Browser / WiFi Print</button>
+      <button class="aab aab-green" onclick="exportCSV()"><i class="ti ti-file-spreadsheet"></i>Export CSV</button>
+      <button class="aab aab-dark" onclick="lockAdmin()"><i class="ti ti-lock"></i>Lock Admin</button>
+      <button class="aab aab-red" onclick="confirmReset()"><i class="ti ti-trash"></i>Clear All Data</button>
     </div>
   </div>
 
@@ -563,15 +410,9 @@ body::before{
 
 <!-- BOTTOM NAV -->
 <div class="bnav">
-  <div class="ni on" id="ni-entry" onclick="goPage('entry')">
-    <i class="ti ti-calculator"></i>Entry
-  </div>
-  <div class="ni" id="ni-history" onclick="goPage('history')">
-    <i class="ti ti-clock-history"></i>History
-  </div>
-  <div class="ni" id="ni-admin" onclick="tapNavAdmin()">
-    <i class="ti ti-shield-lock"></i>Admin
-  </div>
+  <div class="ni on" id="ni-entry" onclick="goPage('entry')"><i class="ti ti-calculator"></i>Entry</div>
+  <div class="ni" id="ni-history" onclick="goPage('history')"><i class="ti ti-clock-history"></i>History</div>
+  <div class="ni" id="ni-admin" onclick="tapNavAdmin()"><i class="ti ti-shield-lock"></i>Admin</div>
 </div>
 
 <!-- SAVE SHEET -->
@@ -585,30 +426,29 @@ body::before{
   </div>
 </div>
 
-<!-- BLUETOOTH PRINT SHEET -->
+<!-- BT SHEET -->
 <div class="overlay hide" id="btOverlay" onclick="closeBTSheet(event)">
   <div class="sheet">
     <div class="sh-handle"></div>
-    <div class="sh-title"><i class="ti ti-bluetooth" style="color:var(--saffron);margin-right:6px"></i>Bluetooth Printer</div>
+    <div class="sh-title"><i class="ti ti-bluetooth" style="color:var(--accent);margin-right:6px"></i>Bluetooth Printer</div>
 
     <div class="bt-status" id="btStatus">
       <div class="bt-dot off" id="btDot"></div>
       <div class="bt-txt">
         <div class="bt-name" id="btName">Not connected</div>
-        <div class="bt-sub" id="btSub">Tap Connect to search Bluetooth printers</div>
+        <div class="bt-sub" id="btSub">Tap Connect to search printers</div>
       </div>
       <button class="bt-action" id="btConnBtn" onclick="btConnect()">Connect</button>
     </div>
 
     <div class="bt-log" id="btLog"></div>
 
-    <!-- Print options -->
     <div style="margin-bottom:10px">
-      <div class="inp-lbl" style="margin-bottom:6px">What to print</div>
+      <div class="inp-lbl" style="margin-bottom:6px">Print report type</div>
       <select class="inp" id="btPrintMode" style="font-size:13px">
+        <option value="grand_denom">Grand Total — All denominations breakdown</option>
+        <option value="batches_then_current">All saved batches + current batch</option>
         <option value="current">Current batch only</option>
-        <option value="all">All saved batches</option>
-        <option value="grand">Grand total report</option>
       </select>
     </div>
 
@@ -623,42 +463,67 @@ body::before{
 <div id="printArea"></div>
 
 <script>
-const DENOMS=[10,20,50,100,200,500,2000];
-const DCOLORS={10:'#7c3aed',20:'#2563eb',50:'#dc2626',100:'#059669',200:'#d97706',500:'#0891b2',2000:'#db2777'};
+const ALL_DENOMS=[10,20,50,100,200,500,2000];
+const DCOLORS={10:'#a855f7',20:'#3b82f6',50:'#ef4444',100:'#22c55e',200:'#f59e0b',500:'#06b6d4',2000:'#ec4899'};
 const LS='rupaya_v3';
 const PIN='7865';
 let adminUnlocked=false,pinBuf='';
-
-// BT state
 let btDevice=null,btChar=null,btConnected=false;
+
+/* ---- GET ENABLED DENOMS ---- */
+function getDisabled(){try{return JSON.parse(localStorage.getItem('rupaya_disabled')||'[]')}catch(e){return[]}}
+function saveDisabled(arr){localStorage.setItem('rupaya_disabled',JSON.stringify(arr))}
+function isDenomEnabled(d){return!getDisabled().includes(d)}
+function toggleDenom(d){
+  const dis=getDisabled();
+  const idx=dis.indexOf(d);
+  if(idx===-1)dis.push(d);else dis.splice(idx,1);
+  saveDisabled(dis);
+  const el=document.getElementById('dc'+d);
+  el.classList.toggle('disabled-note',!isDenomEnabled(d));
+  // reset value if disabling
+  if(!isDenomEnabled(d)){
+    document.getElementById('d'+d).value='';
+    document.getElementById('ds'+d).textContent='—';
+    document.getElementById('badge'+d).textContent='×0';
+    el.classList.remove('active');
+  }
+  recalc();
+}
+function getEnabledDenoms(){return ALL_DENOMS.filter(d=>isDenomEnabled(d))}
 
 /* ---- BUILD DENOM GRID ---- */
 const dl=document.getElementById('denomList');
-DENOMS.forEach(d=>{
-  const cls=d===2000?'dc full':'dc';
-  dl.innerHTML+=`<div class="${cls}" data-d="${d}" id="dc${d}">
-    <div class="dc-stripe" style="background:${DCOLORS[d]}"></div>
+ALL_DENOMS.forEach(d=>{
+  const full=d===2000?'dc full':'dc';
+  dl.innerHTML+=`<div class="${full}" data-d="${d}" id="dc${d}">
     <div class="dc-top">
-      <div class="dc-rs">₹</div>
-      <div class="dc-val">${d>=1000?d/1000+'K':d}</div>
-      <div class="dc-badge" id="badge${d}">×0</div>
+      <div class="dc-val">₹${d>=1000?(d/1000)+'K':d}</div>
+      <div style="display:flex;align-items:center;gap:5px">
+        <div class="dc-badge" id="badge${d}">×0</div>
+        <div class="dc-toggle" onclick="toggleDenom(${d})" title="Enable/Disable"><i class="ti ti-x" style="font-size:10px"></i></div>
+      </div>
     </div>
-    <div class="dc-row">
+    <div class="dc-controls">
       <div class="dc-btn" onclick="step(${d},-1)">−</div>
-      <input class="dc-inp" type="number" id="d${d}" min="0" placeholder="0"
-        oninput="onDI(${d})" onwheel="return false" inputmode="numeric">
+      <input class="dc-inp" type="number" id="d${d}" min="0" placeholder="0" oninput="onDI(${d})" onwheel="return false" inputmode="numeric">
       <div class="dc-btn plus" onclick="step(${d},1)">+</div>
     </div>
     <div class="dc-sub" id="ds${d}">—</div>
   </div>`;
 });
 
+// Apply disabled state on load
+getDisabled().forEach(d=>{const el=document.getElementById('dc'+d);if(el)el.classList.add('disabled-note')});
+
 function step(d,dir){
+  if(!isDenomEnabled(d))return;
   const i=document.getElementById('d'+d);
   i.value=Math.max(0,(parseInt(i.value)||0)+dir)||'';
   onDI(d);
 }
 function onDI(d){
+  if(!isDenomEnabled(d))return;
   const qty=parseInt(document.getElementById('d'+d).value||0);
   const dc=document.getElementById('dc'+d);
   document.getElementById('ds'+d).textContent=qty>0?inr(qty*d):'—';
@@ -668,23 +533,23 @@ function onDI(d){
 }
 
 function inr(n){return(n<0?'−':'')+'₹'+Math.abs(n).toLocaleString('en-IN')}
+
 function getCurrent(){
   let total=0;const rows=[];
-  DENOMS.forEach(d=>{
+  getEnabledDenoms().forEach(d=>{
     const qty=parseInt(document.getElementById('d'+d).value||0);
     if(qty>0)rows.push({d,qty,amt:qty*d});
     total+=qty*d;
   });
   return{total,rows};
 }
+
 function recalc(){
   const{total,rows}=getCurrent();
-  document.getElementById('heroAmt').textContent=inr(total);
-  document.getElementById('heroSub').textContent=rows.length
-    ?`${rows.length} denom · ${rows.reduce((s,r)=>s+r.qty,0)} notes`
-    :'Enter denominations below';
+  document.getElementById('heroNum').textContent=total.toLocaleString('en-IN');
+  document.getElementById('heroSub').textContent=rows.length?`${rows.length} denom · ${rows.reduce((s,r)=>s+r.qty,0)} notes`:'Enter denominations below';
   const pp=document.getElementById('heroChips');
-  pp.innerHTML=rows.map(r=>`<div class="chip">₹${r.d}×${r.qty}</div>`).join('');
+  pp.innerHTML=rows.map(r=>`<div class="hchip">₹${r.d}×${r.qty}</div>`).join('');
   if(adminUnlocked)renderAdminData();
   persist();
 }
@@ -705,8 +570,7 @@ function doUnlock(){
   document.getElementById('app').classList.add('show');
   goPage('admin');renderAdminData();renderHistory();
 }
-function lockAdmin(){adminUnlocked=false;pinBuf='';document.getElementById('adminHBtn').classList.remove('admin-on');goPage('entry');showToast('Admin locked');
-}
+function lockAdmin(){adminUnlocked=false;pinBuf='';document.getElementById('adminHBtn').classList.remove('admin-on');goPage('entry');showToast('Admin locked')}
 function showLock(){pinBuf='';updDots();document.getElementById('lockErr').textContent='';document.getElementById('lockScreen').style.display='flex'}
 function tapAdminBtn(){adminUnlocked?goPage('admin'):showLock()}
 function tapNavAdmin(){if(adminUnlocked){goPage('admin');renderAdminData();}else showLock()}
@@ -741,8 +605,8 @@ function openSaveSheet(){
   if(!total){showToast('Add at least one denomination first');return}
   const label=document.getElementById('batchLabel').value.trim()||'Unnamed Batch';
   document.getElementById('sheetContent').innerHTML=
-    rows.map(r=>`<div class="sh-row"><div class="sh-note">₹${r.d}</div><div class="sh-detail"><div class="sh-qty">${r.qty} note${r.qty>1?'s':''}</div></div><div class="sh-amt">${inr(r.amt)}</div></div>`).join('')+
-    `<div class="sh-total"><div class="sht-lbl">${label}</div><div class="sht-val">${inr(total)}</div></div>`;
+    rows.map(r=>`<div class="sh-row"><div class="sh-note">₹${r.d}</div><div class="sh-qty">${r.qty} note${r.qty>1?'s':''}</div><div class="sh-amt">${inr(r.amt)}</div></div>`).join('')+
+    `<div class="sh-total-box"><div class="sh-total-lbl">${label}</div><div class="sh-total-val">${inr(total)}</div></div>`;
   document.getElementById('saveOverlay').classList.remove('hide');
 }
 function closeSaveSheet(e){if(e.target===document.getElementById('saveOverlay'))document.getElementById('saveOverlay').classList.add('hide')}
@@ -756,9 +620,9 @@ function confirmSave(){
   document.getElementById('saveOverlay').classList.add('hide');showToast('Batch saved ✓');
 }
 function clearEntry(){
-  DENOMS.forEach(d=>{document.getElementById('d'+d).value='';document.getElementById('ds'+d).textContent='—';document.getElementById('dc'+d).classList.remove('active');document.getElementById('badge'+d).textContent='×0'});
+  getEnabledDenoms().forEach(d=>{document.getElementById('d'+d).value='';document.getElementById('ds'+d).textContent='—';document.getElementById('dc'+d).classList.remove('active');document.getElementById('badge'+d).textContent='×0'});
   document.getElementById('batchLabel').value='';
-  document.getElementById('heroAmt').textContent='₹0';document.getElementById('heroSub').textContent='Enter denominations below';document.getElementById('heroChips').innerHTML='';
+  document.getElementById('heroNum').textContent='0';document.getElementById('heroSub').textContent='Enter denominations below';document.getElementById('heroChips').innerHTML='';
   const f=load();f.live={};save(f);
 }
 
@@ -768,23 +632,23 @@ function renderHistory(){
   let batches=(full.batches||[]).slice().reverse();
   if(q)batches=batches.filter(b=>(b.label+b.loc).toLowerCase().includes(q));
   const allB=full.batches||[];const sTotal=allB.reduce((s,b)=>s+b.total,0);
-  const band=document.getElementById('statsBand');
+  const row=document.getElementById('statsRow');
   if(allB.length){
-    band.style.display='flex';
+    row.style.display='flex';
     document.getElementById('sBatches').textContent=allB.length;
     document.getElementById('sTotal').textContent=adminUnlocked?inr(sTotal):'🔒';
     document.getElementById('sAvg').textContent=adminUnlocked?inr(Math.round(sTotal/allB.length)):'—';
-  } else band.style.display='none';
+  } else row.style.display='none';
   const el=document.getElementById('histArea');
   if(!batches.length){el.innerHTML=`<div class="empty-s"><div class="empty-ic"><i class="ti ti-archive"></i></div><div class="empty-t">${q?'No results':'No batches yet'}</div><div class="empty-s2">${q?'Try a different keyword.':'Go to Entry tab and save your first batch.'}</div></div>`;return}
-  const colors=['#e8670a','#059669','#2563eb','#db2777'];
+  const colors=[DCOLORS[500],DCOLORS[100],DCOLORS[20],DCOLORS[2000]];
   el.innerHTML=batches.map((b,i)=>{
     const ts=new Date(b.time).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
     const chips=b.rows.map(r=>`<div class="hi-chip">₹${r.d}×${r.qty}</div>`).join('');
-    const amt=adminUnlocked?`<div class="hi-amt">${inr(b.total)}</div>`:`<div class="hi-amt locked"><i class="ti ti-lock" style="font-size:11px"></i></div>`;
+    const amt=adminUnlocked?`<div class="hi-amt">${inr(b.total)}</div>`:`<div class="hi-amt locked"><i class="ti ti-lock" style="font-size:10px"></i></div>`;
     return`<div class="hi"><div class="hi-bar" style="background:${colors[i%4]}"></div>
       <button class="hi-del" onclick="delBatch(${b.id})"><i class="ti ti-x"></i></button>
-      <div class="hi-head"><div><div class="hi-name">${b.label}</div><div class="hi-meta">${b.loc?`<span><i class="ti ti-map-pin" style="font-size:10px"></i> ${b.loc}</span>`:''}<span>${ts}</span></div></div><div>${amt}</div></div>
+      <div class="hi-head"><div><div class="hi-name">${b.label}</div><div class="hi-meta">${b.loc?`<span><i class="ti ti-map-pin" style="font-size:9px"></i> ${b.loc}</span>`:''}<span>${ts}</span></div></div><div>${amt}</div></div>
       <div class="hi-chips">${chips}</div></div>`;
   }).join('');
 }
@@ -797,18 +661,18 @@ function renderAdminData(){
   document.getElementById('adminGrand').textContent=inr(cur+prev);
   document.getElementById('adminSub').textContent=`${batches.length} saved batch${batches.length!==1?'es':''} + live ${inr(cur)}`;
   document.getElementById('adminGrid').innerHTML=`
-    <div class="adm-cell"><div class="adm-cell-lbl">Live Batch</div><div class="adm-cell-val">${inr(cur)}</div><div class="adm-cell-note">Unsaved</div></div>
-    <div class="adm-cell"><div class="adm-cell-lbl">Saved Total</div><div class="adm-cell-val">${inr(prev)}</div><div class="adm-cell-note">${batches.length} batch${batches.length!==1?'es':''}</div></div>`;
-  const mm={};DENOMS.forEach(d=>mm[d]=0);
+    <div class="adm-card"><div class="adm-card-lbl">Live Batch</div><div class="adm-card-val">${inr(cur)}</div><div class="adm-card-note">Unsaved</div></div>
+    <div class="adm-card"><div class="adm-card-lbl">Saved Total</div><div class="adm-card-val">${inr(prev)}</div><div class="adm-card-note">${batches.length} batch${batches.length!==1?'es':''}</div></div>`;
+  const mm={};ALL_DENOMS.forEach(d=>mm[d]=0);
   batches.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
   curRows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty);
-  const maxQ=Math.max(1,...DENOMS.map(d=>mm[d]));
-  const rows=DENOMS.filter(d=>mm[d]>0);
+  const maxQ=Math.max(1,...ALL_DENOMS.map(d=>mm[d]));
+  const rows=ALL_DENOMS.filter(d=>mm[d]>0);
   const bk=document.getElementById('denomBk');
   if(rows.length){
     bk.style.display='';
-    bk.innerHTML=`<div class="denom-bk-hd">Denomination Breakdown</div>`+
-      rows.map(d=>`<div class="db-row"><div class="db-dot" style="background:${DCOLORS[d]}"></div><div class="db-note">₹${d}</div><div class="db-bw"><div class="db-bf" style="width:${Math.round(mm[d]/maxQ*100)}%;background:${DCOLORS[d]}"></div></div><div class="db-qty">${mm[d]} notes</div><div class="db-amt">${inr(mm[d]*d)}</div></div>`).join('');
+    bk.innerHTML=`<div class="db-header">Denomination Breakdown</div>`+
+      rows.map(d=>`<div class="db-row"><div class="db-dot" style="background:${DCOLORS[d]}"></div><div class="db-note">₹${d}</div><div class="db-bar-wrap"><div class="db-bar-fill" style="width:${Math.round(mm[d]/maxQ*100)}%;background:${DCOLORS[d]}"></div></div><div class="db-qty">${mm[d]} notes</div><div class="db-amt">${inr(mm[d]*d)}</div></div>`).join('');
   } else bk.style.display='none';
 }
 function confirmReset(){if(!confirm('Delete ALL data?'))return;clearEntry();const f=load();f.batches=[];f.live={};save(f);renderHistory();renderAdminData();showToast('Cleared')}
@@ -817,11 +681,10 @@ function confirmReset(){if(!confirm('Delete ALL data?'))return;clearEntry();cons
 function exportCSV(){
   if(!adminUnlocked){showToast('Admin required');return}
   const batches=load().batches||[];if(!batches.length){showToast('No data');return}
-  let csv='Batch,Location,Date,Time,Total,'+DENOMS.map(d=>'₹'+d).join(',')+'\n';
+  let csv='Batch,Location,Date,Time,Total,'+ALL_DENOMS.map(d=>'₹'+d).join(',')+'\n';
   batches.forEach(b=>{
-    const dt=new Date(b.time);
-    const qm={};b.rows.forEach(r=>qm[r.d]=r.qty);
-    csv+=`"${b.label}","${b.loc||''}","${dt.toLocaleDateString('en-IN')}","${dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}",${b.total},${DENOMS.map(d=>qm[d]||0).join(',')}\n`;
+    const dt=new Date(b.time);const qm={};b.rows.forEach(r=>qm[r.d]=r.qty);
+    csv+=`"${b.label}","${b.loc||''}","${dt.toLocaleDateString('en-IN')}","${dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}",${b.total},${ALL_DENOMS.map(d=>qm[d]||0).join(',')}\n`;
   });
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rupaya.csv';a.click();showToast('Exported ✓');
 }
@@ -834,55 +697,48 @@ function doPrint(){
   const loc=document.getElementById('locName').value.trim();
   const curLabel=document.getElementById('batchLabel').value.trim()||'Current Batch';
   const now=new Date();
-  let cB=null,pB=[];
-  if(curT>0){cB={label:curLabel,total:curT,rows:curR};pB=batches;}
-  else if(batches.length){cB=batches[batches.length-1];pB=batches.slice(0,-1);}
-  else{showToast('Nothing to print');return}
-  const mm={};DENOMS.forEach(d=>mm[d]=0);
-  pB.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
-  const mR=DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}));
-  const mT=mR.reduce((s,r)=>s+r.amt,0);
+  // Always build grand denomination breakdown
+  const mm={};ALL_DENOMS.forEach(d=>mm[d]=0);
+  batches.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
+  curR.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty);
+  const mR=ALL_DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}));
+  const grand=mR.reduce((s,r)=>s+r.amt,0);
   function tR(rr){if(!rr.length)return`<tr><td colspan="3" style="font-style:italic">No entries</td></tr>`;return rr.map(r=>`<tr><td>Rs.${r.d}</td><td>${r.qty}</td><td>Rs.${r.amt.toLocaleString('en-IN')}</td></tr>`).join('')}
   const dtStr=now.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  let html=`<div class="pr-shop">RUPAYA CASH LEDGER</div><div class="pr-sub">${loc||'Denomination Report'}</div><div class="pr-date">${dtStr}</div><hr class="pr-rule">
-  <div class="pr-sec">Current Batch</div><div class="pr-sec-sub">${cB.label}</div>
-  <table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${tR(cB.rows)}</tbody></table>
-  <div class="pr-btotal">Total: Rs.${cB.total.toLocaleString('en-IN')}</div>`;
-  if(pB.length)html+=`<hr class="pr-rule"><div class="pr-sec">Previous Batches</div><div class="pr-sec-sub">${pB.length} batches merged</div><table><thead><tr><th>Note</th><th>Qty</th><th>Amount</th></tr></thead><tbody>${tR(mR)}</tbody></table><div class="pr-btotal">Combined: Rs.${mT.toLocaleString('en-IN')}</div>`;
-  html+=`<hr class="pr-rule"><div class="pr-grand">GRAND TOTAL<span class="pr-gval">Rs.${(cB.total+mT).toLocaleString('en-IN')}</span></div><div class="pr-foot">Rupaya · ${now.toLocaleDateString('en-IN')} · ${loc||''}</div>`;
+  let html=`<div class="pr-shop">RUPAYA CASH LEDGER</div><div class="pr-sub">${loc||'Denomination Report'}</div><div class="pr-date">${dtStr}</div><hr class="pr-rule">`;
+  // Section 1: Grand denomination breakdown
+  html+=`<div class="pr-sec">Grand Total — All Denominations</div><div class="pr-sec-sub">${batches.length} saved + live batch</div>
+  <table><thead><tr><th>Note</th><th>Count</th><th>Amount</th></tr></thead><tbody>${tR(mR)}</tbody></table>
+  <div class="pr-btotal">Grand Total: Rs.${grand.toLocaleString('en-IN')}</div><hr class="pr-rule">`;
+  // Section 2: Previous saved batches
+  if(batches.length){
+    const prevTotal=batches.reduce((s,b)=>s+b.total,0);
+    const prevMM={};ALL_DENOMS.forEach(d=>prevMM[d]=0);
+    batches.forEach(b=>b.rows.forEach(r=>prevMM[r.d]=(prevMM[r.d]||0)+r.qty));
+    const prevR=ALL_DENOMS.filter(d=>prevMM[d]>0).map(d=>({d,qty:prevMM[d],amt:prevMM[d]*d}));
+    html+=`<div class="pr-sec">Previous Saved Batches</div><div class="pr-sec-sub">${batches.length} batch${batches.length!==1?'es':''} combined</div>
+    <table><thead><tr><th>Note</th><th>Count</th><th>Amount</th></tr></thead><tbody>${tR(prevR)}</tbody></table>
+    <div class="pr-btotal">Saved Total: Rs.${prevTotal.toLocaleString('en-IN')}</div><hr class="pr-rule">`;
+  }
+  // Section 3: Current batch
+  if(curT>0){
+    html+=`<div class="pr-sec">Current Batch</div><div class="pr-sec-sub">${curLabel}</div>
+    <table><thead><tr><th>Note</th><th>Count</th><th>Amount</th></tr></thead><tbody>${tR(curR)}</tbody></table>
+    <div class="pr-btotal">Batch Total: Rs.${curT.toLocaleString('en-IN')}</div><hr class="pr-rule">`;
+  }
+  html+=`<div class="pr-grand">GRAND TOTAL<span class="pr-gval">Rs.${grand.toLocaleString('en-IN')}</span></div><div class="pr-foot">Rupaya · ${now.toLocaleDateString('en-IN')} · ${loc||''}</div>`;
   document.getElementById('printArea').innerHTML=html;setTimeout(()=>window.print(),80);
 }
 
 /* ================================================================
    BLUETOOTH THERMAL PRINTING — ESC/POS via Web Bluetooth API
-   Targets: Printer0001 (BT Classic SPP or BLE with print char)
    ================================================================ */
+const BLE_PRINT_SERVICES=['000018f0-0000-1000-8000-00805f9b34fb','49535343-fe7d-4ae5-8fa9-9fafd205e455','6e400001-b5a3-f393-e0a9-e50e24dcca9e'];
+const BLE_WRITE_CHARS=['000018f1-0000-1000-8000-00805f9b34fb','49535343-8841-43f4-a8d4-ecbe34729bb3','6e400002-b5a3-f393-e0a9-e50e24dcca9e'];
 
-// SPP Serial Port Profile UUIDs for BT thermal printers
-// Generic BLE print service UUIDs (common in cheap thermal printers)
-const BLE_PRINT_SERVICES = [
-  '000018f0-0000-1000-8000-00805f9b34fb', // common thermal BLE
-  '49535343-fe7d-4ae5-8fa9-9fafd205e455', // Microchip SPP BLE
-  '6e400001-b5a3-f393-e0a9-e50e24dcca9e', // Nordic UART
-];
-const BLE_WRITE_CHARS = [
-  '000018f1-0000-1000-8000-00805f9b34fb',
-  '49535343-8841-43f4-a8d4-ecbe34729bb3',
-  '6e400002-b5a3-f393-e0a9-e50e24dcca9e',
-];
-
-function btLog(msg){
-  const el=document.getElementById('btLog');
-  el.classList.add('show');
-  el.innerHTML+=`<div>${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})} — ${msg}</div>`;
-  el.scrollTop=el.scrollHeight;
-}
+function btLog(msg){const el=document.getElementById('btLog');el.classList.add('show');el.innerHTML+=`<div>${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})} — ${msg}</div>`;el.scrollTop=el.scrollHeight}
 function setBtUI(state,name='',sub=''){
-  const dot=document.getElementById('btDot');
-  const nm=document.getElementById('btName');
-  const sb=document.getElementById('btSub');
-  const btn=document.getElementById('btConnBtn');
-  const pBtn=document.getElementById('btPrintBtn');
+  const dot=document.getElementById('btDot');const nm=document.getElementById('btName');const sb=document.getElementById('btSub');const btn=document.getElementById('btConnBtn');const pBtn=document.getElementById('btPrintBtn');
   dot.className='bt-dot '+state;
   nm.textContent=name||{off:'Not connected',scanning:'Scanning…',on:'Connected',error:'Connection failed'}[state]||name;
   if(sub)sb.textContent=sub;
@@ -892,333 +748,116 @@ function setBtUI(state,name='',sub=''){
 }
 
 async function btConnect(){
-
-  if (!navigator.bluetooth) {
-    showToast('Bluetooth not supported in this browser');
-    btLog('❌ Use Chrome browser only');
-    return;
-  }
-
-  if (location.protocol !== 'https:' &&
-      location.hostname !== 'localhost' &&
-      location.hostname !== '127.0.0.1') {
-
-    showToast('Bluetooth requires HTTPS');
-    btLog('❌ Open from HTTPS website');
-    return;
-  }
-
-  try {
-
-    setBtUI('scanning', 'Searching...', 'Select your thermal printer');
-    btLog('🔍 Searching all Bluetooth printers...');
-
-    btDevice = await navigator.bluetooth.requestDevice({
-
-      acceptAllDevices: true,
-
-      optionalServices: [
-        '000018f0-0000-1000-8000-00805f9b34fb',
-        '49535343-fe7d-4ae5-8fa9-9fafd205e455',
-        '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
-      ]
-
-    });
-
-    btLog('✅ Selected: ' + btDevice.name);
-
-    const server = await btDevice.gatt.connect();
-
-    btLog('✅ Connected to GATT');
-
-    const services = await server.getPrimaryServices();
-
-    btLog('📦 Services found: ' + services.length);
-
-    btChar = null;
-
-    for (const service of services) {
-
-      try {
-
-        const chars = await service.getCharacteristics();
-
-        for (const char of chars) {
-
-          if (
-            char.properties.write ||
-            char.properties.writeWithoutResponse
-          ) {
-
-            btChar = char;
-
-            btLog('✅ Writable characteristic found');
-            break;
-          }
-        }
-
-      } catch (e) {}
-
-      if (btChar) break;
+  if(!navigator.bluetooth){showToast('Bluetooth not supported in this browser');btLog('❌ Use Chrome browser only');return}
+  if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){showToast('Bluetooth requires HTTPS');btLog('❌ Open from HTTPS website');return}
+  try{
+    setBtUI('scanning','Searching...','Select your thermal printer');btLog('🔍 Searching all Bluetooth printers...');
+    btDevice=await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:['000018f0-0000-1000-8000-00805f9b34fb','49535343-fe7d-4ae5-8fa9-9fafd205e455','6e400001-b5a3-f393-e0a9-e50e24dcca9e']});
+    btLog('✅ Selected: '+btDevice.name);
+    const server=await btDevice.gatt.connect();btLog('✅ Connected to GATT');
+    const services=await server.getPrimaryServices();btLog('📦 Services found: '+services.length);
+    btChar=null;
+    for(const service of services){
+      try{const chars=await service.getCharacteristics();for(const char of chars){if(char.properties.write||char.properties.writeWithoutResponse){btChar=char;btLog('✅ Writable characteristic found');break;}}}catch(e){}
+      if(btChar)break;
     }
-
-    if (!btChar) {
-
-      btLog('❌ No writable characteristic');
-      setBtUI(
-        'error',
-        'Unsupported Printer',
-        'Printer does not support BLE printing'
-      );
-
-      return;
-    }
-
-    btConnected = true;
-
-    setBtUI(
-      'on',
-      btDevice.name || 'Thermal Printer',
-      'Ready to print'
-    );
-
-    btLog('🖨️ Printer ready');
-
-    btDevice.addEventListener(
-      'gattserverdisconnected',
-      () => {
-
-        btConnected = false;
-        btChar = null;
-
-        setBtUI(
-          'off',
-          'Disconnected',
-          'Reconnect printer'
-        );
-
-        btLog('🔌 Printer disconnected');
-      }
-    );
-
-  } catch (e) {
-
-    console.error(e);
-
-    setBtUI(
-      'error',
-      'Connection Failed',
-      e.message
-    );
-
-    btLog('❌ ' + e.message);
-
-    showToast(e.message);
-  }
+    if(!btChar){btLog('❌ No writable characteristic');setBtUI('error','Unsupported Printer','Printer does not support BLE printing');return}
+    btConnected=true;setBtUI('on',btDevice.name||'Thermal Printer','Ready to print');btLog('🖨️ Printer ready');
+    btDevice.addEventListener('gattserverdisconnected',()=>{btConnected=false;btChar=null;setBtUI('off','Disconnected','Reconnect printer');btLog('🔌 Printer disconnected')});
+  }catch(e){console.error(e);setBtUI('error','Connection Failed',e.message);btLog('❌ '+e.message);showToast(e.message)}
 }
 
-async function btDisconnect(){
-  if(btDevice&&btDevice.gatt.connected){btDevice.gatt.disconnect()}
-  btConnected=false;btChar=null;setBtUI('off');btLog('🔌 Disconnected manually');
-}
+async function btDisconnect(){if(btDevice&&btDevice.gatt.connected)btDevice.gatt.disconnect();btConnected=false;btChar=null;setBtUI('off');btLog('🔌 Disconnected manually')}
 
-// Build ESC/POS receipt bytes
-function buildEscPos(lines) {
-
-  const encoder = new TextEncoder();
-
-  let data = [];
-
-  const push = (...bytes) => {
-    data.push(...bytes);
-  };
-
-  const text = (txt = '') => {
-    data.push(...encoder.encode(txt + '\n'));
-  };
-
-  // Initialize printer
-  push(0x1B, 0x40);
-
-  // Center
-  push(0x1B, 0x61, 0x01);
-
-  // Bold ON
-  push(0x1B, 0x45, 0x01);
-
-  // Double size text
-  push(0x1D, 0x21, 0x11);
-
-  text('RUPAYA');
-
-  // Normal size
-  push(0x1D, 0x21, 0x00);
-
-  text('Cash Ledger');
-
-  // Bold OFF
-  push(0x1B, 0x45, 0x00);
-
-  const loc =
-    document.getElementById('locName')
-    .value
-    .trim();
-
-  if (loc) {
-    text(loc);
-  }
-
-  text(
-    new Date().toLocaleString('en-IN')
-  );
-
-  text('--------------------------------');
-
-  // Left align
-  push(0x1B, 0x61, 0x00);
-
-  for (const line of lines) {
-    text(line);
-  }
-
-  text('--------------------------------');
-
-  // Center align
-  push(0x1B, 0x61, 0x01);
-
-  // Bold ON
-  push(0x1B, 0x45, 0x01);
-
-  text('THANK YOU');
-
-  // Bold OFF
-  push(0x1B, 0x45, 0x00);
-
-  text('Printed via Rupaya');
-
-  // Feed lines
-  push(0x1B, 0x64, 0x04);
-
-  // Partial cut
-  push(0x1D, 0x56, 0x41, 0x10);
-
+function buildEscPos(lines){
+  const encoder=new TextEncoder();let data=[];
+  const push=(...bytes)=>data.push(...bytes);
+  const text=(txt='')=>data.push(...encoder.encode(txt+'\n'));
+  push(0x1B,0x40);push(0x1B,0x61,0x01);push(0x1B,0x45,0x01);push(0x1D,0x21,0x11);text('RUPAYA');push(0x1D,0x21,0x00);text('Cash Ledger');push(0x1B,0x45,0x00);
+  const loc=document.getElementById('locName').value.trim();if(loc)text(loc);
+  text(new Date().toLocaleString('en-IN'));text('--------------------------------');push(0x1B,0x61,0x00);
+  for(const line of lines)text(line);
+  text('--------------------------------');push(0x1B,0x61,0x01);push(0x1B,0x45,0x01);text('THANK YOU');push(0x1B,0x45,0x00);text('Printed via Rupaya');push(0x1B,0x64,0x04);push(0x1D,0x56,0x41,0x10);
   return new Uint8Array(data);
 }
 
-function padEnd(s,n){return (s+'').padEnd(n,' ').slice(0,n)}
-function padStart(s,n){return (s+'').padStart(n,' ').slice(-n)}
+function padEnd(s,n){return(s+'').padEnd(n,' ').slice(0,n)}
+function padStart(s,n){return(s+'').padStart(n,' ').slice(-n)}
 
 function buildReceiptLines(mode){
   const full=load();const batches=full.batches||[];
   const{total:curT,rows:curR}=getCurrent();
   const lines=[];
+
   function addTable(rows){
     lines.push(padEnd('NOTE',8)+padEnd('QTY',8)+padStart('AMOUNT',16));
     lines.push('--------------------------------');
-    rows.forEach(r=>{
-      lines.push(padEnd('Rs.'+r.d,8)+padEnd(''+r.qty,8)+padStart('Rs.'+r.amt.toLocaleString('en-IN'),16));
-    });
+    rows.forEach(r=>lines.push(padEnd('Rs.'+r.d,8)+padEnd(''+r.qty,8)+padStart('Rs.'+r.amt.toLocaleString('en-IN'),16)));
   }
-  if(mode==='current'){
-    if(!curT&&!batches.length){return null}
-    const src=curT>0?{label:document.getElementById('batchLabel').value.trim()||'Current Batch',total:curT,rows:curR}:batches[batches.length-1];
-    lines.push('  [CURRENT BATCH]');
-    lines.push('  '+src.label);
-    lines.push('');addTable(src.rows);
-    lines.push('');
-    lines.push(padStart('TOTAL: Rs.'+src.total.toLocaleString('en-IN'),32));
-  } else if(mode==='all'){
-    if(!batches.length){return null}
-    batches.forEach((b,i)=>{
-      lines.push(`  [BATCH ${i+1}] ${b.label}`);
-      lines.push('');addTable(b.rows);
-      lines.push(padStart('Rs.'+b.total.toLocaleString('en-IN'),32));
-      lines.push('');
-    });
-  } else { // grand
-    const mm={};DENOMS.forEach(d=>mm[d]=0);
+
+  if(mode==='grand_denom'){
+    // Grand total of ALL currency with denomination breakdown
+    const mm={};ALL_DENOMS.forEach(d=>mm[d]=0);
     batches.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
     curR.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty);
-    const mR=DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}));
+    const mR=ALL_DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}));
     const grand=mR.reduce((s,r)=>s+r.amt,0);
-    lines.push('  [GRAND TOTAL REPORT]');lines.push('');
-    addTable(mR);
-    lines.push('');lines.push('================================');
+    if(!mR.length)return null;
+    lines.push('  [GRAND TOTAL — ALL DENOMINATIONS]');lines.push('');
+    addTable(mR);lines.push('');
+    lines.push('================================');
     lines.push('  GRAND TOTAL');
     lines.push('  Rs.'+grand.toLocaleString('en-IN'));
+    lines.push('  Notes: '+mR.reduce((s,r)=>s+r.qty,0)+' total notes');
     lines.push('================================');
+
+  } else if(mode==='batches_then_current'){
+    // All saved batches combined first, then current batch below
+    if(!batches.length&&!curT)return null;
+    if(batches.length){
+      const prevMM={};ALL_DENOMS.forEach(d=>prevMM[d]=0);
+      batches.forEach(b=>b.rows.forEach(r=>prevMM[r.d]=(prevMM[r.d]||0)+r.qty));
+      const prevR=ALL_DENOMS.filter(d=>prevMM[d]>0).map(d=>({d,qty:prevMM[d],amt:prevMM[d]*d}));
+      const prevT=batches.reduce((s,b)=>s+b.total,0);
+      lines.push('  [ALL PREVIOUS BATCHES]');lines.push('  '+batches.length+' batches combined');lines.push('');
+      addTable(prevR);lines.push('');
+      lines.push(padStart('SAVED TOTAL: Rs.'+prevT.toLocaleString('en-IN'),32));
+      lines.push('');lines.push('--------------------------------');lines.push('');
+    }
+    if(curT>0){
+      const curLabel=document.getElementById('batchLabel').value.trim()||'Current Batch';
+      lines.push('  [CURRENT BATCH]');lines.push('  '+curLabel);lines.push('');
+      addTable(curR);lines.push('');
+      lines.push(padStart('BATCH TOTAL: Rs.'+curT.toLocaleString('en-IN'),32));
+    }
+
+  } else {
+    // current only
+    if(!curT&&!batches.length)return null;
+    const src=curT>0?{label:document.getElementById('batchLabel').value.trim()||'Current Batch',total:curT,rows:curR}:batches[batches.length-1];
+    lines.push('  [CURRENT BATCH]');lines.push('  '+src.label);lines.push('');
+    addTable(src.rows);lines.push('');
+    lines.push(padStart('TOTAL: Rs.'+src.total.toLocaleString('en-IN'),32));
   }
   return lines;
 }
 
-async function btPrint() {
-
-  if (!btConnected || !btChar) {
-    showToast('Connect printer first');
-    return;
-  }
-
-  const mode =
-    document.getElementById('btPrintMode').value;
-
-  const lines = buildReceiptLines(mode);
-
-  if (!lines) {
-    showToast('No data to print');
-    return;
-  }
-
-  try {
-
-    const bytes = buildEscPos(lines);
-
-    btLog('🖨️ Printing started...');
-
-    const CHUNK_SIZE = 120;
-
-    for (
-      let i = 0;
-      i < bytes.length;
-      i += CHUNK_SIZE
-    ) {
-
-      const chunk =
-        bytes.slice(i, i + CHUNK_SIZE);
-
-      if (
-        btChar.properties.writeWithoutResponse
-      ) {
-
-        await btChar.writeValueWithoutResponse(
-          chunk
-        );
-
-      } else {
-
-        if (btChar.writeValueWithoutResponse) {
-  await btChar.writeValueWithoutResponse(chunk);
-} else {
-  await btChar.writeValue(chunk);
-}
-      }
-
-      await new Promise(resolve =>
-        setTimeout(resolve, 40)
-      );
+async function btPrint(){
+  if(!btConnected||!btChar){showToast('Connect printer first');return}
+  const mode=document.getElementById('btPrintMode').value;
+  const lines=buildReceiptLines(mode);
+  if(!lines){showToast('No data to print');return}
+  try{
+    const bytes=buildEscPos(lines);btLog('🖨️ Printing started...');
+    const CHUNK_SIZE=120;
+    for(let i=0;i<bytes.length;i+=CHUNK_SIZE){
+      const chunk=bytes.slice(i,i+CHUNK_SIZE);
+      if(btChar.properties.writeWithoutResponse){await btChar.writeValueWithoutResponse(chunk);}
+      else{if(btChar.writeValueWithoutResponse)await btChar.writeValueWithoutResponse(chunk);else await btChar.writeValue(chunk);}
+      await new Promise(r=>setTimeout(r,40));
     }
-
-    btLog('✅ Print completed');
-
-    showToast('Printed successfully');
-
-  } catch (e) {
-
-    console.error(e);
-
-    btLog('❌ Print failed: ' + e.message);
-
-    showToast('Print failed');
-  }
+    btLog('✅ Print completed');showToast('Printed successfully');
+  }catch(e){console.error(e);btLog('❌ Print failed: '+e.message);showToast('Print failed')}
 }
 
 function openBTSheet(){document.getElementById('btOverlay').classList.remove('hide')}
@@ -1227,13 +866,13 @@ function closeBTSheet(e){if(e.target===document.getElementById('btOverlay'))docu
 /* ---- PERSIST ---- */
 function persist(){
   const f=load();const live={};
-  DENOMS.forEach(d=>{live['d'+d]=document.getElementById('d'+d).value||''});
+  getEnabledDenoms().forEach(d=>{live['d'+d]=document.getElementById('d'+d).value||''});
   live.label=document.getElementById('batchLabel').value;live.loc=document.getElementById('locName').value;
   f.live=live;save(f);
 }
 function restoreLive(){
   const live=(load().live)||{};
-  DENOMS.forEach(d=>{if(live['d'+d]){document.getElementById('d'+d).value=live['d'+d];onDI(d);}});
+  getEnabledDenoms().forEach(d=>{if(live['d'+d]){document.getElementById('d'+d).value=live['d'+d];onDI(d);}});
   if(live.label)document.getElementById('batchLabel').value=live.label;
   if(live.loc)document.getElementById('locName').value=live.loc;
   recalc();
@@ -1247,77 +886,21 @@ function updateDate(){document.getElementById('topDate').textContent=new Date().
 
 // INIT
 document.getElementById('lockScreen').style.display='none';
-document.getElementById('app').style.display='flex';document.getElementById('app').classList.add('show');
+document.getElementById('app').style.display='flex';
+document.getElementById('app').classList.add('show');
 restoreLive();renderHistory();updateDate();setInterval(updateDate,30000);
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-const SUPABASE_URL = "https://hjwmcldmhclyzumuqoeb.supabase.co";
-const SUPABASE_KEY = "sb_publishable_twC8kvjp0sV68uC1Ck5lhg_vfc8yBtm";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-async function cloudSave(fullData){
-  try {
-    await supabaseClient.from('cash_data').delete().neq('id',0);
-
-    await supabaseClient.from('cash_data').insert([{
-      data: JSON.stringify(fullData)
-    }]);
-
-    console.log("Cloud save success");
-  } catch(err) {
-    console.log("Cloud save failed", err);
-  }
-}
-
-async function cloudLoad(){
-  try {
-    const { data, error } = await supabaseClient
-      .from('cash_data')
-      .select('*')
-      .order('id', { ascending:false })
-      .limit(1);
-
-    if(error) {
-      console.log(error);
-      return null;
-    }
-
-    if(data && data.length > 0) {
-      return JSON.parse(data[0].data);
-    }
-
-    return null;
-  } catch(err) {
-    console.log(err);
-    return null;
-  }
-}
-
-async function save(data){
-  localStorage.setItem(LS, JSON.stringify(data));
-  await cloudSave(data);
-}
-
-function load(){
-  try {
-    return JSON.parse(localStorage.getItem(LS) || '{"batches":[],"live":{}}');
-  } catch(e) {
-    return {batches:[],live:{}};
-  }
-}
-
-window.addEventListener('load', async () => {
-  const cloudData = await cloudLoad();
-
-  if(cloudData){
-    localStorage.setItem(LS, JSON.stringify(cloudData));
-    location.reload();
-  }
-});
+const SUPABASE_URL="https://hjwmcldmhclyzumuqoeb.supabase.co";
+const SUPABASE_KEY="sb_publishable_twC8kvjp0sV68uC1Ck5lhg_vfc8yBtm";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+async function cloudSave(fullData){try{await supabaseClient.from('cash_data').delete().neq('id',0);await supabaseClient.from('cash_data').insert([{data:JSON.stringify(fullData)}]);console.log("Cloud save success")}catch(err){console.log("Cloud save failed",err)}}
+async function cloudLoad(){try{const{data,error}=await supabaseClient.from('cash_data').select('*').order('id',{ascending:false}).limit(1);if(error){console.log(error);return null}if(data&&data.length>0)return JSON.parse(data[0].data);return null}catch(err){console.log(err);return null}}
+async function save(data){localStorage.setItem(LS,JSON.stringify(data));await cloudSave(data);}
+function load(){try{return JSON.parse(localStorage.getItem(LS)||'{"batches":[],"live":{}}')}catch(e){return{batches:[],live:{}}}}
+window.addEventListener('load',async()=>{const cloudData=await cloudLoad();if(cloudData){localStorage.setItem(LS,JSON.stringify(cloudData));location.reload();}});
 </script>
-
 </body>
 </html>
