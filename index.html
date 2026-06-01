@@ -18,7 +18,7 @@
   --or:#FF5F1F;--org:rgba(255,95,31,.28);
   --pk:#FF2D78;--cy:#00D4FF;--gr:#00E676;--ye:#FFD600;
   --t1:#fff;--t2:rgba(255,255,255,.7);--t3:rgba(255,255,255,.4);--t4:rgba(255,255,255,.18);
-  --r8:8px;--r12:12px;--r16:16px;--r20:20px;--r24:24px;
+  --r8:8px;--r12:12px;--r16:16px;--r20:20px;
   --safe:env(safe-area-inset-bottom,0px);
 }
 html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
@@ -26,9 +26,11 @@ body{max-width:430px;margin:0 auto;position:relative}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:linear-gradient(rgba(255,95,31,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,95,31,.025) 1px,transparent 1px);
   background-size:28px 28px}
+
+/* LOCK */
 #lockScreen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 28px calc(56px + var(--safe))}
-.lk-logo{width:76px;height:76px;background:linear-gradient(135deg,var(--or),var(--pk));border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;box-shadow:0 0 40px var(--org),0 0 80px rgba(255,95,31,.1);animation:logoPulse 3s ease-in-out infinite;margin-bottom:14px}
-@keyframes logoPulse{0%,100%{box-shadow:0 0 40px var(--org)}50%{box-shadow:0 0 70px var(--org),0 0 120px rgba(255,95,31,.15)}}
+.lk-logo{width:76px;height:76px;background:linear-gradient(135deg,var(--or),var(--pk));border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;box-shadow:0 0 40px var(--org);animation:logoPulse 3s ease-in-out infinite;margin-bottom:14px}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 40px var(--org)}50%{box-shadow:0 0 70px var(--org)}}
 .lk-title{font-size:34px;font-weight:900;background:linear-gradient(135deg,#fff 30%,var(--or));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;letter-spacing:-.02em}
 .lk-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);font-weight:600;margin-bottom:38px}
 .lk-hint{font-size:13px;color:var(--t3);margin-bottom:14px}
@@ -38,15 +40,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .pin-dot.error{background:var(--pk);border-color:var(--pk);animation:errShake .4s}
 @keyframes errShake{0%,100%{transform:translateX(0) scale(1.35)}25%{transform:translateX(-6px) scale(1.35)}75%{transform:translateX(6px) scale(1.35)}}
 .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:272px}
-.nk{height:64px;border-radius:var(--r16);background:var(--glass2);border:1px solid var(--border);color:var(--t1);font-size:22px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .1s;user-select:none;letter-spacing:-.01em}
+.nk{height:64px;border-radius:var(--r16);background:var(--glass2);border:1px solid var(--border);color:var(--t1);font-size:22px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .1s;user-select:none}
 .nk:active{background:var(--glass3);transform:scale(.88)}
 .nk .sub{font-size:7px;letter-spacing:.18em;color:var(--t4);font-weight:600;text-transform:uppercase}
 .nk.bio{color:var(--or);border-color:var(--org);background:rgba(255,95,31,.1)}
 .nk.del{color:var(--t3)}.nk.zero{grid-column:2}
 .lk-err{font-size:12px;color:var(--pk);min-height:18px;text-align:center;margin-top:12px;font-weight:700}
+
+/* APP */
 #app{display:none;flex-direction:column;min-height:100vh;padding-bottom:calc(72px + var(--safe));position:relative;z-index:1}
 #app.show{display:flex;animation:fadeUp .35s cubic-bezier(.34,1.2,.64,1)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* HEADER */
 .hdr{background:rgba(10,10,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:11px 14px 9px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .hdr-left{display:flex;align-items:center;gap:9px}
 .hdr-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--or),var(--pk));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;box-shadow:0 0 18px var(--org);flex-shrink:0}
@@ -56,21 +62,50 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .hbtn{height:32px;padding:0 10px;border-radius:var(--r8);background:var(--glass2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:5px;color:var(--t3);font-size:12px;font-weight:600;cursor:pointer;transition:all .14s}
 .hbtn:active{background:var(--glass3);transform:scale(.91)}
 .hbtn.admin-on{color:var(--or);border-color:var(--org);background:rgba(255,95,31,.1)}
-.bal-wrap{padding:12px 14px 0}
-.bal-card{background:linear-gradient(135deg,#1a0d00,#0d0022);border:1px solid rgba(255,95,31,.3);border-radius:var(--r20);padding:16px;position:relative;overflow:hidden;box-shadow:0 6px 32px rgba(255,95,31,.1)}
+
+/* MODE TOGGLE — IN / OUT */
+.mode-toggle{display:flex;gap:0;margin:10px 14px 0;background:var(--glass);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden}
+.mt-btn{flex:1;height:38px;border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:700;color:var(--t3);cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px;letter-spacing:.02em}
+.mt-btn:active{opacity:.7}
+.mt-btn.in-on{background:rgba(0,230,118,.15);color:var(--gr);box-shadow:inset 0 0 0 1px rgba(0,230,118,.25)}
+.mt-btn.out-on{background:rgba(255,45,120,.15);color:var(--pk);box-shadow:inset 0 0 0 1px rgba(255,45,120,.25)}
+
+/* BALANCE CARD */
+.bal-wrap{padding:8px 14px 0}
+.bal-card{background:linear-gradient(135deg,#1a0d00,#0d0022);border:1px solid rgba(255,95,31,.3);border-radius:var(--r20);padding:14px;position:relative;overflow:hidden;box-shadow:0 6px 32px rgba(255,95,31,.1)}
 .bal-card::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,95,31,.18),transparent 70%);pointer-events:none}
-.bal-tag{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,95,31,.65);margin-bottom:5px}
-.bal-amt{font-size:42px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:3px;transition:all .18s cubic-bezier(.34,1.56,.64,1);text-shadow:0 0 32px rgba(255,95,31,.25)}
-.bal-sub{font-size:11px;color:var(--t3);margin-bottom:8px}
+.bal-tag{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,95,31,.65);margin-bottom:4px}
+.bal-amt{font-size:38px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:2px;text-shadow:0 0 32px rgba(255,95,31,.25)}
+.bal-sub{font-size:11px;color:var(--t3);margin-bottom:6px}
 .bal-chips{display:flex;flex-wrap:wrap;gap:4px}
-.chip{background:rgba(255,95,31,.15);border:1px solid rgba(255,95,31,.3);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;color:var(--or);font-family:monospace;animation:chipPop .18s cubic-bezier(.34,1.56,.64,1)}
+.chip{border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;font-family:monospace;animation:chipPop .18s cubic-bezier(.34,1.56,.64,1)}
+.chip-in{background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.3);color:var(--gr)}
+.chip-out{background:rgba(255,45,120,.15);border:1px solid rgba(255,45,120,.3);color:var(--pk)}
 @keyframes chipPop{from{opacity:0;transform:scale(.65)}to{opacity:1;transform:scale(1)}}
-.qb-row{display:flex;gap:7px;padding:9px 14px}
-.qb{flex:1;height:40px;border-radius:var(--r12);border:none;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .14s;letter-spacing:.01em}
+
+/* NET SUMMARY BAR */
+.net-bar{display:flex;gap:6px;padding:6px 14px 0}
+.net-cell{flex:1;background:var(--glass);border:1px solid var(--border);border-radius:var(--r12);padding:8px 10px}
+.net-lbl{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
+.net-lbl.in{color:rgba(0,230,118,.6)}
+.net-lbl.out{color:rgba(255,45,120,.6)}
+.net-lbl.net{color:rgba(255,95,31,.6)}
+.net-val{font-size:16px;font-weight:900;font-family:monospace}
+.net-val.in{color:var(--gr)}
+.net-val.out{color:var(--pk)}
+.net-val.net-pos{color:var(--or)}
+.net-val.net-neg{color:var(--pk)}
+
+/* QUICK BUTTONS */
+.qb-row{display:flex;gap:7px;padding:8px 14px}
+.qb{flex:1;height:38px;border-radius:var(--r12);border:none;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:all .14s}
 .qb:active{transform:scale(.93);opacity:.82}
-.qb-save{background:linear-gradient(135deg,var(--or),#e83800);color:#fff;box-shadow:0 4px 18px rgba(255,95,31,.28)}
+.qb-in{background:rgba(0,230,118,.18);color:var(--gr);border:1px solid rgba(0,230,118,.3)}
+.qb-out{background:rgba(255,45,120,.15);color:var(--pk);border:1px solid rgba(255,45,120,.25)}
 .qb-print{background:var(--glass2);border:1px solid var(--border);color:var(--t2)}
 .qb-reset{background:var(--glass);border:1px solid var(--border);color:var(--t3)}
+
+/* PAGES */
 .page{display:none;flex-direction:column;animation:fadeUp .2s ease}.page.on{display:flex}
 .sec{padding:9px 14px}
 .sec-hd{font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);margin-bottom:8px;display:flex;align-items:center;gap:8px}
@@ -83,6 +118,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .inp:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(255,95,31,.12)}
 select.inp{cursor:pointer}
 select.inp option{background:#1a1a26;color:#fff}
+
+/* DENOM GRID */
 .denom-priority{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:7px}
 .denom-others-toggle{display:flex;align-items:center;gap:7px;padding:9px 12px;cursor:pointer;background:var(--glass);border:1px solid var(--border);border-radius:var(--r12);font-size:12px;font-weight:600;color:var(--t3);transition:all .18s;user-select:none;margin-bottom:0}
 .denom-others-toggle:active{opacity:.7}
@@ -90,19 +127,25 @@ select.inp option{background:#1a1a26;color:#fff}
 .denom-others-toggle.open .arr{transform:rotate(180deg)}
 .dot-set{display:flex;gap:4px;margin-left:auto}
 .dot-ind{width:5px;height:5px;border-radius:50%;background:var(--border);transition:background .2s}
-.dot-ind.active{background:var(--or)}
+.dot-ind.active-in{background:var(--gr)}
+.dot-ind.active-out{background:var(--pk)}
 .denom-others{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:7px;max-height:0;overflow:hidden;transition:max-height .38s cubic-bezier(.4,0,.2,1)}
 .denom-others.open{max-height:180px}
-.dc{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r16);padding:0 8px 9px;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;overflow:hidden;transition:border-color .18s,box-shadow .18s}
+
+/* DENOM CARD */
+.dc{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r16);padding:0 8px 9px;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;overflow:hidden;transition:border-color .18s}
 .dc.priority{padding:0 10px 10px}
-.dc-stripe{width:calc(100% + 20px);height:3px;margin:-0px -10px 8px;opacity:.75;border-radius:var(--r16) var(--r16) 0 0}
-.dc.priority .dc-stripe{width:calc(100% + 24px);margin:-0px -12px 9px}
-.dc.active{border-color:rgba(255,255,255,.18)}
+.dc-stripe{width:calc(100% + 20px);height:3px;margin:0 -10px 8px;opacity:.75;border-radius:var(--r16) var(--r16) 0 0}
+.dc.priority .dc-stripe{width:calc(100% + 24px);margin:0 -12px 9px}
+.dc.active-in{border-color:rgba(0,230,118,.3)}
+.dc.active-out{border-color:rgba(255,45,120,.3)}
 .dc-val{font-size:26px;font-weight:900;line-height:1;letter-spacing:-.02em}
 .dc.priority .dc-val{font-size:32px}
 .dc-lbl{font-size:8px;font-weight:700;color:var(--t4);letter-spacing:.1em}
-.dc-badge{position:absolute;top:6px;right:6px;font-size:8px;font-weight:700;background:var(--or);color:#fff;border-radius:8px;padding:1px 5px;opacity:0;transition:opacity .18s;font-family:monospace}
-.dc.active .dc-badge{opacity:1}
+.dc-badge{position:absolute;top:5px;right:5px;font-size:7px;font-weight:700;border-radius:7px;padding:1px 4px;opacity:0;transition:opacity .18s;font-family:monospace}
+.dc-badge-in{background:rgba(0,230,118,.25);color:var(--gr)}
+.dc-badge-out{background:rgba(255,45,120,.2);color:var(--pk)}
+.dc.active-in .dc-badge,.dc.active-out .dc-badge{opacity:1}
 .dc-row{display:flex;align-items:center;gap:3px;width:100%}
 .dc-btn{width:28px;height:28px;border-radius:8px;flex-shrink:0;background:var(--glass2);border:1px solid var(--border);color:var(--t2);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;user-select:none}
 .dc.priority .dc-btn{width:32px;height:32px;font-size:18px}
@@ -110,8 +153,11 @@ select.inp option{background:#1a1a26;color:#fff}
 .dc-inp{flex:1;background:transparent;border:none;font-family:monospace;font-size:22px;font-weight:700;color:var(--t1);text-align:center;outline:none;-moz-appearance:textfield;padding:0;min-width:0}
 .dc.priority .dc-inp{font-size:28px}
 .dc-inp::-webkit-inner-spin-button,.dc-inp::-webkit-outer-spin-button{-webkit-appearance:none}
-.dc-sub{font-size:9px;font-weight:700;color:var(--t4);font-family:monospace;min-height:11px;transition:color .18s}
-.dc.active .dc-sub{color:var(--or)}
+.dc-sub{font-size:9px;font-weight:700;font-family:monospace;min-height:11px;transition:color .18s;color:var(--t4)}
+.dc.active-in .dc-sub{color:var(--gr)}
+.dc.active-out .dc-sub{color:var(--pk)}
+
+/* HISTORY */
 .toolbar{display:flex;align-items:center;gap:6px;padding:0 14px 8px;flex-wrap:wrap}
 .tb-btn{height:30px;padding:0 10px;border-radius:var(--r8);background:var(--glass2);border:1px solid var(--border);color:var(--t2);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .14s;white-space:nowrap}
 .tb-btn:active{transform:scale(.92);opacity:.8}
@@ -121,25 +167,28 @@ select.inp option{background:#1a1a26;color:#fff}
 .srch-inp{flex:1;border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;color:var(--t1);background:transparent}
 .srch-inp::placeholder{color:var(--t4)}
 .stats-band{display:flex;background:var(--glass);border:1px solid var(--border);border-radius:var(--r12);margin:0 14px 8px;overflow:hidden}
-.sb-cell{flex:1;padding:9px 7px;text-align:center;position:relative}
+.sb-cell{flex:1;padding:8px 6px;text-align:center;position:relative}
 .sb-cell+.sb-cell::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:1px;background:var(--border)}
-.sb-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--t4);margin-bottom:2px}
-.sb-val{font-size:15px;font-weight:900;color:var(--t1);font-family:monospace}
-.sb-val.or{color:var(--or)}
+.sb-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t4);margin-bottom:2px}
+.sb-val{font-size:13px;font-weight:900;font-family:monospace}
+.sb-val.gr{color:var(--gr)}.sb-val.pk{color:var(--pk)}.sb-val.or{color:var(--or)}
 .hi{background:var(--glass);border:1px solid var(--border);border-radius:var(--r12);padding:10px 10px 8px;margin-bottom:7px;position:relative;overflow:hidden;transition:border-color .18s;animation:fadeUp .18s ease}
 .hi.selected{border-color:rgba(255,95,31,.45);background:rgba(255,95,31,.06)}
-.hi-bar{position:absolute;top:0;left:0;bottom:0;width:3px}
-.hi-chk{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);background:var(--glass2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s}
+.hi.hi-out{border-left:3px solid rgba(255,45,120,.5)}
+.hi.hi-in{border-left:3px solid rgba(0,230,118,.5)}
+.hi-chk{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);background:var(--glass2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15px}
 .hi-chk.on{background:var(--or);border-color:var(--or)}
 .hi-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:5px;padding-right:24px}
-.hi-batch{font-size:10px;font-weight:700;color:var(--or);font-family:monospace;margin-bottom:2px}
+.hi-batch{font-size:10px;font-weight:700;font-family:monospace;margin-bottom:2px}
+.hi-batch.in{color:var(--gr)}.hi-batch.out{color:var(--pk)}
 .hi-name{font-size:13px;font-weight:800;color:var(--t1)}
 .hi-meta{font-size:10px;color:var(--t4);font-weight:500}
-.hi-amt{font-size:18px;font-weight:900;color:var(--or);font-family:monospace;text-align:right}
+.hi-amt{font-size:17px;font-weight:900;font-family:monospace;text-align:right}
+.hi-amt.in{color:var(--gr)}.hi-amt.out{color:var(--pk)}
 .hi-chips{display:flex;flex-wrap:wrap;gap:3px}
 .hi-chip{background:var(--glass2);border:1px solid var(--border);border-radius:4px;padding:2px 5px;font-size:9px;font-weight:700;color:var(--t3);font-family:monospace}
 .hi-btns{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
-.hi-btn{height:24px;padding:0 8px;border-radius:6px;border:none;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:3px;transition:all .13s}
+.hi-btn{height:24px;padding:0 8px;border-radius:6px;border:none;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:3px;transition:all .13px}
 .hi-btn:active{transform:scale(.91)}
 .hi-btn-del{background:rgba(255,45,120,.1);color:var(--pk);border:1px solid rgba(255,45,120,.2)}
 .hi-btn-print{background:rgba(255,95,31,.12);color:var(--or);border:1px solid rgba(255,95,31,.25)}
@@ -148,15 +197,17 @@ select.inp option{background:#1a1a26;color:#fff}
 .empty-ic{width:52px;height:52px;border-radius:var(--r16);background:var(--glass2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px}
 .empty-t{font-size:14px;font-weight:800;color:var(--t2);margin-bottom:4px}
 .empty-s2{font-size:12px;color:var(--t4);line-height:1.6}
-.adm-hero{margin:10px 14px 8px;background:linear-gradient(135deg,rgba(255,95,31,.14),rgba(255,45,120,.08));border:1px solid rgba(255,95,31,.2);border-radius:var(--r20);padding:16px;position:relative;overflow:hidden}
+
+/* ADMIN */
+.adm-hero{margin:10px 14px 8px;background:linear-gradient(135deg,rgba(255,95,31,.14),rgba(255,45,120,.08));border:1px solid rgba(255,95,31,.2);border-radius:var(--r20);padding:14px;position:relative;overflow:hidden}
 .adm-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(255,95,31,.18),transparent 70%);pointer-events:none}
 .adm-lbl{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,95,31,.6);margin-bottom:4px}
-.adm-total{font-size:42px;font-weight:900;color:var(--or);line-height:1;letter-spacing:-.03em;margin-bottom:3px;font-family:monospace}
+.adm-total{font-size:38px;font-weight:900;color:var(--or);line-height:1;letter-spacing:-.03em;margin-bottom:3px;font-family:monospace}
 .adm-sub{font-size:11px;color:var(--t3)}
 .adm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0 14px 8px}
-.adm-cell{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r12);padding:11px 10px}
-.adm-cell-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--t4);margin-bottom:3px}
-.adm-cell-val{font-size:20px;font-weight:900;color:var(--t1);font-family:monospace}
+.adm-cell{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r12);padding:10px 8px}
+.adm-cell-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t4);margin-bottom:3px}
+.adm-cell-val{font-size:17px;font-weight:900;font-family:monospace}
 .adm-cell-note{font-size:9px;color:var(--t4);margin-top:1px}
 .denom-bk{background:var(--glass);border:1px solid var(--border);border-radius:var(--r12);margin:0 14px 8px;overflow:hidden}
 .denom-bk-hd{padding:8px 12px;border-bottom:1px solid var(--border);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t4)}
@@ -176,35 +227,42 @@ select.inp option{background:#1a1a26;color:#fff}
 .ab-gr{background:rgba(0,230,118,.09);color:var(--gr);border:1px solid rgba(0,230,118,.18)}
 .ab-lo{background:var(--glass);color:var(--t2);border:1px solid var(--border)}
 .ab-rd{background:rgba(255,45,120,.08);color:var(--pk);border:1px solid rgba(255,45,120,.18)}
+
+/* BOTTOM NAV */
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(10,10,15,.92);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:7px 10px calc(7px + var(--safe));z-index:100;gap:5px;box-shadow:0 -3px 24px rgba(0,0,0,.4)}
 .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:5px 3px;border-radius:var(--r12);font-size:8px;font-weight:700;letter-spacing:.08em;color:var(--t4);transition:all .15s;text-transform:uppercase}
-.ni svg,.ni i{font-size:19px;transition:all .18s}
 .ni.on{color:var(--or)}
-.ni.on svg,.ni.on i{color:var(--or);filter:drop-shadow(0 0 5px var(--org))}
 .ni-bar{width:18px;height:2.5px;border-radius:2px;background:transparent;margin-top:1px;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
 .ni.on .ni-bar{background:var(--or);box-shadow:0 0 7px var(--org)}
 .ni:active{transform:scale(.86)}
+
+/* OVERLAYS */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:flex;align-items:flex-end;animation:fadeBg .2s ease;backdrop-filter:blur(5px)}
 .overlay.hide{display:none}
 @keyframes fadeBg{from{opacity:0}to{opacity:1}}
 .sheet{background:#12121a;border-radius:22px 22px 0 0;border-top:1px solid var(--border2);padding:5px 16px calc(22px + var(--safe));width:100%;max-height:92vh;overflow-y:auto;animation:sheetUp .28s cubic-bezier(.34,1.2,.64,1)}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .sh-handle{width:30px;height:3.5px;background:var(--border2);border-radius:2px;margin:9px auto 14px}
-.sh-title{font-size:18px;font-weight:900;margin-bottom:12px;color:var(--t1);letter-spacing:-.01em}
+.sh-title{font-size:18px;font-weight:900;margin-bottom:12px;color:var(--t1)}
 .sh-row{display:flex;align-items:center;gap:9px;margin-bottom:5px;padding:9px 11px;background:var(--glass);border-radius:var(--r12);border:1px solid var(--border)}
 .sh-note{font-size:15px;font-weight:900;min-width:46px}
 .sh-detail{flex:1}
 .sh-qty{font-size:11px;color:var(--t3);font-weight:600;font-family:monospace}
-.sh-amt{font-size:12px;font-weight:700;color:var(--or);font-family:monospace}
-.sh-total{background:linear-gradient(135deg,var(--or),#e83800);border-radius:var(--r12);padding:14px;text-align:center;margin:9px 0;box-shadow:0 5px 20px rgba(255,95,31,.28)}
-.sht-lbl{font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:3px}
-.sht-val{font-size:32px;font-weight:900;color:#fff;letter-spacing:-.02em;font-family:monospace}
-.sbtn{width:100%;height:48px;border-radius:var(--r12);border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .12s;margin-bottom:6px;letter-spacing:.01em}
+.sh-amt{font-size:12px;font-weight:700;font-family:monospace}
+.sh-amt.in{color:var(--gr)}.sh-amt.out{color:var(--pk)}
+.sh-total{border-radius:var(--r12);padding:14px;text-align:center;margin:9px 0}
+.sh-total.in{background:linear-gradient(135deg,rgba(0,230,118,.25),rgba(0,230,118,.1));border:1px solid rgba(0,230,118,.3)}
+.sh-total.out{background:linear-gradient(135deg,rgba(255,45,120,.2),rgba(255,45,120,.08));border:1px solid rgba(255,45,120,.25)}
+.sht-lbl{font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:3px}
+.sht-val{font-size:30px;font-weight:900;letter-spacing:-.02em;font-family:monospace}
+.sht-val.in{color:var(--gr)}.sht-val.out{color:var(--pk)}
+.sbtn{width:100%;height:48px;border-radius:var(--r12);border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .12s;margin-bottom:6px}
 .sbtn:active{transform:scale(.97);opacity:.83}
-.sbtn-fill{background:linear-gradient(135deg,var(--or),#e83800);color:#fff;box-shadow:0 5px 18px rgba(255,95,31,.28)}
-.sbtn-out{background:var(--glass2);border:1px solid var(--border);color:var(--t2)}
-.sbtn-gr{background:rgba(0,230,118,.1);color:var(--gr);border:1px solid rgba(0,230,118,.2)}
-.sbtn-cy{background:rgba(0,212,255,.08);color:var(--cy);border:1px solid rgba(0,212,255,.2)}
+.sbtn-in{background:rgba(0,230,118,.18);color:var(--gr);border:1px solid rgba(0,230,118,.3)}
+.sbtn-out{background:rgba(255,45,120,.12);color:var(--pk);border:1px solid rgba(255,45,120,.22)}
+.sbtn-cancel{background:var(--glass2);border:1px solid var(--border);color:var(--t2)}
+
+/* PRINT SHEET */
 .print-sheet{background:#12121a;border-radius:22px 22px 0 0;border-top:1px solid var(--border2);padding:5px 0 calc(22px + var(--safe));width:100%;max-height:94vh;overflow-y:auto;animation:sheetUp .28s cubic-bezier(.34,1.2,.64,1)}
 .ps-head{padding:0 16px 12px;display:flex;align-items:center;gap:10px}
 .ps-title{font-size:18px;font-weight:900;color:var(--t1);flex:1}
@@ -216,26 +274,32 @@ select.inp option{background:#1a1a26;color:#fff}
 .ps-opt:active{transform:scale(.91)}
 .ps-opt.on{background:rgba(255,95,31,.18);border-color:rgba(255,95,31,.4);color:var(--or)}
 .ps-divider{height:1px;background:var(--border);margin:4px 0}
+.mode-info{font-size:9px;color:var(--t4);font-style:italic;padding:2px 0 6px 0}
 .preview-wrap{margin:0 16px;background:#fff;border-radius:var(--r12);overflow:hidden;min-height:200px}
 .preview-inner{font-family:'Courier New',Courier,monospace;font-size:9pt;line-height:1.25;color:#000;padding:6px 8px;white-space:pre-wrap;word-break:break-all}
 .ps-actions{padding:10px 16px 0;display:flex;gap:7px}
+
+/* BT */
 .bt-status{display:flex;align-items:center;gap:9px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r12);padding:11px;margin-bottom:7px}
 .bt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .28s}
-.bt-dot.off{background:var(--t4)}.bt-dot.scanning{background:var(--ye);animation:pulse 1s infinite;box-shadow:0 0 8px rgba(255,214,0,.35)}.bt-dot.on{background:var(--gr);box-shadow:0 0 8px var(--gr)}.bt-dot.error{background:var(--pk)}
+.bt-dot.off{background:var(--t4)}.bt-dot.scanning{background:var(--ye);animation:pulse 1s infinite}.bt-dot.on{background:var(--gr);box-shadow:0 0 8px var(--gr)}.bt-dot.error{background:var(--pk)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .bt-txt{flex:1}.bt-name{font-size:12px;font-weight:700;color:var(--t1)}.bt-sub{font-size:10px;color:var(--t4)}
-.bt-act{height:28px;padding:0 11px;border-radius:var(--r8);border:none;background:var(--or);color:#fff;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .13s}
+.bt-act{height:28px;padding:0 11px;border-radius:var(--r8);border:none;background:var(--or);color:#fff;font-size:11px;font-weight:700;cursor:pointer}
 .bt-act:active{opacity:.78}
 .bt-log{background:rgba(0,0,0,.45);border-radius:var(--r12);padding:9px;font-family:monospace;font-size:9px;color:rgba(255,255,255,.38);max-height:90px;overflow-y:auto;margin-bottom:7px;line-height:1.65;display:none;border:1px solid var(--border)}
 .bt-log.show{display:block}
+
+/* TOAST */
 .toast{position:fixed;bottom:calc(82px + var(--safe));left:50%;transform:translateX(-50%) translateY(10px);background:rgba(18,18,26,.96);border:1px solid var(--border2);color:var(--t1);font-size:12px;font-weight:700;padding:9px 16px;border-radius:26px;opacity:0;pointer-events:none;transition:all .22s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;box-shadow:0 7px 28px rgba(0,0,0,.45);backdrop-filter:blur(10px)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* CONFETTI */
 .cfti{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden}
 .cfp{position:absolute;width:7px;height:7px;border-radius:2px;animation:cfFall linear forwards;opacity:0}
 @keyframes cfFall{0%{opacity:1;transform:translateY(-20px) rotate(0deg)}80%{opacity:1}100%{opacity:0;transform:translateY(110vh) rotate(700deg)}}
+
 #printArea{display:none}
-/* Mode info badge */
-.mode-info{font-size:9px;color:var(--t4);font-style:italic;padding:2px 0 6px 0}
 @media print{
   *{margin:0!important;padding:0!important}
   html,body{width:var(--pw,70mm)!important;background:#fff!important;color:#000!important;font-family:'Courier New',monospace!important;font-size:8.5pt!important}
@@ -290,19 +354,43 @@ select.inp option{background:#1a1a26;color:#fff}
     </div>
   </div>
 
+  <!-- CASH IN / OUT TOGGLE -->
+  <div class="mode-toggle">
+    <button class="mt-btn in-on" id="mtIn" onclick="setEntryMode('in')">&#8593; Cash In</button>
+    <button class="mt-btn" id="mtOut" onclick="setEntryMode('out')">&#8595; Cash Out</button>
+  </div>
+
+  <!-- BALANCE CARD -->
   <div class="bal-wrap">
     <div class="bal-card">
-      <div class="bal-tag">Live Batch Total</div>
+      <div class="bal-tag" id="balTag">Live Cash In Total</div>
       <div class="bal-amt" id="heroAmt">&#8377;0</div>
       <div class="bal-sub" id="heroSub">Enter denominations below</div>
       <div class="bal-chips" id="heroChips"></div>
     </div>
   </div>
 
+  <!-- NET SUMMARY BAR -->
+  <div class="net-bar">
+    <div class="net-cell">
+      <div class="net-lbl in">&#8593; IN</div>
+      <div class="net-val in" id="netIn">&#8377;0</div>
+    </div>
+    <div class="net-cell">
+      <div class="net-lbl out">&#8595; OUT</div>
+      <div class="net-val out" id="netOut">&#8377;0</div>
+    </div>
+    <div class="net-cell">
+      <div class="net-lbl net">= NET</div>
+      <div class="net-val net-pos" id="netBal">&#8377;0</div>
+    </div>
+  </div>
+
   <div class="qb-row">
-    <button class="qb qb-save" onclick="openSaveSheet()">&#128190; Save</button>
+    <button class="qb qb-in" onclick="openSaveSheet()">&#8593; Save In</button>
+    <button class="qb qb-out" onclick="openSaveSheetOut()">&#8595; Save Out</button>
     <button class="qb qb-print" onclick="openPrintSheet('mode1',null)">&#128438; Print</button>
-    <button class="qb qb-reset" onclick="clearEntry()">&#8635; Reset</button>
+    <button class="qb qb-reset" onclick="clearEntry()">&#8635;</button>
   </div>
 
   <!-- ENTRY PAGE -->
@@ -321,10 +409,10 @@ select.inp option{background:#1a1a26;color:#fff}
       </div>
     </div>
     <div class="sec" style="padding-top:0">
-      <div class="sec-hd">Priority Notes</div>
+      <div class="sec-hd" id="denomSectionHd">Priority Notes</div>
       <div class="denom-priority" id="denomPriority"></div>
       <div class="denom-others-toggle" id="othersToggle" onclick="toggleOthers()">
-        <span style="font-size:14px" class="arr">&#8964;</span>
+        <span class="arr" style="font-size:14px">&#8964;</span>
         <span>Other Denominations</span>
         <span style="font-size:10px;color:var(--t4);font-family:monospace;margin-left:4px">10 · 20 · 50 · 2000</span>
         <div class="dot-set" id="othersDots">
@@ -339,10 +427,11 @@ select.inp option{background:#1a1a26;color:#fff}
   <!-- HISTORY PAGE -->
   <div class="page" id="pageHistory">
     <div class="toolbar">
-      <button class="tb-btn" onclick="selectAll()">&#9745; Select All</button>
+      <button class="tb-btn" onclick="selectAll()">&#9745; All</button>
       <button class="tb-btn" onclick="clearSel()">&#9746; Clear</button>
-      <button class="tb-btn" id="multiPrintBtn" onclick="openPrintSheet('mode5',null)" style="display:none">&#128438; Multi-Print</button>
-      <button class="tb-btn" id="combinedPrintBtn" onclick="openPrintSheet('mode3',null)" style="display:none">&#128202; Combined</button>
+      <button class="tb-btn" id="filterInBtn" onclick="toggleFilter('in')">&#8593; In</button>
+      <button class="tb-btn" id="filterOutBtn" onclick="toggleFilter('out')">&#8595; Out</button>
+      <button class="tb-btn" id="multiPrintBtn" onclick="openPrintSheet('mode5',null)" style="display:none">&#128438; Multi</button>
     </div>
     <div class="srch">
       <span style="color:var(--t4);font-size:14px">&#128269;</span>
@@ -350,25 +439,25 @@ select.inp option{background:#1a1a26;color:#fff}
     </div>
     <div class="stats-band" id="statsBand" style="display:none">
       <div class="sb-cell"><div class="sb-lbl">Batches</div><div class="sb-val" id="sBatches">0</div></div>
-      <div class="sb-cell"><div class="sb-lbl">Total</div><div class="sb-val or" id="sTotal">&#8377;0</div></div>
-      <div class="sb-cell"><div class="sb-lbl">Notes</div><div class="sb-val" id="sNotes">0</div></div>
+      <div class="sb-cell"><div class="sb-lbl">&#8593; In</div><div class="sb-val gr" id="sIn">&#8377;0</div></div>
+      <div class="sb-cell"><div class="sb-lbl">&#8595; Out</div><div class="sb-val pk" id="sOut">&#8377;0</div></div>
+      <div class="sb-cell"><div class="sb-lbl">Net</div><div class="sb-val or" id="sNet">&#8377;0</div></div>
     </div>
-    <div class="sec" style="padding-top:0">
-      <div id="histArea"></div>
-    </div>
+    <div class="sec" style="padding-top:0"><div id="histArea"></div></div>
   </div>
 
   <!-- ADMIN PAGE -->
   <div class="page" id="pageAdmin">
     <div class="adm-hero">
-      <div class="adm-lbl">Grand Total · All Batches</div>
+      <div class="adm-lbl">Net Balance · All Batches</div>
       <div class="adm-total" id="adminGrand">&#8377;0</div>
       <div class="adm-sub" id="adminSub">—</div>
     </div>
     <div class="adm-grid" id="adminGrid"></div>
     <div class="denom-bk" id="denomBk"></div>
     <div class="adm-btns">
-      <button class="ab ab-or" onclick="openSaveSheet()">&#128190; Save Current Batch</button>
+      <button class="ab ab-or" onclick="openSaveSheet()">&#8593; Save Cash In Batch</button>
+      <button class="ab ab-rd" onclick="openSaveSheetOut()">&#8595; Save Cash Out Batch</button>
       <button class="ab ab-dk" onclick="openPrintSheet('mode1',null)">&#128438; Print Preview</button>
       <button class="ab ab-dk" onclick="openBTSheet()">&#128304; Bluetooth Print</button>
       <button class="ab ab-gr" onclick="exportJSON()">&#128229; Export Backup (JSON)</button>
@@ -384,16 +473,13 @@ select.inp option{background:#1a1a26;color:#fff}
 <!-- BOTTOM NAV -->
 <div class="bnav">
   <div class="ni on" id="ni-entry" onclick="goPage('entry')">
-    <span style="font-size:20px">&#8999;</span>Entry
-    <div class="ni-bar"></div>
+    <span style="font-size:20px">&#8999;</span>Entry<div class="ni-bar"></div>
   </div>
   <div class="ni" id="ni-history" onclick="goPage('history')">
-    <span style="font-size:20px">&#128336;</span>History
-    <div class="ni-bar"></div>
+    <span style="font-size:20px">&#128336;</span>History<div class="ni-bar"></div>
   </div>
   <div class="ni" id="ni-admin" onclick="tapNavAdmin()">
-    <span style="font-size:20px">&#128274;</span>Admin
-    <div class="ni-bar"></div>
+    <span style="font-size:20px">&#128274;</span>Admin<div class="ni-bar"></div>
   </div>
 </div>
 
@@ -401,10 +487,10 @@ select.inp option{background:#1a1a26;color:#fff}
 <div class="overlay hide" id="saveOverlay" onclick="closeSaveSheet(event)">
   <div class="sheet">
     <div class="sh-handle"></div>
-    <div class="sh-title">Save Batch</div>
+    <div class="sh-title" id="saveSheetTitle">Save Batch</div>
     <div id="sheetContent"></div>
-    <button class="sbtn sbtn-fill" onclick="confirmSave()">&#10003; Confirm &amp; Save</button>
-    <button class="sbtn sbtn-out" onclick="document.getElementById('saveOverlay').classList.add('hide')">Cancel</button>
+    <button class="sbtn sbtn-in" id="saveConfirmBtn" onclick="confirmSave()">&#10003; Confirm &amp; Save</button>
+    <button class="sbtn sbtn-cancel" onclick="document.getElementById('saveOverlay').classList.add('hide')">Cancel</button>
   </div>
 </div>
 
@@ -420,14 +506,15 @@ select.inp option{background:#1a1a26;color:#fff}
       <div class="ps-row">
         <span class="ps-lbl">Mode</span>
         <div class="ps-btns" id="printModeOpts">
-          <button class="ps-opt on" data-mode="mode1" onclick="setPrintMode('mode1',this)">1 · Current</button>
-          <button class="ps-opt" data-mode="mode2" onclick="setPrintMode('mode2',this)">2 · Prev+Cur</button>
-          <button class="ps-opt" data-mode="mode3" onclick="setPrintMode('mode3',this)">3 · Combined</button>
-          <button class="ps-opt" data-mode="mode4" onclick="setPrintMode('mode4',this)">4 · Any Batch</button>
-          <button class="ps-opt" data-mode="mode5" onclick="setPrintMode('mode5',this)">5 · Multi-Print</button>
+          <button class="ps-opt on" data-mode="mode1" onclick="setPrintMode('mode1',this)">1·Current</button>
+          <button class="ps-opt" data-mode="mode2" onclick="setPrintMode('mode2',this)">2·Prev+Cur</button>
+          <button class="ps-opt" data-mode="mode3" onclick="setPrintMode('mode3',this)">3·Combined</button>
+          <button class="ps-opt" data-mode="mode4" onclick="setPrintMode('mode4',this)">4·Any Batch</button>
+          <button class="ps-opt" data-mode="mode5" onclick="setPrintMode('mode5',this)">5·Multi</button>
+          <button class="ps-opt" data-mode="mode6" onclick="setPrintMode('mode6',this)">6·In vs Out</button>
         </div>
       </div>
-      <div class="mode-info" id="modeInfo">Prints the current unsaved batch or last saved batch.</div>
+      <div class="mode-info" id="modeInfo">Prints current live batch or last saved.</div>
       <div class="ps-row">
         <span class="ps-lbl">Paper</span>
         <div class="ps-btns">
@@ -443,8 +530,8 @@ select.inp option{background:#1a1a26;color:#fff}
       <div class="preview-inner" id="previewInner">Loading…</div>
     </div>
     <div class="ps-actions">
-      <button class="sbtn sbtn-fill" style="flex:1;margin:0" onclick="doBrowserPrint()">&#128438; Print</button>
-      <button class="sbtn sbtn-gr" style="flex:1;margin:0" onclick="downloadPDF()">&#128196; PDF</button>
+      <button class="sbtn sbtn-in" style="flex:1;margin:0" onclick="doBrowserPrint()">&#128438; Print</button>
+      <button class="sbtn sbtn-cancel" style="flex:1;margin:0" onclick="downloadPDF()">&#128196; PDF</button>
     </div>
   </div>
 </div>
@@ -463,15 +550,16 @@ select.inp option{background:#1a1a26;color:#fff}
     <div style="margin-bottom:8px">
       <div class="inp-lbl" style="margin-bottom:5px">Print Mode</div>
       <select class="inp" id="btPrintMode">
-        <option value="mode1">Mode 1 — Current batch only</option>
-        <option value="mode2">Mode 2 — Previous + Current + Grand Total</option>
-        <option value="mode3">Mode 3 — Combined (all selected)</option>
-        <option value="mode4">Mode 4 — Any selected batch</option>
-        <option value="mode5">Mode 5 — Multi-batch print</option>
+        <option value="mode1">Mode 1 — Current batch</option>
+        <option value="mode2">Mode 2 — Prev + Current</option>
+        <option value="mode3">Mode 3 — Combined</option>
+        <option value="mode4">Mode 4 — Any batch</option>
+        <option value="mode5">Mode 5 — Multi-batch</option>
+        <option value="mode6">Mode 6 — Cash In vs Out</option>
       </select>
     </div>
-    <button class="sbtn sbtn-fill" id="btPrintBtn" onclick="btPrint()" disabled style="opacity:.45">&#128438; Print via Bluetooth</button>
-    <button class="sbtn sbtn-out" onclick="document.getElementById('btOverlay').classList.add('hide')">Close</button>
+    <button class="sbtn sbtn-in" id="btPrintBtn" onclick="btPrint()" disabled style="opacity:.45">&#128438; Print via Bluetooth</button>
+    <button class="sbtn sbtn-cancel" onclick="document.getElementById('btOverlay').classList.add('hide')">Close</button>
   </div>
 </div>
 
@@ -480,46 +568,46 @@ select.inp option{background:#1a1a26;color:#fff}
 <div id="printArea"></div>
 
 <script>
-// ============================================================
-//  SR Cash Ledger — Updated with 5 Print Modes
-// ============================================================
 const DENOMS_P=[100,200,500];
 const DENOMS_O=[10,20,50,2000];
 const DENOMS=[10,20,50,100,200,500,2000];
 const DC={10:'#a78bfa',20:'#60a5fa',50:'#f87171',100:'#34d399',200:'#fbbf24',500:'#38bdf8',2000:'#f472b6'};
-const LS='sr_v2';
+const LS='sr_v3';
 const PIN='7865';
 let adminUnlocked=false,pinBuf='';
 let othersOpen=false;
 let selectedBatches=new Set();
+let histFilter=null; // 'in' | 'out' | null
 let printMode='mode1';
 let paperW='70mm';
-let currentPrintBatchId=null; // for mode4 (single batch)
+let currentPrintBatchId=null;
+let entryMode='in'; // 'in' | 'out'
+let pendingSaveType='in';
 let btDevice=null,btChar=null,btConnected=false;
 
-// ===== AUDIO =====
+// AUDIO
 let ac=null;
-const ga=()=>{if(!ac)try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}; return ac};
+const ga=()=>{if(!ac)try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){};return ac};
 const beep=(f,t,v=0.06,tp='sine')=>{const c=ga();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=tp;o.frequency.value=f;g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+t);o.start();o.stop(c.currentTime+t)};
 const playTick=()=>beep(800,0.045,0.055);
 const playStep=()=>beep(550,0.04,0.04);
-const playErr=()=>{beep(200,0.15,0.05,'square')};
+const playErr=()=>beep(200,0.15,0.05,'square');
 const playSave=()=>{[0,0.08,0.17].forEach((t,i)=>{setTimeout(()=>beep([440,550,660][i],0.18,0.09),t*1000)})};
 const hap=(p=[10])=>{try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}};
 
-// ===== CONFETTI =====
+// CONFETTI
 function launchConfetti(){
   const c=document.getElementById('cfti');
   const cols=['#FF5F1F','#FF2D78','#00D4FF','#00E676','#FFD600','#a78bfa'];
   for(let i=0;i<48;i++){
     const el=document.createElement('div');el.className='cfp';
     const dur=1.1+Math.random()*1.2,del=Math.random()*0.5;
-    el.style.cssText=`left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${dur}s;animation-delay:${del}s`;
+    el.style.cssText=`left:${Math.random()*100}%;background:${cols[i%cols.length]};width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${dur}s;animation-delay:${del}s`;
     c.appendChild(el);setTimeout(()=>el.remove(),(dur+del)*1000+100);
   }
 }
 
-// ===== BUILD DENOM CARDS =====
+// DENOM CARDS
 function makeDC(d,priority){
   const sz=priority?'priority':'';
   return`<div class="dc ${sz}" data-d="${d}" id="dc${d}">
@@ -529,8 +617,7 @@ function makeDC(d,priority){
     <div class="dc-lbl">&#8377;${d}</div>
     <div class="dc-row">
       <div class="dc-btn" onclick="step(${d},-1);event.stopPropagation()">&#8722;</div>
-      <input class="dc-inp" type="number" id="d${d}" min="0" placeholder="0"
-        oninput="onDI(${d})" onwheel="return false" inputmode="numeric">
+      <input class="dc-inp" type="number" id="d${d}" min="0" placeholder="0" oninput="onDI(${d})" onwheel="return false" inputmode="numeric">
       <div class="dc-btn" onclick="step(${d},1);event.stopPropagation()" style="color:var(--or)">&#43;</div>
     </div>
     <div class="dc-sub" id="ds${d}">—</div>
@@ -539,43 +626,73 @@ function makeDC(d,priority){
 document.getElementById('denomPriority').innerHTML=DENOMS_P.map(d=>makeDC(d,true)).join('');
 document.getElementById('denomOthers').innerHTML=DENOMS_O.map(d=>makeDC(d,false)).join('');
 
-function toggleOthers(){
-  othersOpen=!othersOpen;
-  document.getElementById('othersToggle').classList.toggle('open',othersOpen);
-  document.getElementById('denomOthers').classList.toggle('open',othersOpen);
-  playTick();
-}
-function step(d,dir){
-  const i=document.getElementById('d'+d);i.value=Math.max(0,(parseInt(i.value)||0)+dir)||'';onDI(d);playStep();hap([5]);
-}
+function toggleOthers(){othersOpen=!othersOpen;document.getElementById('othersToggle').classList.toggle('open',othersOpen);document.getElementById('denomOthers').classList.toggle('open',othersOpen);playTick()}
+function step(d,dir){const i=document.getElementById('d'+d);i.value=Math.max(0,(parseInt(i.value)||0)+dir)||'';onDI(d);playStep();hap([5])}
 function onDI(d){
   const qty=parseInt(document.getElementById('d'+d).value||0);
   document.getElementById('ds'+d).textContent=qty>0?inr(qty*d):'—';
   document.getElementById('badge'+d).textContent=qty;
-  document.getElementById('dc'+d).classList.toggle('active',qty>0);
-  const dot=document.querySelector(`[data-od="${d}"]`);if(dot)dot.classList.toggle('active',qty>0);
+  const isIn=entryMode==='in';
+  document.getElementById('dc'+d).classList.remove('active-in','active-out');
+  if(qty>0)document.getElementById('dc'+d).classList.add(isIn?'active-in':'active-out');
+  document.getElementById('badge'+d).className='dc-badge '+(isIn?'dc-badge-in':'dc-badge-out');
+  const dot=document.querySelector(`[data-od="${d}"]`);
+  if(dot){dot.classList.remove('active-in','active-out');if(qty>0)dot.classList.add(isIn?'active-in':'active-out')}
   recalc();
 }
 
-// ===== UTILS =====
+// ENTRY MODE TOGGLE
+function setEntryMode(m){
+  entryMode=m;
+  document.getElementById('mtIn').className='mt-btn'+(m==='in'?' in-on':'');
+  document.getElementById('mtOut').className='mt-btn'+(m==='out'?' out-on':'');
+  document.getElementById('balTag').textContent=m==='in'?'Live Cash In Total':'Live Cash Out Total';
+  document.getElementById('denomSectionHd').textContent=m==='in'?'Priority Notes — Cash In':'Priority Notes — Cash Out';
+  // Re-style all active cards
+  DENOMS.forEach(d=>{
+    const qty=parseInt(document.getElementById('d'+d).value||0);
+    document.getElementById('dc'+d).classList.remove('active-in','active-out');
+    if(qty>0)document.getElementById('dc'+d).classList.add(m==='in'?'active-in':'active-out');
+    document.getElementById('badge'+d).className='dc-badge '+(m==='in'?'dc-badge-in':'dc-badge-out');
+    document.getElementById('ds'+d).textContent=qty>0?inr(qty*d):'—';
+  });
+  recalc();playTick();persist();
+}
+
+// UTILS
 const inr=n=>(n<0?'−':'')+'&#8377;'+Math.abs(n).toLocaleString('en-IN');
 const fmtAmt=n=>'Rs.'+Math.abs(n).toLocaleString('en-IN');
 function getCurrent(){
   let total=0;const rows=[];
-  DENOMS.forEach(d=>{const qty=parseInt(document.getElementById('d'+d).value||0);if(qty>0)rows.push({d,qty,amt:qty*d});total+=qty*d;});
+  DENOMS.forEach(d=>{const qty=parseInt(document.getElementById('d'+d).value||0);if(qty>0)rows.push({d,qty,amt:qty*d});total+=qty*d});
   return{total,rows};
+}
+function getSavedNetBalance(){
+  const full=load();const batches=full.batches||[];
+  const totalIn=batches.filter(b=>b.type==='in').reduce((s,b)=>s+b.total,0);
+  const totalOut=batches.filter(b=>b.type==='out').reduce((s,b)=>s+b.total,0);
+  return{totalIn,totalOut,net:totalIn-totalOut};
 }
 function recalc(){
   const{total,rows}=getCurrent();
+  const isIn=entryMode==='in';
   document.getElementById('heroAmt').innerHTML=inr(total);
   document.getElementById('heroSub').textContent=rows.length?`${rows.length} denom · ${rows.reduce((s,r)=>s+r.qty,0)} notes`:'Enter denominations below';
-  document.getElementById('heroChips').innerHTML=rows.map(r=>`<div class="chip">&#8377;${r.d}&times;${r.qty}</div>`).join('');
+  document.getElementById('heroChips').innerHTML=rows.map(r=>`<div class="chip ${isIn?'chip-in':'chip-out'}">&#8377;${r.d}&times;${r.qty}</div>`).join('');
+  // Net bar
+  const{totalIn,totalOut,net}=getSavedNetBalance();
+  const liveIn=isIn?total:0;const liveOut=isIn?0:total;
+  const dispIn=totalIn+liveIn;const dispOut=totalOut+liveOut;const dispNet=dispIn-dispOut;
+  document.getElementById('netIn').innerHTML=inr(dispIn);
+  document.getElementById('netOut').innerHTML=inr(dispOut);
+  const nb=document.getElementById('netBal');
+  nb.innerHTML=inr(dispNet);nb.className='net-val '+(dispNet>=0?'net-pos':'net-neg');
   if(adminUnlocked)renderAdminData();
   updatePreviewIfOpen();
   persist();
 }
 
-// ===== LOCK =====
+// LOCK
 function nkp(k){if(pinBuf.length>=4)return;pinBuf+=k;updDots();playTick();hap([8]);if(pinBuf.length===4)setTimeout(checkPin,160)}
 function nkd(){pinBuf=pinBuf.slice(0,-1);updDots();document.getElementById('lockErr').textContent='';playTick()}
 function updDots(){for(let i=0;i<4;i++){document.getElementById('pd'+i).classList.toggle('filled',i<pinBuf.length);document.getElementById('pd'+i).classList.remove('error')}}
@@ -583,11 +700,7 @@ function checkPin(){
   if(pinBuf===PIN){playSave();doUnlock();}
   else{playErr();hap([50,30,50]);for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('error');document.getElementById('lockErr').textContent='Wrong PIN.';setTimeout(()=>{pinBuf='';updDots()},700)}
 }
-function doUnlock(){
-  adminUnlocked=true;document.getElementById('lockScreen').style.display='none';
-  document.getElementById('adminHBtn').classList.add('admin-on');
-  goPage('admin');renderAdminData();renderHistory();
-}
+function doUnlock(){adminUnlocked=true;document.getElementById('lockScreen').style.display='none';document.getElementById('adminHBtn').classList.add('admin-on');goPage('admin');renderAdminData();renderHistory()}
 function lockAdmin(){adminUnlocked=false;document.getElementById('adminHBtn').classList.remove('admin-on');goPage('entry');showToast('Admin locked');playTick()}
 function showLock(){pinBuf='';updDots();document.getElementById('lockErr').textContent='';document.getElementById('lockScreen').style.display='flex'}
 function tapAdminBtn(){adminUnlocked?goPage('admin'):showLock()}
@@ -607,7 +720,7 @@ async function tryBio(){
   }catch(e){if(e.name!=='NotAllowedError')showToast('Biometric failed — use PIN')}
 }
 
-// ===== PAGES =====
+// PAGES
 function goPage(n){
   ['entry','history','admin'].forEach(p=>{document.getElementById('page'+p[0].toUpperCase()+p.slice(1)).classList.remove('on');document.getElementById('ni-'+p).classList.remove('on')});
   document.getElementById('page'+n[0].toUpperCase()+n.slice(1)).classList.add('on');
@@ -615,71 +728,94 @@ function goPage(n){
   if(n==='history')renderHistory();if(n==='admin')renderAdminData();hap([7]);
 }
 
-// ===== SAVE SHEET =====
+// SAVE SHEETS
+function buildSheetContent(rows,total,type){
+  return rows.map(r=>`<div class="sh-row"><div class="sh-note" style="color:${DC[r.d]}">&#8377;${r.d}</div><div class="sh-detail"><div class="sh-qty">${r.qty} note${r.qty>1?'s':''}</div></div><div class="sh-amt ${type}">${fmtAmt(r.amt)}</div></div>`).join('');
+}
 function openSaveSheet(){
   const{total,rows}=getCurrent();if(!total){showToast('Add a denomination first');playErr();return}
-  const label=document.getElementById('batchLabel').value.trim()||'Unnamed Batch';
-  document.getElementById('sheetContent').innerHTML=
-    rows.map(r=>`<div class="sh-row"><div class="sh-note" style="color:${DC[r.d]}">&#8377;${r.d}</div><div class="sh-detail"><div class="sh-qty">${r.qty} note${r.qty>1?'s':''}</div></div><div class="sh-amt">${fmtAmt(r.amt)}</div></div>`).join('')+
-    `<div class="sh-total"><div class="sht-lbl">${label}</div><div class="sht-val">${fmtAmt(total)}</div></div>`;
+  pendingSaveType='in';
+  const label=document.getElementById('batchLabel').value.trim()||'Cash In';
+  document.getElementById('saveSheetTitle').textContent='Save Cash In Batch';
+  document.getElementById('sheetContent').innerHTML=buildSheetContent(rows,total,'in')+
+    `<div class="sh-total in"><div class="sht-lbl">${label} · CASH IN</div><div class="sht-val in">+${fmtAmt(total)}</div></div>`;
+  document.getElementById('saveConfirmBtn').className='sbtn sbtn-in';
+  document.getElementById('saveConfirmBtn').innerHTML='&#10003; Confirm Cash In';
+  document.getElementById('saveOverlay').classList.remove('hide');playTick();
+}
+function openSaveSheetOut(){
+  const{total,rows}=getCurrent();if(!total){showToast('Add a denomination first');playErr();return}
+  pendingSaveType='out';
+  const label=document.getElementById('batchLabel').value.trim()||'Cash Out';
+  document.getElementById('saveSheetTitle').textContent='Save Cash Out Batch';
+  document.getElementById('sheetContent').innerHTML=buildSheetContent(rows,total,'out')+
+    `<div class="sh-total out"><div class="sht-lbl">${label} · CASH OUT</div><div class="sht-val out">−${fmtAmt(total)}</div></div>`;
+  document.getElementById('saveConfirmBtn').className='sbtn sbtn-out';
+  document.getElementById('saveConfirmBtn').innerHTML='&#10003; Confirm Cash Out';
   document.getElementById('saveOverlay').classList.remove('hide');playTick();
 }
 function closeSaveSheet(e){if(e.target===document.getElementById('saveOverlay'))document.getElementById('saveOverlay').classList.add('hide')}
 function confirmSave(){
   const{total,rows}=getCurrent();if(!total)return;
-  const label=document.getElementById('batchLabel').value.trim()||('Batch '+((load().batches||[]).length+1));
-  const loc=document.getElementById('locName').value.trim();
+  const type=pendingSaveType;
   const full=load();if(!full.batches)full.batches=[];
-  full.batches.push({id:Date.now(),label,loc,total,rows,time:new Date().toISOString()});
+  const allB=full.batches;
+  const label=document.getElementById('batchLabel').value.trim()||((type==='in'?'Cash In ':'Cash Out ')+((allB.length)+1));
+  const loc=document.getElementById('locName').value.trim();
+  allB.push({id:Date.now(),label,loc,total,rows,type,time:new Date().toISOString()});
   save(full);clearEntry();renderHistory();if(adminUnlocked)renderAdminData();
   document.getElementById('saveOverlay').classList.add('hide');
-  showToast('Saved ✓');playSave();launchConfetti();hap([20,10,20]);
+  showToast(type==='in'?'Cash In saved ✓':'Cash Out saved ✓');playSave();launchConfetti();hap([20,10,20]);
 }
 function clearEntry(){
-  DENOMS.forEach(d=>{document.getElementById('d'+d).value='';document.getElementById('ds'+d).textContent='—';document.getElementById('dc'+d).classList.remove('active');document.getElementById('badge'+d).textContent='0';const dot=document.querySelector(`[data-od="${d}"]`);if(dot)dot.classList.remove('active')});
+  DENOMS.forEach(d=>{document.getElementById('d'+d).value='';document.getElementById('ds'+d).textContent='—';document.getElementById('dc'+d).classList.remove('active-in','active-out');document.getElementById('badge'+d).textContent='0';const dot=document.querySelector(`[data-od="${d}"]`);if(dot){dot.classList.remove('active-in','active-out')}});
   document.getElementById('batchLabel').value='';
   document.getElementById('heroAmt').innerHTML='&#8377;0';document.getElementById('heroSub').textContent='Enter denominations below';document.getElementById('heroChips').innerHTML='';
-  const f=load();f.live={};save(f);
+  const f=load();f.live={};save(f);recalc();
 }
 
-// ===== HISTORY =====
+// HISTORY
+function toggleFilter(f){
+  histFilter=histFilter===f?null:f;
+  document.getElementById('filterInBtn').classList.toggle('active',histFilter==='in');
+  document.getElementById('filterOutBtn').classList.toggle('active',histFilter==='out');
+  renderHistory();playTick();
+}
 function renderHistory(){
   const full=load();
   const q=(document.getElementById('searchInp').value||'').toLowerCase();
   let batches=(full.batches||[]).slice().reverse();
-  if(q)batches=batches.filter(b=>(b.label+''+b.loc).toLowerCase().includes(q));
+  if(q)batches=batches.filter(b=>(b.label+''+(b.loc||'')).toLowerCase().includes(q));
+  if(histFilter)batches=batches.filter(b=>b.type===histFilter);
   const allB=full.batches||[];
-  const sTotal=allB.reduce((s,b)=>s+b.total,0);
-  const sNotes=allB.reduce((s,b)=>s+b.rows.reduce((ss,r)=>ss+r.qty,0),0);
+  const totalIn=allB.filter(b=>b.type==='in').reduce((s,b)=>s+b.total,0);
+  const totalOut=allB.filter(b=>b.type==='out').reduce((s,b)=>s+b.total,0);
+  const net=totalIn-totalOut;
   const band=document.getElementById('statsBand');
   if(allB.length){
     band.style.display='flex';
     document.getElementById('sBatches').textContent=allB.length;
-    document.getElementById('sTotal').innerHTML=adminUnlocked?inr(sTotal):'&#128274;';
-    document.getElementById('sNotes').textContent=sNotes;
+    document.getElementById('sIn').innerHTML=adminUnlocked?inr(totalIn):'&#128274;';
+    document.getElementById('sOut').innerHTML=adminUnlocked?inr(totalOut):'&#128274;';
+    const sn=document.getElementById('sNet');sn.innerHTML=adminUnlocked?inr(net):'&#128274;';sn.className='sb-val '+(net>=0?'or':'pk');
   }else band.style.display='none';
-  const selCount=selectedBatches.size;
-  document.getElementById('multiPrintBtn').style.display=selCount>1?'flex':'none';
-  document.getElementById('combinedPrintBtn').style.display=selCount>1?'flex':'none';
+  document.getElementById('multiPrintBtn').style.display=selectedBatches.size>1?'flex':'none';
   const el=document.getElementById('histArea');
-  if(!batches.length){
-    el.innerHTML=`<div class="empty-s"><div class="empty-ic">&#128451;</div><div class="empty-t">${q?'No results':'No batches yet'}</div><div class="empty-s2">${q?'Try another keyword.':'Go to Entry and save your first batch.'}</div></div>`;return;
-  }
-  const bcolors=Object.values(DC);
-  el.innerHTML=batches.map((b,i)=>{
+  if(!batches.length){el.innerHTML=`<div class="empty-s"><div class="empty-ic">&#128451;</div><div class="empty-t">${q||histFilter?'No results':'No batches yet'}</div><div class="empty-s2">${q||histFilter?'Try another filter.':'Go to Entry and save your first batch.'}</div></div>`;return}
+  el.innerHTML=batches.map(b=>{
+    const isIn=b.type==='in';
     const ts=new Date(b.time).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
     const chips=b.rows.map(r=>`<div class="hi-chip" style="color:${DC[r.d]};border-color:${DC[r.d]}44">&#8377;${r.d}&times;${r.qty}</div>`).join('');
-    const amt=adminUnlocked?`<div class="hi-amt">${fmtAmt(b.total)}</div>`:`<div class="hi-amt" style="font-size:13px">&#128274;</div>`;
+    const amt=adminUnlocked?`<div class="hi-amt ${isIn?'in':'out'}">${isIn?'+':'-'}${fmtAmt(b.total)}</div>`:`<div class="hi-amt" style="font-size:13px">&#128274;</div>`;
     const isSel=selectedBatches.has(b.id);
-    const bNum=allB.findIndex(x=>x.id===b.id)+1;
-    return`<div class="hi${isSel?' selected':''}" id="hi${b.id}">
-      <div class="hi-bar" style="background:${bcolors[i%bcolors.length]}"></div>
+    const bNum=(full.batches||[]).findIndex(x=>x.id===b.id)+1;
+    return`<div class="hi hi-${isIn?'in':'out'}${isSel?' selected':''}" id="hi${b.id}">
       <div class="hi-chk${isSel?' on':''}" onclick="toggleSel(${b.id})">${isSel?'&#10003;':''}</div>
       <div class="hi-head">
         <div>
-          <div class="hi-batch">BATCH #${bNum}</div>
+          <div class="hi-batch ${isIn?'in':'out'}">${isIn?'&#8593;':'&#8595;'} BATCH #${bNum} · ${isIn?'CASH IN':'CASH OUT'}</div>
           <div class="hi-name">${b.label}</div>
-          <div class="hi-meta">${b.loc?b.loc+' · ':''} ${ts}</div>
+          <div class="hi-meta">${b.loc?b.loc+' · ':''}${ts}</div>
         </div>
         <div>${amt}</div>
       </div>
@@ -692,411 +828,213 @@ function renderHistory(){
     </div>`;
   }).join('');
 }
-function toggleSel(id){
-  if(selectedBatches.has(id))selectedBatches.delete(id);else selectedBatches.add(id);
-  renderHistory();playTick();
-}
-function selectAll(){
-  const full=load();(full.batches||[]).forEach(b=>selectedBatches.add(b.id));renderHistory();showToast('All selected');
-}
+function toggleSel(id){if(selectedBatches.has(id))selectedBatches.delete(id);else selectedBatches.add(id);renderHistory();playTick()}
+function selectAll(){const full=load();(full.batches||[]).forEach(b=>selectedBatches.add(b.id));renderHistory();showToast('All selected')}
 function clearSel(){selectedBatches.clear();renderHistory()}
-function delBatch(id){
-  if(!confirm('Remove this batch?'))return;
-  const f=load();f.batches=(f.batches||[]).filter(b=>b.id!==id);save(f);selectedBatches.delete(id);
-  renderHistory();if(adminUnlocked)renderAdminData();showToast('Removed');playTick();
-}
-// Mode 4: print a specific batch
-function printMode4Batch(id){
-  currentPrintBatchId=id;
-  openPrintSheet('mode4',null);
-}
-// Mode 2: for a specific batch (it's the "current", all before it are "previous")
-function printMode2ForBatch(id){
-  currentPrintBatchId=id;
-  openPrintSheet('mode2',null);
-}
+function delBatch(id){if(!confirm('Remove this batch?'))return;const f=load();f.batches=(f.batches||[]).filter(b=>b.id!==id);save(f);selectedBatches.delete(id);renderHistory();if(adminUnlocked)renderAdminData();showToast('Removed');playTick()}
+function printMode4Batch(id){currentPrintBatchId=id;openPrintSheet('mode4',null)}
+function printMode2ForBatch(id){currentPrintBatchId=id;openPrintSheet('mode2',null)}
 
-// ===== ADMIN =====
+// ADMIN
 function renderAdminData(){
   const full=load();const batches=full.batches||[];
-  const{total:cur,rows:curRows}=getCurrent();const prev=batches.reduce((s,b)=>s+b.total,0);
-  document.getElementById('adminGrand').innerHTML=inr(cur+prev);
-  document.getElementById('adminSub').textContent=`${batches.length} saved + live ${fmtAmt(cur)}`;
+  const{total:cur,rows:curRows}=getCurrent();
+  const totalIn=batches.filter(b=>b.type==='in').reduce((s,b)=>s+b.total,0);
+  const totalOut=batches.filter(b=>b.type==='out').reduce((s,b)=>s+b.total,0);
+  const net=totalIn-totalOut+(entryMode==='in'?cur:-cur);
+  document.getElementById('adminGrand').innerHTML=inr(net);
+  document.getElementById('adminSub').textContent=`In: ${fmtAmt(totalIn)} | Out: ${fmtAmt(totalOut)} | Live: ${entryMode==='in'?'+':'-'}${fmtAmt(cur)}`;
   const totalNotes=batches.reduce((s,b)=>s+b.rows.reduce((ss,r)=>ss+r.qty,0),0)+curRows.reduce((s,r)=>s+r.qty,0);
   document.getElementById('adminGrid').innerHTML=`
-    <div class="adm-cell"><div class="adm-cell-lbl">Live</div><div class="adm-cell-val">${fmtAmt(cur)}</div><div class="adm-cell-note">Unsaved</div></div>
-    <div class="adm-cell"><div class="adm-cell-lbl">Saved</div><div class="adm-cell-val">${fmtAmt(prev)}</div><div class="adm-cell-note">${batches.length} batch${batches.length!==1?'es':''}</div></div>
-    <div class="adm-cell"><div class="adm-cell-lbl">Notes</div><div class="adm-cell-val">${totalNotes}</div><div class="adm-cell-note">Total count</div></div>`;
+    <div class="adm-cell"><div class="adm-cell-lbl" style="color:rgba(0,230,118,.6)">&#8593; Total In</div><div class="adm-cell-val" style="color:var(--gr)">${fmtAmt(totalIn)}</div><div class="adm-cell-note">${batches.filter(b=>b.type==='in').length} batches</div></div>
+    <div class="adm-cell"><div class="adm-cell-lbl" style="color:rgba(255,45,120,.6)">&#8595; Total Out</div><div class="adm-cell-val" style="color:var(--pk)">${fmtAmt(totalOut)}</div><div class="adm-cell-note">${batches.filter(b=>b.type==='out').length} batches</div></div>
+    <div class="adm-cell"><div class="adm-cell-lbl">Notes</div><div class="adm-cell-val">${totalNotes}</div><div class="adm-cell-note">All</div></div>`;
   const mm={};DENOMS.forEach(d=>mm[d]=0);
-  batches.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));curRows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty);
-  const maxQ=Math.max(1,...DENOMS.map(d=>mm[d]));const rows=DENOMS.filter(d=>mm[d]>0);
+  batches.forEach(b=>b.rows.forEach(r=>{if(b.type==='in')mm[r.d]=(mm[r.d]||0)+r.qty;else mm[r.d]=(mm[r.d]||0)-r.qty}));
+  curRows.forEach(r=>{mm[r.d]=(mm[r.d]||0)+(entryMode==='in'?r.qty:-r.qty)});
+  const rows=DENOMS.filter(d=>mm[d]!==0);
+  const maxQ=Math.max(1,...DENOMS.map(d=>Math.abs(mm[d]||0)));
   const bk=document.getElementById('denomBk');
-  if(rows.length){bk.style.display='';bk.innerHTML=`<div class="denom-bk-hd">Denomination Breakdown</div>`+rows.map(d=>`<div class="db-row"><div class="db-dot" style="background:${DC[d]}"></div><div class="db-note">&#8377;${d}</div><div class="db-bw"><div class="db-bf" style="width:${Math.round(mm[d]/maxQ*100)}%;background:${DC[d]}"></div></div><div class="db-qty">${mm[d]}</div><div class="db-amt">${fmtAmt(mm[d]*d)}</div></div>`).join('');}else bk.style.display='none';
+  if(rows.length){bk.style.display='';bk.innerHTML=`<div class="denom-bk-hd">Net Denomination Balance</div>`+rows.map(d=>`<div class="db-row"><div class="db-dot" style="background:${DC[d]}"></div><div class="db-note">&#8377;${d}</div><div class="db-bw"><div class="db-bf" style="width:${Math.round(Math.abs(mm[d])/maxQ*100)}%;background:${mm[d]>=0?'var(--gr)':'var(--pk)'}"></div></div><div class="db-qty" style="color:${mm[d]>=0?'var(--gr)':'var(--pk)'}">${mm[d]>=0?'+':''}${mm[d]}</div><div class="db-amt">${fmtAmt(Math.abs(mm[d]*d))}</div></div>`).join('');}else bk.style.display='none';
 }
-function confirmReset(){
-  if(!confirm('Delete ALL saved batches?'))return;
-  clearEntry();const f=load();f.batches=[];f.live={};save(f);renderHistory();renderAdminData();showToast('Cleared');playErr();
-}
+function confirmReset(){if(!confirm('Delete ALL saved batches?'))return;clearEntry();const f=load();f.batches=[];f.live={};save(f);renderHistory();renderAdminData();showToast('Cleared');playErr()}
 
-// ===== EXPORT / IMPORT =====
-function exportJSON(){
-  if(!adminUnlocked){showToast('Admin required');return}
-  const data=load();
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='SR_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('Exported JSON ✓');playSave();
-}
-function importJSON(){
-  if(!adminUnlocked){showToast('Admin required');return}
-  document.getElementById('importFile').click();
-}
+// EXPORT / IMPORT
+function exportJSON(){if(!adminUnlocked){showToast('Admin required');return}const data=load();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='SR_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('Exported ✓');playSave()}
+function importJSON(){if(!adminUnlocked){showToast('Admin required');return}document.getElementById('importFile').click()}
 function handleImport(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=ev=>{
-    try{
-      const data=JSON.parse(ev.target.result);
-      if(!data.batches)throw new Error('Invalid format');
-      if(!confirm(`Import ${data.batches.length} batches? This will merge with current data.`))return;
-      const current=load();
-      const existingIds=new Set((current.batches||[]).map(b=>b.id));
-      const newBatches=(data.batches||[]).filter(b=>!existingIds.has(b.id));
-      current.batches=[...(current.batches||[]),...newBatches];
-      save(current);renderHistory();if(adminUnlocked)renderAdminData();
-      showToast(`Imported ${newBatches.length} batches ✓`);playSave();
-    }catch(err){showToast('Invalid file');playErr()}
-  };
-  reader.readAsText(file);e.target.value='';
+    try{const data=JSON.parse(ev.target.result);if(!data.batches)throw new Error();if(!confirm(`Import ${data.batches.length} batches?`))return;const current=load();const existingIds=new Set((current.batches||[]).map(b=>b.id));const newB=(data.batches||[]).filter(b=>!existingIds.has(b.id));current.batches=[...(current.batches||[]),...newB];save(current);renderHistory();if(adminUnlocked)renderAdminData();showToast(`Imported ${newB.length} ✓`);playSave()}catch(err){showToast('Invalid file');playErr()}
+  };reader.readAsText(file);e.target.value='';
 }
 function exportCSV(){
   if(!adminUnlocked){showToast('Admin required');return}
   const batches=load().batches||[];if(!batches.length){showToast('No data');return}
-  let csv='#,Batch,Location,Date,Time,Total,'+DENOMS.map(d=>'Rs'+d).join(',')+'\n';
-  batches.forEach((b,i)=>{const dt=new Date(b.time);const qm={};b.rows.forEach(r=>qm[r.d]=r.qty);csv+=`${i+1},"${b.label}","${b.loc||''}","${dt.toLocaleDateString('en-IN')}","${dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}",${b.total},${DENOMS.map(d=>qm[d]||0).join(',')}\n`});
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='SR_'+new Date().toISOString().slice(0,10)+'.csv';a.click();showToast('Exported CSV ✓');
+  let csv='#,Type,Batch,Location,Date,Time,Total,'+DENOMS.map(d=>'Rs'+d).join(',')+'\n';
+  batches.forEach((b,i)=>{const dt=new Date(b.time);const qm={};b.rows.forEach(r=>qm[r.d]=r.qty);csv+=`${i+1},${b.type||'in'},"${b.label}","${b.loc||''}","${dt.toLocaleDateString('en-IN')}","${dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}",${b.total},${DENOMS.map(d=>qm[d]||0).join(',')}\n`});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='SR_'+new Date().toISOString().slice(0,10)+'.csv';a.click();showToast('CSV exported ✓');
 }
 
 // ============================================================
-//  RECEIPT BUILDER — 5 MODES
+//  RECEIPT BUILDER — 6 MODES (Mode 6 = Cash In vs Out report)
 // ============================================================
 function getPW(){return paperW==='58mm'?32:paperW==='80mm'?48:42}
-
-function pad(str,len,right=false){
-  const s=String(str);
-  if(s.length>=len)return s.slice(0,len);
-  const sp=' '.repeat(len-s.length);
-  return right?sp+s:s+sp;
-}
-function divider(ch){return (ch||'-').repeat(getPW())}
-function center(s){const W=getPW();const p=Math.max(0,Math.floor((W-s.length)/2));return ' '.repeat(p)+s}
-function rj(l,r){const W=getPW();const sp=Math.max(1,W-l.length-r.length);return l+' '.repeat(sp)+r}
-
-// Table row: NOTE col=8, QTY col=6, =, AMOUNT right-aligned
+function ctr(s){const W=getPW();return ' '.repeat(Math.max(0,Math.floor((W-s.length)/2)))+s}
+function dvd(ch){return(ch||'-').repeat(getPW())}
+function rj(l,r){const W=getPW();return l+' '.repeat(Math.max(1,W-l.length-r.length))+r}
 function tRow(d,qty,amt){
   const W=getPW();
-  const note=pad('Rs.'+d,8);
-  const q='x'+qty;
-  const eq='=';
-  const a=fmtAmt(amt);
-  // note(8) qty(6) = amount(right)
-  const left=note+pad(q,6)+'= ';
-  const right=a;
-  const sp=Math.max(0,W-left.length-right.length);
-  return left+' '.repeat(sp)+right;
+  const left=('Rs.'+d).padEnd(8)+('x'+qty).padStart(6)+'= ';
+  const right=fmtAmt(amt);
+  return left+' '.repeat(Math.max(0,W-left.length-right.length))+right;
 }
-
-function tHeader(){
-  const W=getPW();
-  const left=pad('NOTE',8)+pad('QTY',6)+'  ';
-  const right='AMOUNT';
-  const sp=Math.max(0,W-left.length-right.length);
-  return left+' '.repeat(sp)+right;
-}
-
-function mergeDenoms(batchList){
-  const mm={};DENOMS.forEach(d=>mm[d]=0);
-  batchList.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));
-  return DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}));
-}
-
-function receiptHeader(loc,label){
+function tHeader(){const W=getPW();const l='NOTE    QTY   = ';const r='AMOUNT';return l+' '.repeat(Math.max(0,W-l.length-r.length))+r}
+function mergeDenoms(bList){const mm={};DENOMS.forEach(d=>mm[d]=0);bList.forEach(b=>b.rows.forEach(r=>mm[r.d]=(mm[r.d]||0)+r.qty));return DENOMS.filter(d=>mm[d]>0).map(d=>({d,qty:mm[d],amt:mm[d]*d}))}
+function rcptHead(loc){
   const now=new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  return[dvd('='),ctr('SR CASH LEDGER'),loc?ctr(loc):'',ctr(now),dvd('=')].filter(Boolean);
+}
+function batchSection(b,allB,label){
+  const bNum=(allB||[]).findIndex(x=>x.id===b.id)+1;
   const lines=[];
-  lines.push(divider('='));
-  lines.push(center('SR CASH LEDGER'));
-  if(loc)lines.push(center(loc));
-  lines.push(center(now));
-  lines.push(divider('='));
+  lines.push(ctr(label||`[ BATCH #${bNum} · ${(b.type||'in').toUpperCase()} ]`));
+  lines.push(ctr(b.label));
+  lines.push(dvd('-'));lines.push(tHeader());lines.push(dvd('-'));
+  b.rows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
+  lines.push(dvd('-'));
+  lines.push(rj((b.type==='out'?'CASH OUT':'CASH IN'),(b.type==='out'?'-':'+')+'Rs.'+b.total.toLocaleString('en-IN')));
   return lines;
 }
 
-// ---- MODE 1: Current / single batch only ----
-function buildMode1(batchObj){
-  const lines=receiptHeader(batchObj.loc||'',batchObj.label);
-  lines.push(center('[ CURRENT BATCH ]'));
-  lines.push(center(batchObj.label));
-  lines.push(divider('-'));
-  lines.push(tHeader());
-  lines.push(divider('-'));
-  batchObj.rows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
-  lines.push(divider('-'));
-  lines.push(rj('TOTAL',fmtAmt(batchObj.total)));
-  lines.push(divider('='));
-  return lines.join('\n');
-}
-
-// ---- MODE 2: Previous batches total + selected/current + grand total ----
-function buildMode2(allBatches, targetBatch){
-  // targetBatch is the "current" batch
-  // previousBatches = all batches BEFORE target in chronological order
-  const allB=allBatches||[];
-  const tIdx=allB.findIndex(b=>b.id===targetBatch.id);
-  const prevBatches=tIdx>=0?allB.slice(0,tIdx):allB;
-  const loc=document.getElementById('locName').value.trim();
-  const lines=receiptHeader(loc,'');
-
-  // Section 1: Previous batches total
-  if(prevBatches.length>0){
-    const prevTotal=prevBatches.reduce((s,b)=>s+b.total,0);
-    const prevRows=mergeDenoms(prevBatches);
-    lines.push(center(`[ PREVIOUS BATCHES (${prevBatches.length}) ]`));
-    lines.push(divider('-'));
-    lines.push(tHeader());
-    lines.push(divider('-'));
-    prevRows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
-    lines.push(divider('-'));
-    lines.push(rj('PREV TOTAL',fmtAmt(prevTotal)));
-    lines.push(divider('='));
-  }
-
-  // Section 2: Current/target batch
-  lines.push(center('[ CURRENT BATCH ]'));
-  lines.push(center(targetBatch.label));
-  lines.push(divider('-'));
-  lines.push(tHeader());
-  lines.push(divider('-'));
-  targetBatch.rows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
-  lines.push(divider('-'));
-  lines.push(rj('BATCH TOTAL',fmtAmt(targetBatch.total)));
-  lines.push(divider('='));
-
-  // Section 3: Grand total (prev + current)
-  const grandTotal=prevBatches.reduce((s,b)=>s+b.total,0)+targetBatch.total;
-  const allIncluded=[...prevBatches,targetBatch];
-  const grandRows=mergeDenoms(allIncluded);
-  lines.push(center('[ GRAND TOTAL ]'));
-  lines.push(divider('-'));
-  lines.push(tHeader());
-  lines.push(divider('-'));
-  grandRows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
-  lines.push(divider('-'));
-  lines.push(rj('GRAND TOTAL',fmtAmt(grandTotal)));
-  lines.push(divider('='));
-  return lines.join('\n');
-}
-
-// ---- MODE 3: Combined total of all selected (or all saved + live) ----
-function buildMode3(pool){
-  const loc=document.getElementById('locName').value.trim();
-  const lines=receiptHeader(loc,'');
-  lines.push(center(`[ COMBINED (${pool.length} BATCHES) ]`));
-  lines.push(divider('-'));
-  lines.push(tHeader());
-  lines.push(divider('-'));
-  const combined=mergeDenoms(pool);
-  combined.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
-  lines.push(divider('-'));
-  const grandTotal=pool.reduce((s,b)=>s+b.total,0);
-  lines.push(rj('TOTAL',fmtAmt(grandTotal)));
-  lines.push(divider('='));
-  return lines.join('\n');
-}
-
-// ---- MODE 4: Print any single selected batch ----
-// Same as mode1 but for a specific batch from history
-function buildMode4(batchObj){
-  const allB=load().batches||[];
-  const bNum=allB.findIndex(b=>b.id===batchObj.id)+1;
-  const lines=receiptHeader(batchObj.loc||'',batchObj.label);
-  lines.push(center(`[ BATCH #${bNum} ]`));
-  lines.push(center(batchObj.label));
-  if(batchObj.loc)lines.push(center(batchObj.loc));
-  lines.push(divider('-'));
-  lines.push(tHeader());
-  lines.push(divider('-'));
-  batchObj.rows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
-  lines.push(divider('-'));
-  lines.push(rj('TOTAL',fmtAmt(batchObj.total)));
-  lines.push(divider('='));
-  return lines.join('\n');
-}
-
-// ---- MODE 5: Print multiple selected batches + combined total ----
-function buildMode5(selBatches){
-  const allB=load().batches||[];
-  const loc=document.getElementById('locName').value.trim();
-  const lines=receiptHeader(loc,'');
-  selBatches.forEach((b,i)=>{
-    const bNum=allB.findIndex(x=>x.id===b.id)+1;
-    lines.push(center(`[ BATCH #${bNum} ]`));
-    lines.push(center(b.label));
-    lines.push(divider('-'));
-    lines.push(tHeader());
-    lines.push(divider('-'));
-    b.rows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
-    lines.push(divider('-'));
-    lines.push(rj('TOTAL',fmtAmt(b.total)));
-    if(i<selBatches.length-1){lines.push(divider('='));}
-  });
-  if(selBatches.length>1){
-    lines.push(divider('='));
-    lines.push(center(`[ COMBINED TOTAL ]`));
-    lines.push(divider('-'));
-    lines.push(tHeader());
-    lines.push(divider('-'));
-    const combined=mergeDenoms(selBatches);
-    combined.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
-    lines.push(divider('-'));
-    const grandTotal=selBatches.reduce((s,b)=>s+b.total,0);
-    lines.push(rj('GRAND TOTAL',fmtAmt(grandTotal)));
-    lines.push(divider('='));
-  }
-  return lines.join('\n');
-}
-
-// ---- MASTER RECEIPT DISPATCHER ----
 function buildReceipt(mode){
-  const full=load();
-  const allBatches=full.batches||[];
+  const full=load();const allB=full.batches||[];
   const{total:curT,rows:curR}=getCurrent();
   const curLabel=document.getElementById('batchLabel').value.trim()||'Current Batch';
   const loc=document.getElementById('locName').value.trim();
 
   if(mode==='mode1'){
-    // Use current live if has data, else last saved
     if(curT>0){
-      return buildMode1({label:curLabel,loc,total:curT,rows:curR,isCurrent:true});
-    } else if(allBatches.length){
-      const last=allBatches[allBatches.length-1];
-      return buildMode1(last);
-    }
-    return 'No data to print.';
+      const lines=[...rcptHead(loc),...batchSection({id:-1,label:curLabel,loc,total:curT,rows:curR,type:entryMode},allB,'[ CURRENT BATCH ]'),dvd('=')];
+      return lines.join('\n');
+    }else if(allB.length){
+      const last=allB[allB.length-1];
+      return [...rcptHead(last.loc||loc),...batchSection(last,allB),dvd('=')].join('\n');
+    }return 'No data to print.';
   }
 
   if(mode==='mode2'){
-    // currentPrintBatchId set by button or fall back to last saved
-    let target=null;
-    if(currentPrintBatchId){
-      target=allBatches.find(b=>b.id===currentPrintBatchId);
+    let target=currentPrintBatchId?allB.find(b=>b.id===currentPrintBatchId):null;
+    if(!target&&allB.length)target=allB[allB.length-1];
+    if(!target)return 'No saved batch found.';
+    const tIdx=allB.findIndex(b=>b.id===target.id);
+    const prevB=tIdx>=0?allB.slice(0,tIdx):[];
+    const lines=[...rcptHead(loc)];
+    if(prevB.length){
+      const pIn=prevB.filter(b=>b.type==='in').reduce((s,b)=>s+b.total,0);
+      const pOut=prevB.filter(b=>b.type==='out').reduce((s,b)=>s+b.total,0);
+      const pRows=mergeDenoms(prevB);
+      lines.push(ctr(`[ PREVIOUS (${prevB.length} batches) ]`));lines.push(dvd('-'));lines.push(tHeader());lines.push(dvd('-'));
+      pRows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
+      lines.push(dvd('-'));lines.push(rj('PREV IN','+Rs.'+pIn.toLocaleString('en-IN')));lines.push(rj('PREV OUT','-Rs.'+pOut.toLocaleString('en-IN')));lines.push(rj('PREV NET','Rs.'+(pIn-pOut).toLocaleString('en-IN')));lines.push(dvd('='));
     }
-    if(!target && allBatches.length){
-      target=allBatches[allBatches.length-1];
-    }
-    if(!target){
-      // Use live as target, no prev
-      if(curT>0){
-        return buildMode2(allBatches,{id:-1,label:curLabel,loc,total:curT,rows:curR});
-      }
-      return 'No data to print.';
-    }
-    return buildMode2(allBatches,target);
+    lines.push(...batchSection(target,allB));lines.push(dvd('='));
+    const allIncl=[...prevB,target];
+    const gIn=allIncl.filter(b=>b.type==='in').reduce((s,b)=>s+b.total,0);
+    const gOut=allIncl.filter(b=>b.type==='out').reduce((s,b)=>s+b.total,0);
+    const gRows=mergeDenoms(allIncl);
+    lines.push(ctr('[ GRAND TOTAL ]'));lines.push(dvd('-'));lines.push(tHeader());lines.push(dvd('-'));
+    gRows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
+    lines.push(dvd('-'));lines.push(rj('TOTAL IN','+Rs.'+gIn.toLocaleString('en-IN')));lines.push(rj('TOTAL OUT','-Rs.'+gOut.toLocaleString('en-IN')));lines.push(rj('NET BALANCE','Rs.'+(gIn-gOut).toLocaleString('en-IN')));lines.push(dvd('='));
+    return lines.join('\n');
   }
 
   if(mode==='mode3'){
-    let pool=[];
-    if(selectedBatches.size>0){
-      pool=Array.from(selectedBatches).map(id=>allBatches.find(b=>b.id===id)).filter(Boolean);
-    } else {
-      pool=[...allBatches];
-      if(curT>0)pool.push({id:-1,label:curLabel,loc,total:curT,rows:curR});
-    }
-    if(!pool.length)return 'No data to print.';
-    return buildMode3(pool);
+    let pool=selectedBatches.size>0?Array.from(selectedBatches).map(id=>allB.find(b=>b.id===id)).filter(Boolean):[...allB];
+    if(curT>0)pool.push({id:-1,label:curLabel,loc,total:curT,rows:curR,type:entryMode});
+    if(!pool.length)return 'No data.';
+    const pIn=pool.filter(b=>b.type==='in').reduce((s,b)=>s+b.total,0);
+    const pOut=pool.filter(b=>b.type==='out').reduce((s,b)=>s+b.total,0);
+    const combined=mergeDenoms(pool);
+    const lines=[...rcptHead(loc),ctr(`[ COMBINED (${pool.length} batches) ]`),dvd('-'),tHeader(),dvd('-')];
+    combined.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
+    lines.push(dvd('-'));lines.push(rj('TOTAL IN','+Rs.'+pIn.toLocaleString('en-IN')));lines.push(rj('TOTAL OUT','-Rs.'+pOut.toLocaleString('en-IN')));lines.push(rj('NET','Rs.'+(pIn-pOut).toLocaleString('en-IN')));lines.push(dvd('='));
+    return lines.join('\n');
   }
 
   if(mode==='mode4'){
-    let target=null;
-    if(currentPrintBatchId){
-      target=allBatches.find(b=>b.id===currentPrintBatchId);
-    }
-    if(!target && selectedBatches.size===1){
-      const id=[...selectedBatches][0];
-      target=allBatches.find(b=>b.id===id);
-    }
-    if(!target && allBatches.length){
-      target=allBatches[allBatches.length-1];
-    }
-    if(!target){
-      if(curT>0)return buildMode1({label:curLabel,loc,total:curT,rows:curR,isCurrent:true});
-      return 'No data to print.';
-    }
-    return buildMode4(target);
+    let target=currentPrintBatchId?allB.find(b=>b.id===currentPrintBatchId):null;
+    if(!target&&selectedBatches.size===1){const id=[...selectedBatches][0];target=allB.find(b=>b.id===id);}
+    if(!target&&allB.length)target=allB[allB.length-1];
+    if(!target)return 'No batch selected.';
+    return [...rcptHead(target.loc||loc),...batchSection(target,allB),dvd('=')].join('\n');
   }
 
   if(mode==='mode5'){
-    let selBatches=[];
-    if(selectedBatches.size>0){
-      selBatches=Array.from(selectedBatches).map(id=>allBatches.find(b=>b.id===id)).filter(Boolean);
-    } else {
-      selBatches=[...allBatches];
+    let sel=selectedBatches.size>0?Array.from(selectedBatches).map(id=>allB.find(b=>b.id===id)).filter(Boolean):[...allB];
+    if(!sel.length)return 'No batches selected.';
+    const lines=[...rcptHead(loc)];
+    sel.forEach((b,i)=>{lines.push(...batchSection(b,allB));if(i<sel.length-1)lines.push(dvd('='))});
+    if(sel.length>1){
+      const pIn=sel.filter(b=>b.type==='in').reduce((s,b)=>s+b.total,0);
+      const pOut=sel.filter(b=>b.type==='out').reduce((s,b)=>s+b.total,0);
+      const combined=mergeDenoms(sel);
+      lines.push(dvd('='));lines.push(ctr('[ COMBINED TOTAL ]'));lines.push(dvd('-'));lines.push(tHeader());lines.push(dvd('-'));
+      combined.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));
+      lines.push(dvd('-'));lines.push(rj('TOTAL IN','+Rs.'+pIn.toLocaleString('en-IN')));lines.push(rj('TOTAL OUT','-Rs.'+pOut.toLocaleString('en-IN')));lines.push(rj('NET','Rs.'+(pIn-pOut).toLocaleString('en-IN')));
     }
-    if(!selBatches.length)return 'No batches selected. Use checkboxes in History.';
-    return buildMode5(selBatches);
+    lines.push(dvd('='));return lines.join('\n');
   }
 
+  if(mode==='mode6'){
+    // CASH IN vs CASH OUT report
+    const inB=allB.filter(b=>b.type==='in');
+    const outB=allB.filter(b=>b.type==='out');
+    const totalIn=inB.reduce((s,b)=>s+b.total,0)+(entryMode==='in'?curT:0);
+    const totalOut=outB.reduce((s,b)=>s+b.total,0)+(entryMode==='out'?curT:0);
+    const net=totalIn-totalOut;
+    const inRows=mergeDenoms(entryMode==='in'?[...inB,{rows:curR}]:inB);
+    const outRows=mergeDenoms(entryMode==='out'?[...outB,{rows:curR}]:outB);
+    const lines=[...rcptHead(loc)];
+    lines.push(ctr('[ CASH IN ]'));lines.push(ctr(`${inB.length+(entryMode==='in'&&curT>0?1:0)} batches`));lines.push(dvd('-'));lines.push(tHeader());lines.push(dvd('-'));
+    if(inRows.length)inRows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));else lines.push(ctr('No cash in entries'));
+    lines.push(dvd('-'));lines.push(rj('TOTAL IN','+Rs.'+totalIn.toLocaleString('en-IN')));
+    lines.push(dvd('='));
+    lines.push(ctr('[ CASH OUT ]'));lines.push(ctr(`${outB.length+(entryMode==='out'&&curT>0?1:0)} batches`));lines.push(dvd('-'));lines.push(tHeader());lines.push(dvd('-'));
+    if(outRows.length)outRows.forEach(r=>lines.push(tRow(r.d,r.qty,r.amt)));else lines.push(ctr('No cash out entries'));
+    lines.push(dvd('-'));lines.push(rj('TOTAL OUT','-Rs.'+totalOut.toLocaleString('en-IN')));
+    lines.push(dvd('='));
+    lines.push(ctr('[ NET BALANCE ]'));lines.push(dvd('-'));
+    lines.push(rj('CASH IN','+Rs.'+totalIn.toLocaleString('en-IN')));
+    lines.push(rj('CASH OUT','-Rs.'+totalOut.toLocaleString('en-IN')));
+    lines.push(dvd('-'));
+    lines.push(rj('NET BALANCE','Rs.'+net.toLocaleString('en-IN')));
+    lines.push(dvd('='));
+    return lines.join('\n');
+  }
   return 'Unknown mode.';
 }
 
-// ===== PRINT SHEET LOGIC =====
+// PRINT SHEET
 const MODE_INFO={
-  mode1:'Prints the current live batch or last saved batch.',
-  mode2:'Shows Previous batches total → Selected/Current batch → Grand total.',
-  mode3:'Combines all selected batches (or all + live) into one summary.',
-  mode4:'Prints any single batch. Tap "Print" on any history item.',
-  mode5:'Prints each selected batch individually, then combined total.'
+  mode1:'Prints current live batch (or last saved).',
+  mode2:'Previous batches → Selected batch → Grand total with In/Out split.',
+  mode3:'Combines selected batches with In/Out totals and net balance.',
+  mode4:'Print any single batch from history.',
+  mode5:'Each selected batch individually, then combined In/Out + net.',
+  mode6:'Full Cash In vs Cash Out report with net balance summary.'
 };
-
-function openPrintSheet(mode,_unused){
-  printMode=mode||'mode1';
-  document.querySelectorAll('#printModeOpts .ps-opt').forEach(b=>b.classList.toggle('on',b.dataset.mode===printMode));
-  document.getElementById('modeInfo').textContent=MODE_INFO[printMode]||'';
-  updatePreview();
-  document.getElementById('printOverlay').classList.remove('hide');
-  playTick();
-}
+function openPrintSheet(mode){printMode=mode||'mode1';document.querySelectorAll('#printModeOpts .ps-opt').forEach(b=>b.classList.toggle('on',b.dataset.mode===printMode));document.getElementById('modeInfo').textContent=MODE_INFO[printMode]||'';updatePreview();document.getElementById('printOverlay').classList.remove('hide');playTick()}
 function closePrintSheet(e){if(e.target===document.getElementById('printOverlay'))document.getElementById('printOverlay').classList.add('hide')}
-function setPrintMode(m,btn){
-  printMode=m;
-  currentPrintBatchId=null; // reset single-batch target when changing mode manually
-  document.querySelectorAll('#printModeOpts .ps-opt').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('modeInfo').textContent=MODE_INFO[m]||'';
-  updatePreview();playTick();
-}
-function setPaperW(w,btn){
-  paperW=w;document.querySelectorAll('[data-pw]').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
-  updatePreview();playTick();
-}
-function updatePreview(){
-  const text=buildReceipt(printMode);
-  document.getElementById('previewInner').textContent=text;
-  const wMap={'58mm':'200px','70mm':'260px','80mm':'300px'};
-  document.getElementById('previewWrap').style.maxWidth=wMap[paperW]||'260px';
-}
-function updatePreviewIfOpen(){
-  if(!document.getElementById('printOverlay').classList.contains('hide'))updatePreview();
-}
-function doBrowserPrint(){
-  const text=buildReceipt(printMode);
-  document.getElementById('printArea').innerHTML=`<pre style="font-family:'Courier New',monospace;font-size:8.5pt;line-height:1.2;color:#000;white-space:pre-wrap;word-break:break-all">${text}</pre>`;
-  document.documentElement.style.setProperty('--pw',paperW);
-  setTimeout(()=>window.print(),80);
-  showToast('Printing…');
-}
-function downloadPDF(){
-  doBrowserPrint();
-  showToast('Choose "Save as PDF" in print dialog');
-}
+function setPrintMode(m,btn){printMode=m;currentPrintBatchId=null;document.querySelectorAll('#printModeOpts .ps-opt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('modeInfo').textContent=MODE_INFO[m]||'';updatePreview();playTick()}
+function setPaperW(w,btn){paperW=w;document.querySelectorAll('[data-pw]').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updatePreview();playTick()}
+function updatePreview(){document.getElementById('previewInner').textContent=buildReceipt(printMode);const wMap={'58mm':'200px','70mm':'260px','80mm':'300px'};document.getElementById('previewWrap').style.maxWidth=wMap[paperW]||'260px'}
+function updatePreviewIfOpen(){if(!document.getElementById('printOverlay').classList.contains('hide'))updatePreview()}
+function doBrowserPrint(){const text=buildReceipt(printMode);document.getElementById('printArea').innerHTML=`<pre style="font-family:'Courier New',monospace;font-size:8.5pt;line-height:1.2;color:#000;white-space:pre-wrap;word-break:break-all">${text}</pre>`;document.documentElement.style.setProperty('--pw',paperW);setTimeout(()=>window.print(),80);showToast('Printing…')}
+function downloadPDF(){doBrowserPrint();showToast('Choose "Save as PDF" in print dialog')}
 
-// ===== BLUETOOTH =====
+// BLUETOOTH
 function btLog(msg){const el=document.getElementById('btLog');el.classList.add('show');el.innerHTML+=`<div>${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})} — ${msg}</div>`;el.scrollTop=el.scrollHeight}
 function setBtUI(state,name,sub){
   const dot=document.getElementById('btDot'),nm=document.getElementById('btName'),sb=document.getElementById('btSub'),btn=document.getElementById('btConnBtn'),pBtn=document.getElementById('btPrintBtn');
@@ -1109,54 +1047,41 @@ async function btConnect(){
   if(!navigator.bluetooth){showToast('Use Chrome browser');return}
   if(location.protocol!=='https:'&&location.hostname!=='localhost'){showToast('HTTPS required');return}
   try{
-    setBtUI('scanning','Searching…','Select your thermal printer');btLog('Searching…');
+    setBtUI('scanning','Searching…');btLog('Searching…');
     btDevice=await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:['000018f0-0000-1000-8000-00805f9b34fb','49535343-fe7d-4ae5-8fa9-9fafd205e455','6e400001-b5a3-f393-e0a9-e50e24dcca9e']});
     btLog('Selected: '+btDevice.name);const server=await btDevice.gatt.connect();btLog('GATT connected');
-    const services=await server.getPrimaryServices();btLog('Services: '+services.length);btChar=null;
-    for(const svc of services){try{const chars=await svc.getCharacteristics();for(const ch of chars){if(ch.properties.write||ch.properties.writeWithoutResponse){btChar=ch;btLog('Write char found');break}}}catch(e){}if(btChar)break}
-    if(!btChar){btLog('No writable char');setBtUI('error','Unsupported','No BLE print support');return}
-    btConnected=true;setBtUI('on',btDevice.name||'Thermal Printer','Ready');btLog('Ready');playSave();
-    btDevice.addEventListener('gattserverdisconnected',()=>{btConnected=false;btChar=null;setBtUI('off','Disconnected','Reconnect');btLog('Disconnected')});
+    const services=await server.getPrimaryServices();btChar=null;
+    for(const svc of services){try{const chars=await svc.getCharacteristics();for(const ch of chars){if(ch.properties.write||ch.properties.writeWithoutResponse){btChar=ch;break}}}catch(e){}if(btChar)break}
+    if(!btChar){setBtUI('error','Unsupported');return}
+    btConnected=true;setBtUI('on',btDevice.name||'Printer','Ready');playSave();
+    btDevice.addEventListener('gattserverdisconnected',()=>{btConnected=false;btChar=null;setBtUI('off','Disconnected');btLog('Disconnected')});
   }catch(e){setBtUI('error','Failed',e.message);btLog('Error: '+e.message);showToast(e.message)}
 }
-async function btDisconnect(){if(btDevice&&btDevice.gatt.connected)btDevice.gatt.disconnect();btConnected=false;btChar=null;setBtUI('off');btLog('Disconnected')}
-function buildEscPos(text){
-  const enc=new TextEncoder();let d=[];
-  d.push(0x1B,0x40);
-  d.push(0x1B,0x61,0x00);
-  d.push(...enc.encode(text+'\n'));
-  d.push(0x1B,0x64,0x04);
-  d.push(0x1D,0x56,0x41,0x10);
-  return new Uint8Array(d);
-}
+async function btDisconnect(){if(btDevice&&btDevice.gatt.connected)btDevice.gatt.disconnect();btConnected=false;btChar=null;setBtUI('off')}
+function buildEscPos(text){const enc=new TextEncoder();const d=[0x1B,0x40,0x1B,0x61,0x00,...enc.encode(text+'\n'),0x1B,0x64,0x04,0x1D,0x56,0x41,0x10];return new Uint8Array(d)}
 async function btPrint(){
   if(!btConnected||!btChar){showToast('Connect printer first');return}
   const mode=document.getElementById('btPrintMode').value;
-  const prevMode=printMode;printMode=mode;
-  const text=buildReceipt(mode);
-  printMode=prevMode;
+  const prev=printMode;printMode=mode;const text=buildReceipt(mode);printMode=prev;
   try{
-    const bytes=buildEscPos(text);btLog('Printing…');
-    for(let i=0;i<bytes.length;i+=120){
-      const chunk=bytes.slice(i,i+120);
-      if(btChar.properties.writeWithoutResponse)await btChar.writeValueWithoutResponse(chunk);else await btChar.writeValue(chunk);
-      await new Promise(r=>setTimeout(r,40));
-    }
-    btLog('Done ✓');showToast('Printed ✓');playSave();hap([20,10,20]);
-  }catch(e){btLog('Error: '+e.message);showToast('Print failed')}
+    const bytes=buildEscPos(text);
+    for(let i=0;i<bytes.length;i+=120){const chunk=bytes.slice(i,i+120);if(btChar.properties.writeWithoutResponse)await btChar.writeValueWithoutResponse(chunk);else await btChar.writeValue(chunk);await new Promise(r=>setTimeout(r,40))}
+    showToast('Printed ✓');playSave();hap([20,10,20]);
+  }catch(e){showToast('Print failed')}
 }
 function openBTSheet(){document.getElementById('btOverlay').classList.remove('hide');playTick()}
 function closeBTSheet(e){if(e.target===document.getElementById('btOverlay'))document.getElementById('btOverlay').classList.add('hide')}
 
-// ===== PERSIST =====
+// PERSIST
 function persist(){
   const f=load();const live={};
   DENOMS.forEach(d=>{live['d'+d]=document.getElementById('d'+d).value||''});
-  live.label=document.getElementById('batchLabel').value;live.loc=document.getElementById('locName').value;
+  live.label=document.getElementById('batchLabel').value;live.loc=document.getElementById('locName').value;live.mode=entryMode;
   f.live=live;save(f);
 }
 function restoreLive(){
   const live=(load().live)||{};
+  if(live.mode)setEntryMode(live.mode);
   DENOMS.forEach(d=>{if(live['d'+d]){document.getElementById('d'+d).value=live['d'+d];onDI(d)}});
   if(live.label)document.getElementById('batchLabel').value=live.label;
   if(live.loc)document.getElementById('locName').value=live.loc;
@@ -1169,7 +1094,7 @@ function save(o){localStorage.setItem(LS,JSON.stringify(o))}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600)}
 function updateDate(){document.getElementById('topDate').textContent=new Date().toLocaleString('en-IN',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
 
-// ===== INIT =====
+// INIT
 document.getElementById('app').style.display='flex';
 document.getElementById('app').classList.add('show');
 document.getElementById('lockScreen').style.display='none';
